@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html lang="zh-cn" ng-app="SetNodeApp">
+<head>
+<meta charset="utf-8">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+<meta content="telephone=no" name="format-detection">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link rel="stylesheet" href="../style/setNode.css">
+<link rel="stylesheet" href="../style/animate.css">
+<link rel="icon" href="../image/icon.png">
+
+<script src="../script/library/jquery.min.js"></script>
+<script src="../script/library/angular.min.js"></script>
+<script src="../script/library/qwebchannel.js"></script>
+<script src="../script/setnode.js"></script>
+
+<title></title>
+</head>
+
+<body ng-controller="setNodeCtrl">
+
+<div class="page" id = "container">
+	<div class="main">
+		<div class="container">
+			<div class="node">
+				<h1>{{nodeFlagTitle}}</h1>
+				<div class="info">
+					{{flag}} <p style="word-wrap:break-word; word-break:normal;">{{nodeFlag.flag}}</p>
+					{{addr}} <span>ip: {{nodeFlag.ip}} port: {{nodeFlag.port}}</span>
+				</div>
+			</div>
+			<div class="server">
+			
+				<h1>{{server}}</h1>
+				<table>
+					<tbody>
+						<tr ng-repeat="ser in servers">
+							<td><span>{{ser.name}}</span></td>
+							<td><span>{{ser.ip}}</span> : <span>{{ser.port}}</span></td>
+						</tr> 
+					</tbody>
+				</table>
+			</div>
+			<div class="pluginAuthorization">
+				<h1>{{pluginRight}}</h1>
+				<table>
+					<tbody>
+						<tr>
+							<td>吾有APP：只和注册使用吾有APP的节点交换数据</td>
+							<td>吾有APP</td>
+							<td><a ng-click="myApptoggle()"><span ng-if="myAppOpen == 1">{{pclose}}</span><span ng-if="myAppOpen == 0">{{popen}}</span></a></td>
+						</tr>
+						<!--
+						<tr>
+							<td>sdhasjohdsauih</td>
+							<td>吾有APP</td>
+							<td><a href="javascript:;">开/关</a></td>
+						</tr>
+						<tr>
+							<td>sdhasjohdsauih</td>
+							<td>吾有APP</td>
+							<td><a href="javascript:;">开/关</a></td>
+						</tr>
+						-->
+					</tbody>
+				</table>
+			</div>
+			<div class="cache">
+				<h1>{{cacheSet}}</h1>
+				<table>
+					<tbody>
+						<tr>
+							<td>
+								{{chaindataCachePath}}: <span>c:\hyperchain\chainDB\</span>
+							</td>
+							<td style="width: 80px;">
+								<a href="javascript:;">{{modify}}</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="backupsRecovery">
+				<h1 style="margin-bottom: 20px;">{{backupAndRecover}}</h1>
+				<a class="btn" href="javascript:;">{{backupSet}}</a>
+				<a class="btn" href="javascript:;">{{recoverSet}}</a>
+				<div style="margin-top: 20px;">
+					<a class="btn" href="javascript:;">{{devMode}}</a>
+					<a class="btn" href="javascript:;">{{popen}}/{{pclose}}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+</body>
+</html>

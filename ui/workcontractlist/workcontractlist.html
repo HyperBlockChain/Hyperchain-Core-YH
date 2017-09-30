@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="WorkContractListApp">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+
+<!--不能有ionic，否则滚动条样式有问题-->
+<!--<link href="../lib/ionic/css/ionic.min.css" rel="stylesheet" type="text/css" />-->
+
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+
+<style>
+    body{
+        -webkit-user-select:none;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        -webkit-border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: darkgrey;
+        outline: 0px solid slategrey;
+        -webkit-border-radius: 4px;
+        -webkit-tap-highlight-color : rgb(134, 131, 127);
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+        background-color: rgb(134, 131, 127);
+    }
+
+    ::-webkit-scrollbar-thumb:window-inactive {
+        background-color: rgb(200, 195, 190);
+    }
+
+    .item {
+        border-color: #ddd;
+        background-color: #fff;
+        color: #444;
+        position: relative;
+        z-index: 2;
+        display: block;
+        margin: -1px;
+        padding: 16px;
+        border-width: 1px;
+        border-style: solid;
+        font-size: 16px; 
+    }
+
+    .item-thumbnail-left, .item-thumbnail-left .item-content {
+        padding-top: 8px;
+        padding-left: 106px;
+        min-height: 100px; 
+    }
+
+    .item-thumbnail-left > img:first-child, .item-thumbnail-left .item-image, .item-thumbnail-left .item-content > img:first-child, .item-thumbnail-left .item-content .item-image {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        max-width: 80px;
+        max-height: 80px;
+        width: 100%;
+        height: 100%; 
+    }
+
+    .item-avatar.item-complex, .item-avatar-left.item-complex, .item-thumbnail-left.item-complex {
+        padding-top: 0;
+        padding-left: 0; 
+    }
+
+    .jobtitle-font {
+    font-size: 10px;
+    -webkit-transform: scale(0.8,0.8);
+    transform: scale(0.75, 0.75);
+    -webkit-transform-origin-x: 0;
+}
+</style>
+
+
+<script src="../js/jq.js"></script>
+<script src="../js/angular.min.js"></script>
+<script src="../js/json2.js"></script>
+<script src="../js/common.js"></script>
+<script src="js/workcontractlistcontroller.js"></script>
+</head>
+
+<body ng-controller="workListCtrl" style="margin: 0px; padding: 0px; background-color: #e8f5fc;">
+
+    <div id="news_box" style="margin: 0px; padding: 0px;">
+        <div style="margin-bottom: 10px;">
+            <div ng-if="!showNoContractTip && contracts.length == 0" style="text-align: center; margin-top: 72px; font-family:'Microsoft YaHei'; font-size: 14px; color: #8b8b8b; background-color: #e8f5fc;">
+                加载中......
+            </div>
+
+            <div ng-if="showNoContractTip && contracts.length == 0" style="font-family:'Microsoft YaHei'; background-color: #e8f5fc;">
+                <div style="text-align: center; margin-top: 72px; font-size: 14px; color: #333333;">
+                    <p>当前工作清单为空</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 75px; font-size: 12px; color: rgb(100, 100, 100);">
+                    <p>欢迎安装并使用SohoTask移动App</p>
+                    <p style="margin-top: -13px;">获得更多自由职业工作机会</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 10px; font-size: 12px; color: rgb(100,100,100);">
+                    <p>通过SohoTask移动APP接受来自雇主的工作邀请</p>
+                    <p style="margin-top: -13px;">接受后的工作将会出现在本工作清单中</p>
+                    <p style="margin-top: -13px;">您可以选择相应工作点击开始进行录制</p>
+                    <p style="margin-top: -13px;">祝您SOHO愉快！</p>
+                </div>
+            </div>
+
+            <div ng-repeat="job in contracts" style="margin-top:-1px;">
+                <div class="item item-thumbnail-left" style="font-family:'Microsoft YaHei'; padding:6px 11px 16px 51px; background-color: #e8f5fc;">
+                    <img ng-src={{GetLogoURI(job)}} style="height:35px;width:35px; margin-left: -3px;">
+                    <div style="color: #169ada; font-family: 'Microsoft YaHei'; font-size: 14px;"> 
+                        <b>{{job.JobTitle}}</b>
+                    </div>
+
+                    <!--雇主类型：团队-->
+                    <div ng-if="job.EmployerType == 10">
+                        <div style="font-family: 'Microsoft YaHei'; font-size: 11px; margin-top: 1px;" ng-if="job.EmployerTeam">
+                            <img ng-src="images/officebuilding.png" style="height:9px;width:9px;line-height:15px;">
+                            <span style="line-height: 10px; margin-top: -3px;">雇主：{{job.EmployerTeam.Name}}</span>
+                        </div>
+                    </div>
+
+                    <div ng-if="job.EmployerType == 1 && job.EmployerUser">
+                        <div style="font-family: 'Microsoft YaHei'; font-size: 11px; margin-top: 1px;">
+                            <img ng-src="images/user.png" style="height:6px;width:6px;line-height:15px;">
+                            <span style="line-height: 10px; margin-top: -3px;" ng-if="job.EmployerUser.CompanyShortName == '' && job.EmployerUser.JobPositionTypeName == null">雇主：{{job.EmployerUser.Nickname}}</span>
+                            <span style="line-height: 10px; margin-top: -3px;" ng-if="job.EmployerUser.CompanyShortName != '' && job.EmployerUser.JobPositionTypeName != null">
+                                雇主：{{job.EmployerUser.Nickname}}
+                                <span style="font-size: 9px;line-height: 12px;">[{{job.EmployerUser.CompanyShortName}}-{{job.EmployerUser.JobPositionTypeName}}]</span>
+                            </span>
+                            <span style="line-height: 10px; margin-top: -3px;" ng-if="job.EmployerUser.CompanyShortName != '' && job.EmployerUser.JobPositionTypeName == null">
+                                雇主：{{job.EmployerUser.Nickname}} 
+                                <span style="font-size: 9px;line-height: 12px;">[{{job.EmployerUser.CompanyShortName}}]</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="auto-hide-char">
+                        <span class="worktime-font">{{getSignDateTime(job)}} 接受工作邀请</span>
+                    </div>
+                    
+                    <div style="margin-top: 5px;font-family: 'Microsoft YaHei'; font-size: 11px;">
+                        <div>
+                            <span style="font-weight: bold;">累计已工作：</span>
+                            <span style="margin-left: 8px;">{{calTotalTime(job)}}</span>
+                        </div>
+                        <div>
+                            <span style="font-weight: bold;">昨日已工作：</span>
+                            <span style="margin-left: 8px;">{{calTotalTimeYesterday(job)}}</span>
+                        </div>
+                        <div>
+                            <span style="font-weight: bold;">今日已工作：</span>
+                            <span style="margin-left: 8px;">{{calTotalTimeToday(job)}}</span>
+                        </div>
+                    </div>
+
+                    <div ng-if="ifContractGrabbing(job.ID)">
+                            <button class="start-grab-btn" style="background-color: #cecece;color: #7e7e7e;" ng-click="">工作中...</button>
+                    </div>
+
+                    <div ng-if="!ifContractGrabbing(job.ID)">
+                        <button class="start-grab-btn" style="background-color: #169ada; cursor:pointer;" ng-click="grab(job.ID, job.VedioParameters)">开始工作</button>
+                    </div>
+                    
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+     
+
+    
+</body>
+</html>

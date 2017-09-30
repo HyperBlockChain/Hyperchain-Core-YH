@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="WorkContractListApp">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+
+<link href="../lib/ionic/css/ionic.min.css" rel="stylesheet" type="text/css" />
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+
+<style>
+    body{
+        -webkit-user-select:none;
+    }
+    
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 0px solid slategrey;
+    -webkit-border-radius: 4px;
+    -webkit-tap-highlight-color: rgb(134, 131, 127);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background-color: rgb(134, 131, 127);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background-color: rgb(200, 195, 190);
+}
+</style>
+
+
+<script src="../js/jq.js"></script>
+<script src="../js/angular.min.js"></script>
+<script src="../js/json2.js"></script>
+<script src="../js/common.js"></script>
+<script src="js/workcontractlistcontroller.js"></script>
+</head>
+
+<body ng-controller="workListCtrl">
+    <div style="width: 100%; ">
+        请选择将要进行的工作
+    </div>
+
+    <div class="row" style="background-color: black;color: white; text-align:center;">
+        <div class="col col-border">雇主</div>
+        <div class="col col-border col-10">工作</div>
+        <div class="col col-border">签约情况</div>
+        <div class="col col-border">完成情况</div>
+        <div class="col  col-border col-10">整体完成度</div>
+        <div class="col col-border ">当前状态</div>
+        <div class="col col-border ">雇主剩余押金</div>
+        <div class="col col-border ">操作</div>
+    </div>
+
+    <div class="news_box">
+        <div class="list" style="background-color: #ffffff;">
+
+            <!--<div ng-repeat="job in contracts" style="margin-top:-1px;">
+                <div class="item item-thumbnail-left" style="font-family:'Microsoft YaHei';padding:8px 11px 16px 80px;">
+                    <img src={{GetLogoURI(job)}} style="height:60px;width:60px;">
+                </div>
+
+            </div>-->
+
+
+            <div class="item font-work-warn" style="font-family:'Microsoft YaHei'; font-size: 14px; padding: 5px; 0px 5px 0px;">
+                <div class="row row-center" style="text-align:center;">
+                    <!--雇主-->
+                    <div class="col col-border">
+                        <div class="row row-center">
+                            <img src="./images/logo144.png" style="height:40px;width:40px;">
+                            <span style="margin-left:5px; white-space:normal;">北京时代未来互联网信息有限公司</span>
+                        </div>
+                        
+                    </div>
+
+                    <!--工作-->
+                    <div class="col col-10 col-border">
+                        <span>产品经理</span><br/>
+                        <span class="smallfont" style="display:block;">(2015-3-21签约)</span>
+                    </div>
+
+                    <!--签约情况-->
+                    <div class="col col-border">
+                        <span>总工时20小时</span><br/>
+                        <span>每天需工作5小时</span><br/>
+                        <span>时薪80元/小时</span><br/>
+                        <span>预计总收入1600元</span>
+                    </div>
+
+                    <!--完成情况-->
+                    <div class="col col-border">
+                        <span>雇主已确认10小时</span><br/>
+                        <span>还有6小时等待审核</span><br/>
+                        <span>预计还需工作4小时</span>
+                    </div>
+
+                    <!--整体完成度-->
+                    <div class="col col-10 col-border">
+                        80%
+                    </div>
+
+                    <!--当前状态-->
+                    <div class="col col-border">
+                        <span style="white-space: normal;">今日还需工作2小时</span><br/>
+                        <span class="smallfont" style="display:block; white-space: nowrap;">(每天需工作5小时,今日已完成3小时)</span>
+                    </div>
+
+                    <!--雇主剩余押金-->
+                    <div class="col col-border">
+                        <span>800元</span><br/>
+                        <span class="smallfont" style="display:block;">（可保障安全工作10小时）</span>
+                    </div>
+
+                    <!--操作-->
+                    <div class="col col-border">
+                        <button class="button button-small btn-able" style="width: 50px;">管理</button>
+                        <button class="button button-small btn-able" style="width: 80px; margin-left: 5px;">开始工作</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!--footer-->
+    <div class="footerclass">
+        <div class="row">
+
+            <img src="./images/logo144.png" style="height:15px;width:15px; margin-top: 5px; margin-left: 5px;">
+
+            <div style="margin-left: 8px;">
+                <p class="font-work-neverfin" style="margin-top: 3px;">今日：总计需完成工时：8小时， 已经完成：4小时， 还需工作：4小时， 剩余时间已经不够用来完成工作</p>
+                <p class="font-work-fin" style="margin-top: -8px;">本周：总计需完成工时：28小时，已经完成：15小时，还需工作：13小时</p>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

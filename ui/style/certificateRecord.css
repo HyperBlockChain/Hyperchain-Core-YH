@@ -1,0 +1,233 @@
+/* --------- reset --------- */
+*,
+*:before,
+*:after {
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box; }
+
+html,
+body,
+.page {
+  min-height: 100%; }
+
+a,
+span,
+strong, b,
+em, i {
+  display: inline-block; }
+
+em, i {
+  font-style: normal; }
+
+strong, b,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal; }
+
+input, textarea, select {
+  outline: none; }
+
+input[type="text"],
+input[type="password"] {
+  padding: 0 5px; }
+
+input[type="button"] {
+  border: 0; }
+
+select {
+  padding: 1px 1px 1px 0; }
+
+ul, ol {
+  list-style-type: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+img {
+  border: 0;
+  vertical-align: middle; }
+
+a {
+  font-size: inherit;
+  color: inherit;
+  text-decoration: none;
+  outline: none; }
+
+/* --------- common --------- */
+.clears {
+  zoom: 1; }
+  .clears:after {
+    content: "";
+    display: block;
+    clear: both; }
+
+.l {
+  float: left; }
+
+.r {
+  float: right; }
+
+.hide {
+  display: none; }
+
+html, body, .page {
+  height: 100%;
+  min-height: 100%; }
+
+.page {
+  position: relative;
+  font-size: 16px;
+  color: #888; }
+
+.container {
+  margin: 0 auto;
+  width: auto; }
+
+.header {
+  padding: 15px;
+  background: rgba(225, 227, 196, 0.3); }
+  .header img {
+    width: 180px;
+    float: left; }
+  .header .nav {
+    padding-top: 5px;
+    float: right; }
+    .header .nav a {
+      margin: 0 15px; }
+      .header .nav a:hover {
+        color: #f2be6d; }
+    .header .nav .active {
+      color: #6ab0ef; }
+
+.main {
+  padding: 20px 0; }
+  .main h1 {
+    text-align: center;
+    font-size: 20px;
+    color: #0870b0; }
+  .main .info {
+    margin: 50px auto 0;
+    width: 50%; }
+    .main .info .fileName,
+    .main .info .fileSize {
+      height: 50px;
+      line-height: 50px; }
+    .main .info img {
+      width: 100px;
+      height: 100px;
+      background: #ccc; }
+  .main .registrationStatus,
+  .main .fingerprint {
+    margin-top: 20px;
+    text-align: center; }
+  .main table {
+    margin: 20px auto;
+    width: 50%; }
+    .main table td {
+      height: 40px; }
+    .main table tr:hover {
+      background: #f5f5f5; }
+  .main .btn_content {
+    text-align: center; }
+
+.btn {
+  margin: 0 10px;
+  width: 90px;
+  height: 30px;
+  background: rgba(106, 176, 239, 0.8);
+  border-radius: 3px;
+  text-align: center;
+  line-height: 30px;
+  font-size: 14px;
+  color: #fff; }
+  .btn:hover {
+    box-shadow: 1px 1px 10px 1px #fff inset; }
+
+.mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); }
+
+.popup {
+  position: relative;
+  padding: 50px 30px;
+  width: 500px;
+  z-index: 99;
+  background-color: #fff;
+  border-radius: 3px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); }
+  .popup .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 20px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px; }
+  .popup .fingerprint {
+    margin-top: 20px;
+    text-align: center; }
+  .popup .dragFile {
+    position: relative;
+    margin: 20px auto;
+    width: 100%;
+    height: 80px;
+    border: 2px dashed #ddd; }
+    .popup .dragFile .info {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      color: #ccc; }
+  .popup .result {
+    position: relative;
+    margin: 20px auto 0;
+    width: 120px;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    text-align: center;
+    line-height: 30px; }
+    .popup .result i {
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
+      border-radius: 50%; }
+  .popup .yes {
+    background-color: #9ae3a1;
+    color: #fff; }
+  .popup .no {
+    background-color: #f3555c;
+    color: #fff; }
+
+.copyright {
+  text-align: center; }

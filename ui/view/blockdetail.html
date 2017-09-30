@@ -1,0 +1,62 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-cn" ng-app="DetailApp">
+<head>
+<meta charset="utf-8">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+<meta content="telephone=no" name="format-detection">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link rel="stylesheet" href="../style/setNode.css">
+<link rel="stylesheet" href="../style/animate.css">
+<link rel="icon" href="../image/icon.png">
+
+<script src="../script/library/jquery.min.js"></script>
+<script src="../script/library/angular.min.js"></script>
+<script src="../script/library/qwebchannel.js"></script>
+<script src="../script/common.js"></script>
+<script src="../script/blockdetail.js"></script>
+
+<title></title>
+</head>
+
+<body ng-controller="detailCtrl">
+
+<div class="page" id="container">
+	<div class="main" style="width: 180px; height: 250px; margin: 0 auto" ng-if="language == 0">
+		<p>BlockNum: {{detail.iBlockNum}}</p>
+		<p>ChainCount:{{detail.iChainNum}}</p>
+		<p>DataChainNum:{{detail.iDataChainNum}}</p>
+		<p>UseNodes:{{detail.iUseNodes}}</p>
+		<p>LongestChain:{{detail.iLongestChain}}</p>
+		<p>RegTime:{{getTimestampDesc(detail.tTime)}}</p>
+
+		<div>RegFileInfo：</div>
+		<p>FileName:{{detail.tFileInfo.cFileName}}</p>
+		<p>SDInfo:{{detail.tFileInfo.cCustomInfo}}</p>
+		<p>Owner:{{detail.tFileInfo.cRightOwner}}</p>
+		<p style="word-wrap:break-word; word-break:normal;">hash:{{detail.tFileInfo.cFileHash}}</p>
+		<p>FileState:{{getFileState(detail.tFileInfo.iFileState)}}</p>
+		<p>FileSize:{{getFileSizeDesc(detail.tFileInfo.iFileSize)}}</p>
+	</div>
+	
+	<div class="main" style="width: 180px; height: 250px; margin: 0 auto" ng-if="language == 1">
+		<p>区块号: {{detail.iBlockNum}}</p>
+		<p>数据链数:{{detail.iChainNum}}</p>
+		<p>登记交易数:{{detail.iDataChainNum}}</p>
+		<p>参与节点数:{{detail.iUseNodes}}</p>
+		<p>最长链:{{detail.iLongestChain}}</p>
+		<p>存证时间:{{getTimestampDesc(detail.tTime)}}</p>
+
+		<div>存证文件信息：</div>
+		<p>文件名称:{{detail.tFileInfo.cFileName}}</p>
+		<p>自定义信息:{{detail.tFileInfo.cCustomInfo}}</p>
+		<p>所有者:{{detail.tFileInfo.cRightOwner}}</p>
+		<p style="word-wrap:break-word; word-break:normal;">hash:{{detail.tFileInfo.cFileHash}}</p>
+		<p>存证状态:{{getFileState(detail.tFileInfo.iFileState)}}</p>
+		<p>文件大小:{{getFileSizeDesc(detail.tFileInfo.iFileSize)}}</p>
+	</div>
+	
+</div>
+
+</body>
+</html>

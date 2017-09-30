@@ -1,0 +1,54 @@
+@mixin prefix($property, $value) {
+	-webkit-#{$property}: $value;
+	-moz-#{$property}: $value;
+	-ms-#{$property}: $value;
+	-o-#{$property}: $value;
+	#{$property}: $value;
+}
+
+@mixin box-sizing() {
+	@include prefix(box-sizing, border-box);
+}
+
+@mixin scale($value) {
+	@include prefix(transform, scale($value));
+}
+
+$position: (
+	translate: translate(-50%, -50%),
+	translateX: translateX(-50%),
+	translateY: translateY(-50%)
+);
+
+@mixin center() {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	@include prefix(transform, map-get($position, translate));
+}
+
+@mixin centerX($value) {
+	position: absolute;
+	top: $value;
+	left: 50%;
+	@include prefix(transform, map-get($position, translateX));
+}
+
+@mixin centerY($value) {
+	position: absolute;
+	top: 50%;
+	left: $value;
+	@include prefix(transform, map-get($position, translateY));
+}
+
+@mixin transitionTime($value) {
+	@include prefix(transition-duration, $value);
+}
+
+@mixin box-shadow($value) {
+	@include prefix(box-shadow, $value);
+}
+
+%center {
+	@include center();
+}

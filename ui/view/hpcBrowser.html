@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html lang="zh-cn" ng-app="BrowserApp">
+<head>
+<meta charset="utf-8">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+<meta content="telephone=no" name="format-detection">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link rel="stylesheet" href="../style/hpcBrowser.css">
+<link rel="stylesheet" href="../style/animate.css">
+<link rel="icon" href="../image/icon.png">
+
+<script src="../script/library/jquery.min.js"></script>
+<script src="../script/library/angular.min.js"></script>
+<script src="../script/library/qwebchannel.js"></script>
+
+<script src="../script/common.js"></script>
+<script src="../script/browser.js"></script>
+
+
+<title></title>
+
+
+
+</head>
+
+<body ng-controller="browserCtrl">
+
+<div class="page" id = "page">
+	<div class="main">
+		<div class="container">
+			<div class="search" ng-if="language == 0">
+			
+				<select >
+					<option value="AllNet">AllNet</option>
+					<option value="NearNode">NearNode</option>
+					<option value="Local">Local</option>
+					<input type="text" >
+					<input type="button" value="Search" ng-click="search()">
+				</select>
+			</div>
+			<div class="search" ng-if="language == 1">				
+				<select>
+					<option value="全网">全网</option>
+					<option value="相邻节点">相邻节点</option>
+					<option value="本地">本地</option>
+					<input type="text" ng-model="sea.searchVal">
+					<input type="button" value="搜索" ng-click="search()">
+				</select>
+			</div>
+			<table>
+				<thead ng-if="language == 0">
+					<tr>
+						<th>BlockNum</th>
+						<th>ChainNum</th>
+						<th>RTNumber</th>
+						<th>ParticipantNodeNum</th>
+						<th>LongerChain</th>
+						<th>Time</th>
+						<th></th>
+					</tr>
+				</thead>
+				<thead ng-if="language == 1">
+					<tr>
+						<th>块号</th>
+						<th>数据链数</th>
+						<th>登记交易数</th>
+						<th>参与节点数</th>
+						<th>最长链</th>
+						<th>时间戳</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-show="searchResult.length > 0">
+						<td>{{searchResult[0].iBlockNum}}</td>
+						<td>{{searchResult[0].iChainNum}}</td>
+						<td>{{searchResult[0].iDataChainNum}}</td>
+						<td>{{searchResult[0].iUseNodes}}</td>
+						<td>{{searchResult[0].iLongestChain}}</td>
+						<td>{{getTimestampDesc(searchResult[0].tTime)}}</td>
+						<td><a ng-click="showDetail(searchResult[0])"><span ng-if="language == 0">Detail</span><span ng-if="language == 1">详细</span></a></td>
+					</tr>
+					<tr ng-repeat="item in searchResult" ng-if="searchResult.length > 1 && showMore" ng-hide="$index == 0">
+						<td>{{item.iBlockNum}}</td>
+						<td>{{item.iChainNum}}</td>
+						<td>{{item.iDataChainNum}}</td>
+						<td>{{item.iUseNodes}}</td>
+						<td>{{item.iLongestChain}}</td>
+						<td>{{getTimestampDesc(item.tTime)}}</td>
+						<td><a ng-click="showDetail(item)"><span ng-if="language == 0">Detail</span><span ng-if="language == 1">详细</span></a></td>
+					</tr>
+				</tbody>
+			</table>
+			<div style="margin-top: 20px; text-align: right;" ng-if="searchResult.length > 1 && showMore == false">
+				<a class="btn" ng-click="showMoreItem()"><span ng-if="language == 0">More</span><span ng-if="language == 1">更多</span></a>
+			</div>
+			<table style="text-align: left;">
+				<tbody>
+					<tr>
+						<td><span ng-if="language == 0">ChainData</span><span ng-if="language == 1">链数据</span></td>
+						<td>{{generalInfo.chainDataSize}}</td>
+						<td></td>
+						<td><span ng-if="language == 0">TotalTrans</span><span ng-if="language == 1">交易总数</span></td>
+						<td>{{generalInfo.tradesTotal}}</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td><span ng-if="language == 0">TotalNodeNum</span><span ng-if="language == 1">全网节点数</span></td>
+						<td>{{generalInfo.nodeCount}}</td>
+						<!-- <td><a ng-click = "checkAllNode()">查看</a></td> -->
+						<td><span ng-if="language == 0">UnconfirmedRequest</span><span ng-if="language == 1">未确认请求</span></td>
+						<td>{{generalInfo.unConfirmedReq}}</td>
+						<!-- <td><a ng-click="checkUnConfirmedReq()">查看</a></td> -->
+					</tr>
+					<tr>
+						<td><span ng-if="language == 0">ConnectToNodesCount</span><span ng-if="language == 1">我连接的节点数</span></td>
+						<td>{{generalInfo.myConnectedNode}}</td>
+						<!--  <td><a ng-click="checkMyConnectNode()">查看</a></td> -->
+						<td><span ng-if="language == 0">ACTime</span><span ng-if="language == 1">备选共识块时间</span></td>
+						<td colspan="2">{{getTimestampDesc(generalInfo.alternativeConsensusBlockTime)}}</td>
+					</tr>
+				</tbody>	
+			</table>
+		</div>
+	</div>
+
+	<div class="copyright">©2016 Copy Right Reserved <span ng-if="language == 0">HyperChain co.,Ltd</span><span ng-if="language == 1">苏州超块链信息科技有限公司</span></div>
+</div>
+<script src="../script/library/jquery.min.js"></script>
+<script>
+$(function() {
+
+});
+</script>
+</body>
+</html>

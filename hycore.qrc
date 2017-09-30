@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/translations">
+        <file>app_zh.qm</file>
+        <file>app_en.qm</file>
+    </qresource>
+    <qresource prefix="/image">
+        <file>image/icon.jpg</file>
+        <file>image/b.png</file>
+        <file>image/close_a.png</file>
+        <file>image/close_hover.png</file>
+        <file>image/close_press.png</file>
+        <file>image/g.png</file>
+        <file>image/icon.png</file>
+        <file>image/logo.ico</file>
+        <file>image/w.png</file>
+        <file>image/y.png</file>
+        <file>image/zoomin_a.png</file>
+        <file>image/zoomin_hover.png</file>
+        <file>image/zoomin_press.png</file>
+    </qresource>
+</RCC>

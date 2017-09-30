@@ -1,0 +1,61 @@
+@charset "utf-8";
+
+@import "mixin.scss";
+/* --------- reset --------- */
+
+*,
+*:before,
+*:after { margin: 0; padding: 0; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	@include box-sizing();
+}
+
+html, 
+body,
+.page { min-height: 100%; }
+
+// base
+a,
+span,
+strong, b,
+em, i { display: inline-block; }
+em, i { font-style: normal; }
+strong, b, 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 { font-weight: normal; }
+
+// form
+input, textarea, select { outline: none; }
+input[type="text"],
+input[type="password"] { padding: 0 5px; }
+input[type="button"] { border: 0; }
+select { padding: 1px 1px 1px 0; }
+
+// list
+ul, ol { list-style-type: none; }
+
+// table
+table { border-collapse: collapse; border-spacing: 0; }
+
+// img
+img { border: 0; vertical-align: middle; }
+
+// link
+a { font-size: inherit; color: inherit; text-decoration: none; outline: none; }
+
+/* --------- common --------- */
+
+// clear float
+.clears { zoom: 1;
+	&:after{ content: ""; display: block; clear: both; }
+}
+
+// float
+.l { float: left; }
+.r { float: right; }
+
+// hide
+.hide { display: none; }

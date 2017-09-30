@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html lang="zh-cn" ng-app="RecordApp">
+<head>
+<meta charset="utf-8">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+<meta content="telephone=no" name="format-detection">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link rel="stylesheet" href="../style/certificateRecord.css">
+<link rel="stylesheet" href="../style/animate.css">
+<link rel="icon" href="../image/icon.png">
+
+<script src="../script/library/jquery.min.js"></script>
+<script src="../script/library/angular.min.js"></script>
+<script src="../script/library/qwebchannel.js"></script>
+<script src="../script/common.js"></script>
+<script src="../script/record.js"></script>
+
+<title></title>
+</head>
+
+<body ng-controller="recordCtrl">
+
+<div class="page" id = "page">
+	<div class="main">
+		<div class="container">
+			<h1><span ng-if="language == 0">CertificateRecord</span><span ng-if="language == 1">存证记录</span></h1>
+			
+			<div style="text-align: right;">
+				<a class="btn" ng-click="showHistory()"><span ng-if="language == 0">History</span><span ng-if="language == 1">操作历史</span></a>
+			</div>
+			
+			<div class="info clears">
+				<div class="l">
+					<div class="fileName"><span ng-if="language == 0">FileName: </span><span ng-if="language == 1">文件名:</span> <span>{{record.cFileName}}</span></div>
+					<div class="fileSize"><span ng-if="language == 0">FileSize: </span><span ng-if="language == 1">文件大小: </span><span>{{getFileSizeDesc()}}</span></div>
+				</div>
+				<!-- <img class="QR r" src="" alt=""> -->
+			</div>
+			<p class="fingerprint"><span ng-if="language == 0">Fingerprint</span><span ng-if="language == 1">数字指纹</span></p>
+			<!-- <p class="fingerprint" style="word-wrap=break-word; word-break=normal;">{{record.cFileHash}}</p> -->
+			<div style="width= 50px;word-wrap=break-word; word-break:break-all;">{{record.cFileHash}}</div>
+			
+			<p class="registrationStatus"><span ng-if="language == 0">RegistrationStatus: </span><span ng-if="language == 1">超块链登记状态: </span>{{getEvidenceStatusDesc()}}</p>
+			
+			<table>
+				<tbody>
+					<tr>
+						<td><span ng-if="language == 0">RightOwner: </span><span ng-if="language == 1">权利所有者: </span></td>
+						<td>{{record.cRightOwner}}</td>
+					</tr>
+					<tr>
+						<td><span ng-if="language == 0">RegTime: </span><span ng-if="language == 1">登记时间: </span></td>
+						<td>{{getTimestampDesc()}}</td>
+					</tr>
+					<tr>
+						<td><span ng-if="language == 0">SelfDefineInfo: </span><span ng-if="language == 1">自定义公开信息: </span></td>
+						<td>{{record.cCustomInfo}}</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="btn_content">
+				<a class="btn" href="javascript:;" ng-if="record.iFileState == 4"><span ng-if="language == 0">Stop/Retry</span><span ng-if="language == 1">停止/重试</span></a>
+				<a class="btn verification" ng-click="verify()" ng-if="record.iFileState == 5"><span ng-if="language == 0">Verify</span><span ng-if="language == 1">验证</span></a>
+			</div>
+		</div>
+	</div>
+
+	<div class="mask hide"></div>
+	<div class="popup hide">
+		<a class="close" href="javascript:;">X</a>
+		<div class="clears">
+			<div class="fileName l">文件名: <span>速度杀就</span></div><div class="fileSize r">文件大小: <span>31321kb</span></div>
+		</div>
+		<p class="fingerprint">数字指纹</p>
+		<div class="dragFile">
+			<div class="info">请将要存证的文件拖放到这里</div>
+		</div>
+		<p class="fingerprint">数字指纹</p>
+		<div class="result yes"><i>√</i>匹配</div>
+	</div>
+
+	<div class="copyright">©2016 Copy Right Reserved <span ng-if="language == 0">HyperChain co.,Ltd</span><span ng-if="language == 1">苏州超块链信息科技有限公司</span></div>
+</div>
+<script src="../script/library/jquery.min.js"></script>
+<script>
+$(function() {
+	$('.close').on('click', function(event) {
+		event.preventDefault();
+		$('.mask').hide();
+		$('.popup').hide();
+	});
+	
+	<!-- $('.verification').on('click', function(event) { -->
+		<!-- event.preventDefault(); -->
+		<!-- $('.mask').show(); -->
+		<!-- $('.popup').show(); -->
+	<!-- }); -->
+
+});
+</script>
+</body>
+</html>

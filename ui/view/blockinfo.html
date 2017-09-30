@@ -1,0 +1,58 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-cn" ng-app="BlockInfoApp">
+<head>
+<meta charset="utf-8">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+<meta content="telephone=no" name="format-detection">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link rel="stylesheet" href="../style/setNode.css">
+<link rel="stylesheet" href="../style/animate.css">
+<link rel="icon" href="../image/icon.png">
+
+<script src="../script/library/jquery.min.js"></script>
+<script src="../script/library/angular.min.js"></script>
+<script src="../script/library/qwebchannel.js"></script>
+<script src="../script/common.js"></script>
+<script src="../script/blockinfo.js"></script>
+
+<title></title>
+</head>
+
+<body ng-controller="blockInfoCtrl">
+
+<div class="page" id="container" ng-if="content_lang == 1">
+	
+	<div class="main" style="width: 180px; height: 250px; margin: 0 auto">
+		<p>区块号: {{blockInfo.blockNum}}</p>
+		<p>文件名:{{blockInfo.fileName}}</p>
+		<p style="word-wrap:break-word; word-break:normal;">hash:{{getFileHash()}}</p>
+		<p>所有者:{{blockInfo.rightOwner}}</p>
+		<p>状态:{{getFileState(blockInfo.fileState)}}</p>
+		<p>登记时间:{{getTimestampDesc(blockInfo.regTime)}}</p>
+		<p>大小:{{getFileSizeDesc(blockInfo.fileSize)}}</p>
+	</div>
+	
+</div>
+
+<div class="page" id="container" ng-if="content_lang == 0">
+	
+	<div class="main" style="width: 180px; height: 250px; margin: 0 auto">
+		<p>BlockNum: {{blockInfo.blockNum}}</p>
+		<p>FileName:{{blockInfo.fileName}}</p>
+		<p style="word-wrap:break-word; word-break:normal;">hash:{{getFileHash()}}</p>
+		<p>Owner:{{blockInfo.rightOwner}}</p>
+		<p>State:{{getFileState(blockInfo.fileState)}}</p>
+		<p>RegTime:{{getTimestampDesc(blockInfo.regTime)}}</p>
+		<p>Size:{{getFileSizeDesc(blockInfo.fileSize)}}</p>
+	</div>
+	
+</div>
+
+<script>
+$(function() {
+
+});
+</script>
+</body>
+</html>

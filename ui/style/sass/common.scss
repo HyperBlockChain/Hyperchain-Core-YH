@@ -1,0 +1,21 @@
+@charset "utf-8";
+
+@import "reset.scss";
+
+.page { font-size: 14px; color: #888; }
+.container { margin: 0 auto; width: 1000px; }
+.header { padding: 15px; background: rgba(225, 227, 196, .3); 
+	img { width: 180px; float: left; }
+	.nav { padding-top: 5px; float: right; 
+		a { margin: 0 15px;
+			&:hover { color: #f2be6d; }
+		}
+		.active { color: #6ab0ef; }
+	}
+}
+
+.btn { width: 90px; height: 30px; background: rgba(106, 176, 239, .8); border-radius: 3px; text-align: center; line-height: 30px; font-size: 14px; color: #fff;
+	&:hover { box-shadow: 1px 1px 10px 1px #fff inset; }
+}
+
+.copyright { text-align: center; }

@@ -1,0 +1,82 @@
+/* --------- reset --------- */
+*,
+*:before,
+*:after {
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box; }
+
+html,
+body,
+.page {
+  min-height: 100%; }
+
+a,
+span,
+strong, b,
+em, i {
+  display: inline-block; }
+
+em, i {
+  font-style: normal; }
+
+strong, b,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal; }
+
+input, textarea, select {
+  outline: none; }
+
+input[type="text"],
+input[type="password"] {
+  padding: 0 5px; }
+
+input[type="button"] {
+  border: 0; }
+
+select {
+  padding: 1px 1px 1px 0; }
+
+ul, ol {
+  list-style-type: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+img {
+  border: 0;
+  vertical-align: middle; }
+
+a {
+  font-size: inherit;
+  color: inherit;
+  text-decoration: none;
+  outline: none; }
+
+/* --------- common --------- */
+.clears {
+  zoom: 1; }
+  .clears:after {
+    content: "";
+    display: block;
+    clear: both; }
+
+.l {
+  float: left; }
+
+.r {
+  float: right; }
+
+.hide {
+  display: none; }

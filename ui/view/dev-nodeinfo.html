@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN" ng-app="DevNodeInfoApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 101 Template</title>
+
+    <link href="../script/library/bootstrap337/css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		body{
+			-webkit-user-select:none;
+		}
+
+		::-webkit-scrollbar {
+			width: 10px;
+		}
+
+		::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+			-webkit-border-radius: 4px;
+		}
+
+		::-webkit-scrollbar-thumb {
+			background-color: darkgrey;
+			outline: 0px solid slategrey;
+			-webkit-border-radius: 4px;
+			-webkit-tap-highlight-color : rgb(134, 131, 127);
+		}
+
+		::-webkit-scrollbar-thumb:active {
+			background-color: rgb(134, 131, 127);
+		}
+
+		::-webkit-scrollbar-thumb:window-inactive {
+			background-color: rgb(200, 195, 190);
+		}
+
+		.item {
+			border-color: #ddd;
+			background-color: #fff;
+			color: #444;
+			position: relative;
+			z-index: 2;
+			display: block;
+			margin: -1px;
+			padding: 16px;
+			border-width: 1px;
+			border-style: solid;
+			font-size: 16px; 
+		}
+
+		.item-thumbnail-left, .item-thumbnail-left .item-content {
+			padding-top: 8px;
+			padding-left: 106px;
+			min-height: 100px; 
+		}
+
+		.item-thumbnail-left > img:first-child, .item-thumbnail-left .item-image, .item-thumbnail-left .item-content > img:first-child, .item-thumbnail-left .item-content .item-image {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			max-width: 80px;
+			max-height: 80px;
+			width: 100%;
+			height: 100%; 
+		}
+
+		.item-avatar.item-complex, .item-avatar-left.item-complex, .item-thumbnail-left.item-complex {
+			padding-top: 0;
+			padding-left: 0; 
+		}
+
+		.jobtitle-font {
+		font-size: 10px;
+		-webkit-transform: scale(0.8,0.8);
+		transform: scale(0.75, 0.75);
+		-webkit-transform-origin-x: 0;
+		}
+	</style>
+	<script src="../script/library/jquery.min.js"></script>
+	<script src="../script/library/angular.min.js"></script>
+	<script src="../script/library/qwebchannel.js"></script>
+
+	<script src="../script/common.js"></script>
+	<script src="../script/dev-nodeinfo.js"></script>
+	
+  </head>
+  <body ng-controller="devNodeInfoCtrl" >
+	<div id= "container">
+    
+	<h3 class="text-center">{{title}}</h3>
+	<ul class="list-group" >
+      <li class="list-group-item">
+	  <textarea id='hclog' style="width:100%; height: 300px;" ng-model="hclog"></textarea>
+	  </li>
+		
+	  <li class="list-group-item">
+		<h4>{{myReg}}</h4>
+		
+			<div>
+				<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{confirming}}</div>
+				<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+				<button type="button" class="btn btn-info" ng-click="testLog()">{{check}}</button>
+				<div style="clear:both"></div>
+			</div>
+			
+			<div class="" style="margin-top: 5px; margin-left: 15px;">
+				<div class="row">
+					<div style="float: left;">
+						<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{confirmed}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+					<div style="float: left; margin-left: 50px;">
+						<div style="width: 130px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{total}}{{confirmed}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+				</div>
+			</div>
+			
+			<div class="" style="margin-top: 5px; margin-left: 15px;">
+				<div class="row">
+					<div style="float: left;">
+						<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{refused}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+					<div style="float: left; margin-left: 50px;">
+						<div style="width: 130px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{total}}{{refused}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+				</div>
+			</div>
+
+	  </li>
+	  
+	  <li class="list-group-item">
+		<h4>{{recvRegReq}}</h4>
+			<div>
+				<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{confirming}}</div>
+				<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+				<button type="button" class="btn btn-info">{{check}}</button>
+				<div style="clear:both"></div>
+			</div>
+			
+			<div class="" style="margin-top: 5px; margin-left: 15px;">
+				<div class="row">
+					<div style="float: left;">
+						<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{confirmed}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+					<div style="float: left; margin-left: 50px;">
+						<div style="width: 130px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{total}}{{confirmed}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+				</div>
+			</div>
+			
+			<div class="" style="margin-top: 5px; margin-left: 15px;">
+				<div class="row">
+					<div style="float: left;">
+						<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{refused}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+					<div style="float: left; margin-left: 50px;">
+						<div style="width: 130px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{total}}{{refused}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+				</div>
+			</div>
+	  </li>
+	  
+	  <li class="list-group-item">
+		<h4>{{noderun}}</h4>
+			<div class="" style="margin-top: 5px; margin-left: 15px;">
+				<div class="row">
+					<div style="float: left;">
+						<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{connectedNodeCount}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+					<div style="float: left; margin-left: 50px;">
+						<div style="width: 120px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{totalRuntime}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">45:10:33</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="" style="margin-top: 5px; margin-left: 15px;">
+				<div class="row">
+					<div style="float: left;">
+						<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{recvReq}}</div>
+						<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">3</div>
+						<button type="button" class="btn btn-info">{{check}}</button>
+					</div>
+				</div>
+			</div>
+	  </li>
+	  
+	  <li class="list-group-item">
+		<h4>{{dataTrans}}</h4>
+		<div class="" style="margin-top: 5px; margin-left: 15px;">
+			<div class="row">
+				<div style="float: left;">
+					<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{sendRate}}</div>
+					<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">35kb/s</div>
+				</div>
+				<div style="float: left; margin-left: 110px;">
+					<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{sendSize}}</div>
+					<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">10M</div>
+				</div>
+			</div>
+			<div class="row" style="margin-top: 10px;">
+				<div style="float: left;">
+					<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{recvRate}}</div>
+					<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">35kb/s</div>
+				</div>
+				<div style="float: left; margin-left: 110px;">
+					<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{recvSize}}</div>
+					<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">20M</div>
+				</div>
+			</div>
+		</div>
+	  </li>
+	  
+	  <li class="list-group-item">
+		<h4>{{storage}}</h4>
+		<div class="" style="margin-top: 5px; margin-left: 15px;">
+			<div class="row">
+				<div style="float: left;">
+					<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{chainStorage}}</div>
+					<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">1.3G</div>
+				</div>
+				<div style="float: left; margin-left: 110px;">
+					<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{cache}}</div>
+					<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">125M</div>
+					<button type="button" class="btn btn-info">{{clearCache}}</button>
+				</div>
+			</div>
+			<div class="row" style="margin-top: 10px;">
+				<div style="float: left;">
+					<div style="width: 100px; height: 30px; line-height:30px; font-size: 18px; float: left;">{{memory}}</div>
+					<div class="label label-warning" style="width: 100px; height: 30px; line-height:25px; float:left; margin-right: 20px; font-size: 18px;">17.3M</div>
+				</div>
+			</div>
+		</div>
+	  </li>
+	  
+	</ul>
+
+	</div>
+    <script src="../script/library/bootstrap337/js/bootstrap.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<html lang="zh-cn" ng-app="HistoryApp">
+<head>
+<meta charset="utf-8">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+<meta content="telephone=no" name="format-detection">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link rel="stylesheet" href="../style/certificateHistory.css">
+<link rel="stylesheet" href="../style/animate.css">
+<link rel="icon" href="../image/icon.png">
+
+<style>
+    body{
+        -webkit-user-select:none;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        -webkit-border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: darkgrey;
+        outline: 0px solid slategrey;
+        -webkit-border-radius: 4px;
+        -webkit-tap-highlight-color : rgb(134, 131, 127);
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+        background-color: rgb(134, 131, 127);
+    }
+
+    ::-webkit-scrollbar-thumb:window-inactive {
+        background-color: rgb(200, 195, 190);
+    }
+
+    .item {
+        border-color: #ddd;
+        background-color: #fff;
+        color: #444;
+        position: relative;
+        z-index: 2;
+        display: block;
+        margin: -1px;
+        padding: 16px;
+        border-width: 1px;
+        border-style: solid;
+        font-size: 16px; 
+    }
+
+    .item-thumbnail-left, .item-thumbnail-left .item-content {
+        padding-top: 8px;
+        padding-left: 106px;
+        min-height: 100px; 
+    }
+
+    .item-thumbnail-left > img:first-child, .item-thumbnail-left .item-image, .item-thumbnail-left .item-content > img:first-child, .item-thumbnail-left .item-content .item-image {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        max-width: 80px;
+        max-height: 80px;
+        width: 100%;
+        height: 100%; 
+    }
+
+    .item-avatar.item-complex, .item-avatar-left.item-complex, .item-thumbnail-left.item-complex {
+        padding-top: 0;
+        padding-left: 0; 
+    }
+
+    .jobtitle-font {
+    font-size: 10px;
+    -webkit-transform: scale(0.8,0.8);
+    transform: scale(0.75, 0.75);
+    -webkit-transform-origin-x: 0;
+}
+</style>
+
+<script src="../script/library/jquery.min.js"></script>
+<script src="../script/library/angular.min.js"></script>
+<script src="../script/library/qwebchannel.js"></script>
+
+<script src="../script/common.js"></script>
+<script src="../script/history.js"></script>
+
+<title></title>
+</head>
+<body ng-controller="historyCtrl">
+
+<div class="page" id= "page">
+	<div class="main">
+		<div class="container">
+			<h1><span ng-if="language == 0">History</span><span ng-if="language == 1">操作历史</span></h1>
+			<p class="currentTime"><span ng-if="language == 0">CurrentTime</span><span ng-if="language == 1">现在是:</span>{{currentTime}}</p>
+			<ul>
+				<li class="clears" ng-repeat="evidence in historys">
+					<input type="checkbox">
+					<div class="info">
+						<div class="submitTime"><span ng-if="language == 0">SubmitTime: </span><span ng-if="language == 1">提交时间: </span><span>{{getTimeStampDesc(evidence)}}</span></div>
+						 <div class="content clears">
+							<div class="fileName">{{evidence.cFileName}}</div>
+							<div class="fileSize">{{getFileSizeDesc(evidence)}}</div>
+							<a ng-click="verifyEvidence(evidence)"><span ng-if="language == 0">Verify</span><span ng-if="language == 1">验证</span></a>
+						</div>
+						 <div class="content clears">
+							<div class="creator"><span ng-if="language == 0">Creator: </span><span ng-if="language == 1">创建者: </span><span>{{evidence.cRightOwner}}</span></div>
+							<div class="possessor"><span ng-if="language == 0">Owner: </span><span ng-if="language == 1">所有者: </span><span>{{evidence.cRightOwner}}</span></div>
+							<div class="status">{{getStatusDesc(evidence)}}</div>
+							<a ng-click="checkEvidenceInfo(evidence)"><span ng-if="language == 0">Check</span><span ng-if="language == 1">查看</span></a>
+						</div> 
+					</div>
+				</li>
+				<!--
+				<li class="clears">
+					<input type="checkbox">
+					<div class="info" >
+						<div class="submitTime">提交时间: <span>00:00:00</span></div>
+						<div class="content clears">
+							<div class="fileName">dnjsajfh.js</div>
+							<div class="fileSize">87647321kb</div>
+							<a href="javascript:;">验证</a>
+						</div>
+						<div class="content clears">
+							<div class="creator">创建者: <span>ddd</span></div>
+							<div class="possessor">所有者: <span>ddd</span></div>
+							<div class="status">已确认</div>
+							<a href="javascript:;">查看</a>
+						</div>
+					</div>
+				</li>
+				-->
+			</ul>
+			<div class="paging">
+				<p ng-if="language == 0">All <span>{{historys.length}}</span> records  </p>
+				<p ng-if="language == 1">共<span>{{historys.length}}</span>条记录</p>
+				<!-- <em ng-click="getEvidence(1, 20)">1</em> -->
+				<!-- <em>2</em> -->
+				<!-- <em>3</em> -->
+				<!-- <em>尾页</em> -->
+				<!-- 共<span>231</span>页 -->
+			</div>
+			<!--
+			<a class="btn delete" ng-click="delMultiEvidence()">删除记录</a>
+			<a class="btn" ng-click="exportAllEvidence()">导出全部</a>
+			<a class="btn" ng-click="exportEvidence()">导出记录</a>
+			-->
+		</div>
+	</div>
+
+	<div class="copyright">©2016 Copy Right Reserved <span ng-if="language == 0">HyperChain co.,Ltd</span><span ng-if="language == 1">苏州超块链信息科技有限公司</span></div>
+</div>
+
+<script>
+$(function() {
+	$('.delete').on('click', function(event) {
+		event.preventDefault();
+		var checkbox = $('input[type="checkbox"]'),
+			checkboxLength = checkbox.length;
+		for (var i = 0; i <= checkboxLength; i++) {
+			if (checkbox.eq(i).prop('checked')) {
+				checkbox.eq(i).parent('li').remove();
+			}
+		}
+	});
+});
+</script>
+
+</body>
+</html>

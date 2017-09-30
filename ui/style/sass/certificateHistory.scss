@@ -1,0 +1,43 @@
+@charset "utf-8";
+
+@import "reset.scss";
+
+.page { font-size: 14px; color: #888; }
+.container { margin: 0 auto; width: 1000px; }
+.header { padding: 15px; background: rgba(225, 227, 196, .3); 
+	img { width: 180px; float: left; }
+	.nav { padding-top: 5px; float: right; 
+		a { margin: 0 15px;
+			&:hover { color: #f2be6d; }
+		}
+		.active { color: #6ab0ef; }
+	}
+}
+
+.main { padding: 50px 0;
+	h1 { text-align: center; font-size: 20px; color: #0870b0; }
+	.currentTime { margin: 20px 0 20px 42px; padding-bottom: 10px; border-bottom: 1px solid #ddd; }
+	ul li { padding: 20px 0; border-bottom: 1px solid #ddd;
+		input[type="checkbox"],
+		.info { float: left; 
+			.submitTime,
+			.content { margin-bottom: 10px; }
+			.fileName,
+			.fileSize,
+			.creator,
+			.status,
+			.possessor { float: left; margin-right: 20px; }
+		}
+
+		input[type="checkbox"] { margin: 30px 30px 0 0; }
+	}
+	.paging { margin: 30px 0; padding-bottom: 30px; border-bottom: 1px solid #ddd; text-align: right;
+		em { padding: 5px 10px; border: 1px solid #ccc; cursor: pointer; }
+	}
+}
+
+.btn { width: 90px; height: 30px; background: rgba(106, 176, 239, .8); border-radius: 3px; text-align: center; line-height: 30px; font-size: 14px; color: #fff;
+	&:hover { box-shadow: 1px 1px 10px 1px #fff inset; }
+}
+
+.copyright { text-align: center; }
