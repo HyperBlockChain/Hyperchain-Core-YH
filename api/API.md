@@ -454,4 +454,216 @@ LocalChainData / NULL
 ```
 
 ## Utility API
+
+### isDataValidated	
+
+Function: `Validate a data block with specified data type and user defined rule.`
+
+Parameter:
+* `ValidationType` 
+* `Data：Void`
+* `UserDefinedRuleDescription: string`
+```js
+ValidationType = enum { 
+    HyperBlock,
+    LocalBlock,
+    RegistrationTX,
+    CustomizedConsesusScript,
+    MerkleTree,
+    UserDefined 
+}
+```
+Return:
+```js
+Result = {
+    Code = {Pass/Fail}
+    Description: string
+} 
+```
+
+### MakeFormatedDataBlock	
+Function:	`Build user data into data block with specified data format.`
+
+Parameter:
+* `PayloadFormat`
+* `UserData` 
+```js
+PayloadFormat = enum { 
+    LocalBlockFormat,
+    RegistrationTXFormat,
+    LedgerTXFormat,
+    CrossChainTXFormat,
+    ContractFormat,
+    UserDefinedFormat
+}
+```
+Return:
+```js
+FormartedDataBlock / NULL
+```
+
 ## Node API
+
+### GetNodeState	
+
+Function: `Return Node running state.`
+
+Parameter:
+* `Void`
+
+Return:
+```js
+NodeState / NULL
+```
+### GetNodeDescription	
+
+Function: `Return Node Description`
+
+Parameter:
+* `Void` 
+
+Return:
+```js
+NodeDescription / NULL
+```
+### GetNodeCapabilityDescription	
+
+Function: `Return Node Capability Description`
+
+Parameter:
+* `Void` 
+
+Return:
+```
+NodeCapabilityDescription / NULL
+```
+### GetConnectedNodeDescription	
+
+Function: `Return Description of Node which have been connected with local node.`
+
+Parameter:
+* `NodeID`
+
+Return:
+```js
+NodeDescription / NULL
+```
+### GetConnectedNodeCapabilityDescription	
+
+Function: `Return Capability Description of Node which have been connected with local node.`
+
+Parameter:
+* `NodeID`
+
+Return:
+```js
+NodeCapabilityDescription / NULL
+```
+### GetConnectingNodeList	
+
+Function: `Return the list of Node which is connecting with local node.`
+
+Parameter:
+* `Void`
+
+Return:
+```js
+NodeList / NULL
+```
+### GetConnectedNodeList	
+
+Function: `Return the list of Node which have been connected with local node.`
+
+Parameter:
+* `Void`
+    
+Return:
+```js
+NodeList / NULL
+```
+### GetSendingRate	
+
+Function: `Return current byte sending rate, Byte per Second, of local node.`
+
+Parameter:
+* `Void`
+
+Return:
+```js
+SendingRate: numeric / -1
+```
+### GetSentByte	
+
+Function: `Return accumulated bytes have been sent since node started.`
+
+Parameter:
+* `Void`
+
+Return:
+```js
+SentByte: numeric / -1
+```
+### GetReceivingRate	
+
+Function: Return current byte receiving rate, Byte per Second, of local node.
+
+Parameter:
+* `Void`
+
+Return:
+```js
+ReceivingRate: numeric / -1
+```
+### GetReceivedByte	
+
+Function: Return accumulated bytes have been received since node started.
+
+Parameter:
+* `Void`
+
+Return:
+```js
+ReceivedByte: numeric / -1
+```
+### GetSentRegistrationTXNum	
+
+Function: `Return accumulated On Chain Registration have been sent from local node since node started.`
+
+Parameter:
+* `Void`
+
+Return:
+```js
+Sent: numeric / -1
+```
+### GetReceivedRegistrationTXNum	
+Function: `Return accumulated On Chain Registration have been received from other node since local node started.`
+
+Parameter:
+* `Void`
+
+Return:
+```js
+Received: numeric / -1
+```
+### GetConnectingNodeListByConnectState	
+Function: `Return the list of Node which is connecting with local node by availability level.`
+
+Parameter:
+* `ConnectState`
+
+```js
+ConnectState={
+    Strong,
+    Average,
+    Weak,
+    Offline
+}
+/NULL
+```
+
+Return:
+```js
+{NodeList, Count} / NULL
+```
+
