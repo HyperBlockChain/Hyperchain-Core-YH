@@ -275,7 +275,7 @@ Parameter:
     
 Return:
 ```js
-    HyperBlockData / NULL
+HyperBlockData / NULL
 ```    
 ### GetHyperBlockHeight	
 Function: `Return the Hyper Block height of the Chain Space.` 
@@ -285,7 +285,7 @@ Parameter:
     
 Return:
 ```js
-    HyperBlockHeight : numeric / -1
+HyperBlockHeight : numeric / -1
 ```    
 ### GetHighestHyperBlockAtLocal	
 Function: `Return the highest Hyper Block cached at local.`
@@ -295,7 +295,7 @@ Parameter:
 
 Return:
 ```js
-    HyperBlockData / NULL
+HyperBlockData / NULL
 ```
 ### GetCachedChainSize	
 
@@ -306,7 +306,7 @@ Parameter:
 
 Return:
 ```js
-    Size: numeric / -1
+Size: numeric / -1
 ```    
 ### GetTotalChainSpaceSize	
 
@@ -317,9 +317,141 @@ Parameter:
     
 Return:
 ```js
-    Size: numeric / -1
+Size: numeric / -1
 ```    
 
 ## Consensus API
+### MakeRegistration	
+
+Function: `Build user specified data and customized consensus script into an On Chain Registration data block.` 
+
+Parameter:
+* `UserData` 
+* `CustomizedConsensusScript`
+
+Return:
+```js
+Registration / NULL
+```
+### SubmitRegistration
+Function: `Submit an On Chain Registration to Hyper chain network.`
+
+Parameter:
+* `Registration` 
+* `TimeOut:numeric`
+
+Return:
+```js
+RegistrationTX / NULL
+```
+### QueryRegistrationTXState	
+Function: `Query On Chain Registration progress after submission.`
+
+Parameter:
+* `RegistrationTXID` 
+* `Registration.selfHash`
+
+Return:
+```js
+RegistrationState:{} / NULL
+```
+### GetLocalRegistrationTXQueue	
+Function: `Query On Chain Registration waiting list at node local.`
+
+Parameter:
+* `Void`
+
+Return:
+```js
+RegistrationTXQueue / NULL
+```
+### CreateCustomizedConsensusScript	
+Function: `Create customized consensus script and cached it at local.`
+
+Parameter:
+* `ScriptType：{}`
+* `Script：string` 
+
+Return:
+```js
+CustomizedConsensusScript / NULL
+```
+### VerifyCustomizedConsensusScript	
+Function: `Verify if a customized consensus script could produce expected result or not.`
+
+Parameter:
+* `CustomizedConsensusScript` 
+
+Return:
+```js
+Pass / Fail
+```
+### SetBuddyDifficulty	
+
+Function: `specify an expected Proof Of Work difficulty for building Local Block buddy locally.`
+
+Parameter:
+* `Difficulty: numeric` 
+* `LocalBlockData`
+
+Return:
+```js
+Success / Fail
+```
+### GetOngoingConsensusData	
+
+Function: `Return a snapshot of the status of ongoing consensus running at local node.`
+
+Parameter:
+* `Void` 
+    
+Return:
+```
+OngoingConsensusData / NULL
+```    
+### GetOngoingConsensusDataElem	
+
+Function: `Return a data item of the status of ongoing consensus running at local.`
+
+Parameter:
+* `OngoingConsensusData`
+* `ConsensusDataElemKey`
+
+Return:
+```js
+ConsensusDataElem / NULL
+```
+### GetBaseHyperBlockOfOngoingConsensus	
+Function: `Return the base Hyper Block of ongoing consensus at local.`
+
+Parameter:
+* `Void`
+    
+Return:
+```js
+HyperBlockData 
+```    
+### GetLocalChainListOfOngoingConsensus	
+
+Function: `Return the Local Chain list of ongoing consensus at local.`
+
+Parameter:
+* `OngoingConsensusData`
+
+Return:
+```js    
+LocalChainDataList / NULL
+```    
+### GetLocalChainOfOngoingConsensus	
+Function: `Return a Local Chain data of ongoing consensus at local.`
+
+Parameter:
+* `LocalChainID`
+
+Return:
+```js
+LocalChainData / NULL
+```
+
 ## Utility API
 ## Node API
