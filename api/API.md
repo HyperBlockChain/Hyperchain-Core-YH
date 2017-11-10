@@ -1,13 +1,14 @@
 # Hyper Block Chain API Ver 0.71
+Prgramming interface specification of Hyper Block Chain.
 
 ## Contents
 
-  * [Terms and Abbreviation](#Terms-and-Abbreviation)
-  * [Block API](#Block-API)
-  * [Chain API](#Chain-API)
-  * [Consensus API](#Consensus-API)
-  * [Utility API](#Utility-API)
-  * [Node API](#Node-API)
+  * [Terms and Abbreviation](#terms-and-abbreviation)
+  * [Block API](#block-api)
+  * [Chain API](#chain-api)
+  * [Consensus API](#consensus-api)
+  * [Utility API](#utility-api)
+  * [Node API](#node-api)
 
 
 ## Terms and Abbreviation
@@ -193,8 +194,8 @@ LocalBlockData / NULL
 Function: `Return the based Hyper Block of specified Local Block.`
 
 Parameter:
-* `LocalBlockID 
-* `BlockHash 
+* `LocalBlockID` 
+* `BlockHash` 
 
 Return:
 ```js
@@ -212,3 +213,113 @@ Return:
 ```js
 HyperBlockData / NULL
 ```
+
+
+## Chain API
+### GetChainOfHyperBlocks	
+
+Function: `Return all Hyper Blocks between two specified Hyper Blocks.`
+
+Parameter:
+* `StartHyperBlockID`
+* `HyperBlockHash`
+* `EndHyperBlockID`
+* `HyperBlockHash`
+
+Return:
+```js
+HyperBlockDataList={
+    ListIndex, 
+    HyperBlockData
+}[]
+/ NULL
+```
+### GetLocalChainsOfHyperBlock	
+
+Function: `Return all Local Chains of specific Hyper Block`
+
+Parameter:
+* `HyperBlockID`
+
+Return:
+```js
+LocalChainDataList = {
+    ListIndex,
+    LocalChainID, 
+    LocalBlockDataList ={
+        ListIndex, 
+        LocalBlockData
+     }[]
+}[]
+/ NULL
+```
+### GetLocalBlocksOnLocalChain	
+Function: `Return all Local Blocks in specified Local Chain`
+
+Parameter:
+* `LocalChainID`
+
+Return:
+```js
+LocalBlockDataList ={
+    ListIndex, 
+    LocalBlockData
+}[] 
+/ NULL
+```
+### GetLatestHyperBlock	
+Function: `Return the highest Hyper Block in the Chain Space.`
+
+Parameter:
+* `Void`
+    
+Return:
+```js
+    HyperBlockData / NULL
+```    
+### GetHyperBlockHeight	
+Function: `Return the Hyper Block height of the Chain Space.` 
+
+Parameter:
+* `Void`
+    
+Return:
+```js
+    HyperBlockHeight : numeric / -1
+```    
+### GetHighestHyperBlockAtLocal	
+Function: `Return the highest Hyper Block cached at local.`
+
+Parameter:
+* `Void`
+
+Return:
+```js
+    HyperBlockData / NULL
+```
+### GetCachedChainSize	
+
+Function: `Return the storage size of chain data cached at local.`
+
+Parameter:
+* `Void`
+
+Return:
+```js
+    Size: numeric / -1
+```    
+### GetTotalChainSpaceSize	
+
+Function: `Return the total chain size of data of the Chain Space`
+
+Parameter:
+* `Void`
+    
+Return:
+```js
+    Size: numeric / -1
+```    
+
+## Consensus API
+## Utility API
+## Node API
