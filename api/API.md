@@ -592,7 +592,7 @@ Return:
 ```js
 SendingRate: numeric / -1
 ```
-### GetSentByte	
+### GetSentBytes	
 
 Function: `Return accumulated bytes have been sent since node started.`
 
@@ -601,7 +601,7 @@ Parameter:
 
 Return:
 ```js
-SentByte: numeric / -1
+SentBytes: numeric / -1
 ```
 ### GetReceivingRate	
 
@@ -614,7 +614,7 @@ Return:
 ```js
 ReceivingRate: numeric / -1
 ```
-### GetReceivedByte	
+### GetReceivedBytes	
 
 Function: Return accumulated bytes have been received since node started.
 
@@ -623,9 +623,9 @@ Parameter:
 
 Return:
 ```js
-ReceivedByte: numeric / -1
+ReceivedBytes: numeric / -1
 ```
-### GetSentRegistrationTXNum	
+### GetSentRegistrationTXsInTotal	
 
 Function: `Return accumulated On Chain Registration have been sent from local node since node started.`
 
@@ -634,9 +634,9 @@ Parameter:
 
 Return:
 ```js
-Sent: numeric / -1
+SentTotal: numeric / -1
 ```
-### GetReceivedRegistrationTXNum	
+### GetReceivedRegistrationTXsInTotal	
 Function: `Return accumulated On Chain Registration have been received from other node since local node started.`
 
 Parameter:
@@ -644,7 +644,7 @@ Parameter:
 
 Return:
 ```js
-Received: numeric / -1
+ReceivedTotal: numeric / -1
 ```
 ### GetConnectingNodeListByConnectState	
 Function: `Return the list of Node which is connecting with local node by availability level.`
