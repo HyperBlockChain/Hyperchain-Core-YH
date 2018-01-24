@@ -1,7 +1,7 @@
 # HyperchainCore
-HyperchainCore is a software with a plugin-enable cross-platform application framework, P2P node layer and protocol stack implementation of Hyper Block Chain.
+HyperchainCore is a software with a plugin-enable cross-platform application framework, P2P node layer and protocol stack implementation of Hyper Block Chain. Please refer to [Hyper Block Chain Whitepaper](http://www.hyperchain.net/blog/archives/311) about the fundamental and the design.
 
-## Prerequisite
+## Prerequisite 
 ### Windows: 
     Microsoft Visual Studio 2013 and above 
     QtCreator for windows 5.7.1 and above
@@ -25,3 +25,6 @@ HyperchainCore is a software with a plugin-enable cross-platform application fra
 ## Dependency
     * Sqlite3, CppSqlite3
     * Qt5Core.dll, Qt5Gui.dll, Qt5Network.dll, Qt5Positioning.dll, Qt5Qml.dll,Qt5Quick.dll, Qt5WebChannel.dll, Qt5WebEngineCore.dll, Qt5WebEngineWidgets.dll, Qt5Widgets.dll
+
+## About
+Visit [Hyperchain Official](http://www.hyperchain.net "Hyper Block Chain Homepage") for more about us.
