@@ -375,6 +375,7 @@ void MainWindow::createTrayIcon()
 {
     trayIconMenu = new QMenu(this);
 
+    
     trayIconMenu->addAction(changeLang);
     trayIconMenu->addAction(showWndAction);
     trayIconMenu->addAction(aboutAction);
@@ -417,7 +418,7 @@ void MainWindow::setUpdateTimerConnect()
 {
     connect(&updateTimer_, &QTimer::timeout, this, &MainWindow::onUpdateTimer);
 
-    //notify child update data
+   
     connect(this, &MainWindow::sigUpdate, _hyperChainWnd, &mine_hyperchain::onUpdateTimer);
     connect(this, &MainWindow::sigUpdate, _chainBrowserWnd, &chain_browser::onUpdateTimer);
 }
@@ -486,7 +487,6 @@ void MainWindow::addEvidence(QSharedPointer<TEVIDENCEINFO> evi)
     listEvi_.append(evi);
 
     DBmgr::instance()->insertEvidence(*evi.data());
-
 
     _attestationHistoryWnd->addEvidence(evi);
 }

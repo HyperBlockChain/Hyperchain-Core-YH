@@ -24,7 +24,7 @@
 #define ATTESTATION_RECORDS_CHANNEL_H
 
 #include <QObject>
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 #include <QSharedPointer>
 #include <QVariant>
 

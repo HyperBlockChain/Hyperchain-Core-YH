@@ -24,7 +24,7 @@
 #define REG_VERIFICATION_FRAMELESS_H
 
 #include <QSharedPointer>
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 
 class QWebEngineView;
 class base_frameless_wnd;

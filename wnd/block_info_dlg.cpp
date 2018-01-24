@@ -84,22 +84,7 @@ void block_info_dlg::setLanguage(int lang)
     reg_->sigChangeLang(lang);
 }
 
-//bool block_info_dlg::eventFilter(QObject *watched, QEvent *event)
-//{
-//    if(watched == view_){
-//        int t = event->type();
-//        if(event->type() == QEvent::FocusOut){
-//            dlg_->hide();
-//            return true;
-//        }else if(event->type() == QEvent::FocusIn){
-//            qDebug()<<"QEvent::FocusIn";
-//        }else if(event->type() == QEvent::MouseButtonPress){
-//            qDebug()<<"QEvent::MouseButtonPress";
-//        }
-//    }
 
-//    return QObject::eventFilter(watched, event);
-//}
 
 void block_info_dlg::onMouseEnter(QEvent *event)
 {
@@ -130,7 +115,6 @@ void block_info_dlg::init()
     dlg_->setWindowFlags(flags);
 
     view_ = new QWebEngineView((QWidget*)dlg_.data()->content_);
-    //view_->installEventFilter(this);
     view_->setAcceptDrops(false);
 
     dlg_->addWidget(view_);
@@ -153,5 +137,4 @@ void block_info_dlg::init()
 #endif
 
     view_->page()->load(QUrl(str));
-    //view_->page()->load(QUrl("www.baidu.com"));
 }

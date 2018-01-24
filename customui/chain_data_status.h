@@ -23,7 +23,7 @@
 #ifndef CHAIN_DATA_STATUS_H
 #define CHAIN_DATA_STATUS_H
 
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 
 #include <QObject>
 #include <QWidget>

@@ -27,7 +27,7 @@
 #include <QSharedPointer>
 #include <QFocusEvent>
 
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 
 
 class QWebEngineView;
@@ -49,7 +49,6 @@ public:
     void setFocus();
     void setLanguage(int lang);
 
-    //bool eventFilter(QObject *watched, QEvent *event);
 
 signals:
 

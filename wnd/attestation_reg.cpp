@@ -25,7 +25,7 @@
 #include "util/md5.h"
 #include "util/commonutil.h"
 #include "mainwindow.h"
-#include "p2p/interface/QtInterface.h"
+#include "HChainP2PManager/interface/QtInterface.h"
 
 
 #include <QMessageBox>
@@ -65,7 +65,6 @@ attestation_reg::~attestation_reg()
 }
 
 void attestation_reg::dragEnterEvent(QDragEnterEvent *event){
-	//http://blog.csdn.net/a3631568/article/details/53819972
 	event->acceptProposedAction();
 }
 
@@ -238,9 +237,9 @@ void attestation_reg::onCommit()
     evi->cFileName = ui->fileNameLabel->text().toStdString();
     evi->cCustomInfo = convertPublicInfo2Json().toStdString();
     evi->cRightOwner = ui->editRightOwner->text().toStdString();
-    evi->cFileHash = sha512_.toStdString();    
-    evi->iFileState = CONFIRMING;              
-    evi->tRegisTime = QDateTime::currentMSecsSinceEpoch();           
+    evi->cFileHash = sha512_.toStdString();     
+    evi->iFileState = CONFIRMING;               
+    evi->tRegisTime = QDateTime::currentMSecsSinceEpoch();            
 
     QFileInfo finfo(fpath_);
     evi->iFileSize = finfo.size();

@@ -37,8 +37,8 @@ class QPushButton;
 enum WndShowMode
 {
     e_WndShow_Unknow = 0,
-    e_WndShow_Show, //显示
-    e_WndShow_Hide //隐藏
+    e_WndShow_Show, 
+    e_WndShow_Hide 
 
 };
 
@@ -57,7 +57,7 @@ public:
     void addWidget(QWidget* widget);
     void showTitleBar(bool show);
 
-    //scaleType 1:按照宽度缩放 2：按照高度缩放
+  
     void setLogoPic(QString picPath, int size = 30, QPoint topLeft = QPoint(0,0), int scaleType = 1);
 
     void setMinMaxCloseButton(QSize btnSize=QSize(30,30),
@@ -96,7 +96,7 @@ private:
     void resetBtnPos();
 
 
-//win32 functions
+
 #ifdef WIN32
 private:
     bool winEvent(const QByteArray &eventType, void *message, long *result);
@@ -115,7 +115,7 @@ private:
     QPixmap m_pixShadow;
 
 
-    //是否支持缩放
+   
     bool ifScale_ = true;
     bool showTitleBar_ = true;
 

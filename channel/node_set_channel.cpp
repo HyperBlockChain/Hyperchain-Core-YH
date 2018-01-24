@@ -24,7 +24,7 @@
 
 #include "customui/base_frameless_wnd.h"
 #include "mainwindow.h"
-#include "p2p/interface/QtInterface.h"
+#include "HChainP2PManager/interface/QtInterface.h"
 
 #include <QMessageBox>
 #include <QVariantMap>
@@ -60,7 +60,7 @@ QVariantMap node_set_channel::getLocalInfo()
     std::string info;
     std::string ip;
     uint16 port;
-	GetNodeDescription(info, ip, port);
+	GetNodeInfo(info, ip, port);
 
     QVariantMap v;
     v["info"] = QString::fromUtf8(info.c_str());

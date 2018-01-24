@@ -23,7 +23,7 @@
 #ifndef COMMONUTIL_H
 #define COMMONUTIL_H
 
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 #include <string>
 #include <QString>
 #include <QVariantMap>

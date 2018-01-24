@@ -38,26 +38,23 @@
 #include <thread>
 
 #include "mainwindow.h"
-#include "p2p/interface/QtInterface.h"
+#include "HChainP2PManager/interface/QtInterface.h"
 
-#include "p2p/headers/includeComm.h"
-
+#include "HChainP2PManager/headers/includeComm.h"
+#include "db/RestApi.h"
 #include "util/cppsqlite3.h"
+
 
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-    //QApplication a(argc, argv);
     SingleApplication a(argc, argv);
     if(a.isRunning()){
         return 0;
     }
 
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "9005");
-
-
-	runP2P(argc, argv);
 
 	bool bShow = true;
 	switch (argc)
@@ -88,11 +85,18 @@ int main(int argc, char *argv[])
 		int w = QApplication::desktop()->width();
 
 		mainWnd.activateWindow();
-
+		getHyperBlockFromLocal();
+		runP2P(argc, argv);
+		
+		
+		RestApi::startRest();
+	
+		
 		return a.exec();
 	}
 	else
 	{
+		runP2P(argc, argv);
 		while (1)
 		{
 			SLEEP(5*1000);

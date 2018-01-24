@@ -24,7 +24,7 @@
 #include "ui_reg_verification.h"
 
 #include "util/commonutil.h"
-#include "p2p/interface/QtInterface.h"
+#include "HChainP2PManager/interface/QtInterface.h"
 
 #include <QDragEnterEvent>
 #include <QMimeData>

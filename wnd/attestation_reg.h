@@ -64,6 +64,13 @@ public:
     QString fpath_;
     QString sha512_;
 
+<<<<<<< .mine
+
+||||||| .r191
+    //自定义公开信息
+=======
+   
+>>>>>>> .r192
     QVector<PublicInfo> publicInfo_;
 };
 

@@ -25,7 +25,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 
 class QWebEngineView;
 class base_frameless_wnd;

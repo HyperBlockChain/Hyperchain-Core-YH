@@ -52,7 +52,7 @@ void partener_chain::setNodeInfo(VEC_T_NODEINFO &vec)
         PartnerNode node;
         node.index = i;
 
-		node.state = (_ePoeReqState)vec[i].uiNodeState;
+         		node.state = (_ePoeReqState)vec[i].uiNodeState;
 
         node.info  = QString::fromStdString(vec[i].strNodeIp);
 
@@ -75,8 +75,7 @@ void partener_chain::initNodes(int chainNum)
 
         PartnerNode node;
         node.index = count;
-        //node.state = CONFIRMING;
-        node.state = DEFAULT_REGISREQ_STATE;
+                 node.state = DEFAULT_REGISREQ_STATE;
         parentNodes_.append(node);
     }else if(2 == chainNum){
         int count = 12;

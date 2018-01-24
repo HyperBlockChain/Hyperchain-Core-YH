@@ -23,7 +23,7 @@
 #ifndef MINE_HYPERCHAIN_H
 #define MINE_HYPERCHAIN_H
 
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 #include <QWidget>
 #include <QSharedPointer>
 #include <QTimer>

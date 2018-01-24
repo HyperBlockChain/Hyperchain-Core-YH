@@ -31,8 +31,7 @@
 
 hc_label::hc_label(QWidget *parent, _ePoeReqState status) : QLabel(parent)
 {
-	//http://www.cnblogs.com/findumars/p/5364689.html
-    setScaledContents(true);
+	     setScaledContents(true);
 
     QString picName;
     switch (status) {
@@ -42,9 +41,7 @@ hc_label::hc_label(QWidget *parent, _ePoeReqState status) : QLabel(parent)
     case CONFIRMING:
         picName = QString("g.png");
         break;
-//    case MYREFUSEOTHER:
- //       picName = QString("y.png");
-//        break;
+
     case RECV:
         picName = QString("w.png");
         break;
@@ -81,5 +78,4 @@ void hc_label::mousePressEvent(QMouseEvent *event)
 void hc_label::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-	//QMessageBox::about(nullptr, QString("Click..........."), QString("click"));
 }

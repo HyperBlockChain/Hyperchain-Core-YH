@@ -33,7 +33,6 @@
 
 chain_data_status::chain_data_status(QWidget *parent) : QLabel(parent)
 {
-    //setFrameShape(QFrame::Shape::Box);
     setMouseTracking(true);
 }
 
@@ -42,13 +41,11 @@ void chain_data_status::mouseMoveEvent(QMouseEvent *event)
     int x = event->pos().x();
     int y = event->pos().y();
 
-    //qDebug()<<"y = "<<y;
 
     if(y > labelH_ || y <= 0){
         emit sigHideNodeInfo();
 
         event->accept();
-        //QWidget::mouseMoveEvent(event);
 
         return;
     }
@@ -115,7 +112,6 @@ void chain_data_status::paintEvent(QPaintEvent *event)
         painter.drawLine(QPoint(labelLR_ + pos, 1), QPoint(labelLR_ + pos, labelH_-1));
 
         if(index == 0){
-            //painter.fillRect(QRect(labelLR_+1, 1, pos - labelLR_ - 1, labelH_ - 1), Qt::green);
             painter.fillRect(QRect(labelLR_+1, 1, 10, labelH_ - 1), Qt::green);
 
             painter.drawText(QRect(18,labelH_ + 5, 20, 15), QStringLiteral("0"));

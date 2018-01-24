@@ -48,10 +48,10 @@ void custom_circle_btn::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
 
-    QRegion r1(QRect(100, 100, 200, 80),    
+    QRegion r1(QRect(100, 100, 200, 80),   
                      QRegion::Ellipse);
 
-    QRegion r2(QRect(100, 120, 90, 30));    
+    QRegion r2(QRect(100, 120, 90, 30));   
     QRegion r3 = r1.intersected(r2);       
 
     QPainter painter(this);

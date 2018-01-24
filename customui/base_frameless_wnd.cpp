@@ -127,6 +127,7 @@ base_frameless_wnd::base_frameless_wnd(QWidget* parent, QString logoPath, bool s
 
 void base_frameless_wnd::init()
 {
+  
     this->setWindowFlags(Qt::FramelessWindowHint);
 
 #ifdef WIN32
@@ -239,7 +240,6 @@ void base_frameless_wnd::setMinMaxCloseButton(QSize btnSize,
         }
 
         closeBtn_->setStyleSheet(closeBtnStyle);
-        //closeBtn_->setToolTip(tr("close"));
 
         connect(closeBtn_, &QPushButton::clicked, this, &base_frameless_wnd::onClose);
     }
@@ -250,7 +250,6 @@ void base_frameless_wnd::setMinMaxCloseButton(QSize btnSize,
         }
 
         minBtn_->setStyleSheet(minBtnStyle);
-        //minBtn_->setToolTip(tr("min"));
     }
 
     if(showMax){
@@ -259,7 +258,6 @@ void base_frameless_wnd::setMinMaxCloseButton(QSize btnSize,
         }
 
         maxBtn_->setStyleSheet(maxBtnStyle);
-        //maxBtn_->setToolTip(tr("max"));
     }
 }
 
@@ -303,7 +301,6 @@ void base_frameless_wnd::leaveEvent(QEvent *event)
 #ifdef Q_OS_LINUX
     void base_frameless_wnd::mousePressEvent(QMouseEvent *event){
         if (event->button() == Qt::LeftButton) {
-            //QPoint Wndpoint = mapFromGlobal(QCursor::pos());
             QPoint Wndpoint = mapFromGlobal(event->globalPos());
             int xPos = Wndpoint.x();
             int yPos = Wndpoint.y();
@@ -384,7 +381,6 @@ bool base_frameless_wnd::winEvent(const QByteArray &eventType, void *message, lo
 
         if(closeBtn_){
             QRect rect = closeBtn_->geometry();
-            //if(rect.contains(xPos-6, yPos-10)){
             if(rect.contains(xPos-6, yPos)){
                 return false;
             }
@@ -392,7 +388,6 @@ bool base_frameless_wnd::winEvent(const QByteArray &eventType, void *message, lo
 
         if(minBtn_){
             QRect rect = minBtn_->geometry();
-            //if(rect.contains(xPos-6, yPos-10)){
             if(rect.contains(xPos-6, yPos)){
                 return false;
             }
@@ -484,7 +479,7 @@ void base_frameless_wnd::paintEvent(QPaintEvent *event)
     painter.setPen(colItemBg);   
     painter.setBrush(colItemBg);
     painter.drawRect(WndMargins, WndMargins, szThis.width() - WndMargins * 2, szThis.height() - WndMargins * 2);
-    this->setMask(pixShadowBg.mask());  
+    this->setMask(pixShadowBg.mask()); 
 #endif
     QWidget::paintEvent(event);
 }
@@ -502,30 +497,21 @@ const QPixmap base_frameless_wnd::drawNinePatch(QSize szDst, const QPixmap &srcP
     int nH = szDst.height();
 
     int nWBg = srcPix.width();
-    int nHBg = srcPix.height(); 
-    QPoint m_ptBgLT(WndMargins, WndMargins);
+    int nHBg = srcPix.height();      
+	QPoint m_ptBgLT(WndMargins, WndMargins);
     QPoint m_ptBgRB(nWBg - WndMargins, nHBg - WndMargins);
 
     QPoint ptDstLT(m_ptBgLT.x(), m_ptBgLT.y());
     QPoint ptDstRB(nW - (nWBg - m_ptBgRB.x()), nH - (nHBg - m_ptBgRB.y()));
 
-    //LT
     painter.drawPixmap(QRect(0, 0, ptDstLT.x(), ptDstLT.y()), srcPix, QRect(0, 0, m_ptBgLT.x(), m_ptBgLT.y()));
-    //MT
     painter.drawPixmap(QRect(ptDstLT.x(), 0, ptDstRB.x() - ptDstLT.x(), ptDstLT.y()), srcPix, QRect(m_ptBgLT.x(), 0, m_ptBgRB.x() - m_ptBgLT.x(), m_ptBgLT.y()));
-    //RT
     painter.drawPixmap(QRect(ptDstRB.x(), 0, nW - ptDstRB.x(), ptDstLT.y()), srcPix, QRect(m_ptBgRB.x(), 0, nWBg - m_ptBgRB.x(), m_ptBgLT.y()));
-    //LM
     painter.drawPixmap(QRect(0, ptDstLT.y(), ptDstLT.x(), ptDstRB.y() - ptDstLT.y()), srcPix, QRect(0, m_ptBgLT.y(), m_ptBgLT.x(), m_ptBgRB.y() - m_ptBgLT.y()));
-    //MM
     painter.drawPixmap(QRect(ptDstLT.x(), ptDstLT.y(), ptDstRB.x() - ptDstLT.x(), ptDstRB.y() - ptDstLT.y()), srcPix, QRect(m_ptBgLT.x(), m_ptBgLT.y(), m_ptBgRB.x() - m_ptBgLT.x(), m_ptBgRB.y() - m_ptBgLT.y()));
-    //RM
     painter.drawPixmap(QRect(ptDstRB.x(), ptDstLT.y(), nW - ptDstRB.x(), ptDstRB.y() - ptDstLT.y()), srcPix, QRect(m_ptBgRB.x(), m_ptBgLT.y(), nWBg - m_ptBgRB.x(), m_ptBgRB.y() - m_ptBgLT.y()));
-    //LB
     painter.drawPixmap(QRect(0, ptDstRB.y(), ptDstLT.x(), nH - ptDstRB.y()), srcPix, QRect(0, m_ptBgRB.y(), m_ptBgLT.x(), nHBg - m_ptBgRB.y()));
-    //MB
     painter.drawPixmap(QRect(ptDstLT.x(), ptDstRB.y(), ptDstRB.x() - ptDstLT.x(), nH - ptDstRB.y()), srcPix, QRect(m_ptBgLT.x(), m_ptBgRB.y()-1, m_ptBgRB.x() - m_ptBgLT.x(), nHBg - m_ptBgRB.y()));
-    //RB
     painter.drawPixmap(QRect(ptDstRB.x(), ptDstRB.y(), nW - ptDstRB.x(), nH - ptDstRB.y()), srcPix, QRect(m_ptBgRB.x(), m_ptBgRB.y(), nWBg - m_ptBgRB.x(), nHBg - m_ptBgRB.y()));
 
     painter.end();

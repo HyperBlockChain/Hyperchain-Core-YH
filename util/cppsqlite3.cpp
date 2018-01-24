@@ -129,7 +129,6 @@ CppSQLite3Exception::~CppSQLite3Exception()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Buffer::CppSQLite3Buffer()
 {
@@ -165,7 +164,6 @@ const char* CppSQLite3Buffer::format(const char* szFormat, ...)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Binary::CppSQLite3Binary() :
 mpBuf(0),
@@ -195,7 +193,7 @@ void CppSQLite3Binary::setEncoded(const unsigned char* pBuf)
     clear();
 
     mnEncodedLen = strlen((const char*)pBuf);
-    mnBufferLen = mnEncodedLen + 1; // Allow for NULL terminator
+    mnBufferLen = mnEncodedLen + 1; 
 
     mpBuf = (unsigned char*)malloc(mnBufferLen);
 
@@ -257,7 +255,7 @@ unsigned char* CppSQLite3Binary::allocBuffer(int nLen)
 {
     clear();
 
-    
+  
     mnBinaryLen = nLen;
     mnBufferLen = 3 + (257*nLen)/254;
 
@@ -288,7 +286,6 @@ void CppSQLite3Binary::clear()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Query::CppSQLite3Query()
 {
@@ -623,7 +620,6 @@ void CppSQLite3Query::checkVM()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Table::CppSQLite3Table()
 {
@@ -637,7 +633,6 @@ CppSQLite3Table::CppSQLite3Table()
 CppSQLite3Table::CppSQLite3Table(const CppSQLite3Table& rTable)
 {
     mpaszResults = rTable.mpaszResults;
-    // Only one object can own the results
     const_cast<CppSQLite3Table&>(rTable).mpaszResults = 0;
     mnRows = rTable.mnRows;
     mnCols = rTable.mnCols;
@@ -676,7 +671,6 @@ CppSQLite3Table& CppSQLite3Table::operator=(const CppSQLite3Table& rTable)
     {
     }
     mpaszResults = rTable.mpaszResults;
-    // Only one object can own the results
     const_cast<CppSQLite3Table&>(rTable).mpaszResults = 0;
     mnRows = rTable.mnRows;
     mnCols = rTable.mnCols;
@@ -880,7 +874,6 @@ void CppSQLite3Table::checkResults()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Statement::CppSQLite3Statement()
 {
@@ -893,7 +886,6 @@ CppSQLite3Statement::CppSQLite3Statement(const CppSQLite3Statement& rStatement)
 {
     mpDB = rStatement.mpDB;
     mpVM = rStatement.mpVM;
-    // Only one object can own VM
     const_cast<CppSQLite3Statement&>(rStatement).mpVM = 0;
 }
 
@@ -921,7 +913,6 @@ CppSQLite3Statement& CppSQLite3Statement::operator=(const CppSQLite3Statement& r
 {
     mpDB = rStatement.mpDB;
     mpVM = rStatement.mpVM;
-    // Only one object can own VM
     const_cast<CppSQLite3Statement&>(rStatement).mpVM = 0;
     return *this;
 }

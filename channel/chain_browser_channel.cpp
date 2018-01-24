@@ -21,7 +21,7 @@
 */
 
 #include "chain_browser_channel.h"
-#include "p2p/interface/QtInterface.h"
+#include "HChainP2PManager/interface/QtInterface.h"
 #include "wnd/block_detail_dlg.h"
 #include "util/commonutil.h"
 
@@ -52,7 +52,7 @@ void chain_browser_channel::onHtmlReady()
 void chain_browser_channel::search(QString key)
 {
     std::string strKey = key.toStdString();
-	VEC_T_QUERYSHOWINFO vec = Query(strKey);
+	VEC_T_BROWSERSHOWINFO vec = Query(strKey);
 
     QList<QVariant> li;
 
@@ -68,9 +68,7 @@ void chain_browser_channel::search(QString key)
 		m["iUseNodes"] = item.iJoinedNodeNum;
 		m["iDataChainNum"] = item.iLocalBlockNum;
 		m["iChainNum"] = item.iLocalChainNum;
-      //  m["iLongestChain"] = item.iLongestChain;
 		m["tTime"] = item.tTimeStamp;
-
 
         QVariantMap mf;
 		convertEvidenceStruct2VariantMap(mf, &item.tPoeRecordInfo);
@@ -84,9 +82,6 @@ void chain_browser_channel::search(QString key)
 
 void chain_browser_channel::showDetail(QVariantMap generalInfo)
 {
-//    quint64 num = generalInfo["iBlockNum"].toULongLong();
-
-//    QVariantMap fi = generalInfo["tFileInfo"].toMap();
 
     detailDlg_->updateDetail(generalInfo);
 
@@ -100,7 +95,7 @@ int chain_browser_channel::getConfirmingNum()
 
 void chain_browser_channel::getLastBlockInfo()
 {
-	uint64 blockNum = GetLatestHyperBlockNo();
+    uint64 blockNum = GetCurBlockNumOfAllNode();
     QString blockNumStr = QString::number(blockNum);
 
     search(blockNumStr);

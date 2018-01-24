@@ -23,7 +23,7 @@
 #ifndef ATTESTATION_RECORD_H
 #define ATTESTATION_RECORD_H
 
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 
 #include <QWidget>
 #include <QSharedPointer>

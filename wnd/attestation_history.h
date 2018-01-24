@@ -23,8 +23,8 @@
 #ifndef ATTESTATION_HISTORY_H
 #define ATTESTATION_HISTORY_H
 
-#include "p2p/headers/inter_public.h"
-#include "p2p/interface/QtInterface.h"
+#include "HChainP2PManager/headers/inter_public.h"
+#include "HChainP2PManager/interface/QtInterface.h"
 
 #include <QWidget>
 #include <QSharedPointer>

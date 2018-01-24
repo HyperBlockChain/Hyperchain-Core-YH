@@ -21,7 +21,7 @@
 */
 
 #include "attestation_history_channel.h"
-#include "p2p/interface/QtInterface.h"
+#include "HChainP2PManager/interface/QtInterface.h"
 #include "mainwindow.h"
 #include "util/commonutil.h"
 #include "db/dbmgr.h"
@@ -47,7 +47,6 @@ void attestation_history_channel::onHtmlReady()
 
 quint64 attestation_history_channel::getEvidenceCount()
 {
-  
     QList<QSharedPointer<TEVIDENCEINFO> > evis = g_mainWindow()->getEvidence();
 
     return evis.size();
@@ -55,7 +54,6 @@ quint64 attestation_history_channel::getEvidenceCount()
 
 void attestation_history_channel::checkEvidenceInfo(QVariantMap evidenceInfo)
 {
-
 
     QSharedPointer<TEVIDENCEINFO> pEvidenceInfo = QSharedPointer<TEVIDENCEINFO>(new TEVIDENCEINFO);
 
@@ -69,7 +67,6 @@ void attestation_history_channel::checkEvidenceInfo(QVariantMap evidenceInfo)
 void attestation_history_channel::getEvidence(int page, int pageSize)
 {
     QList<QVariant> li;
-
 
     QList<TEVIDENCEINFO> evis;
     DBmgr::instance()->getEvidences(evis, -1);

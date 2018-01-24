@@ -46,66 +46,119 @@ tab_bar_wnd::~tab_bar_wnd()
 
 void tab_bar_wnd::setConnect()
 {
-
 }
 
 void tab_bar_wnd::createChildWnd(base_frameless_wnd *flWnd)
 {
-
 }
 
 void tab_bar_wnd::onHyperChainClick()
 {
+
 }
 
 void tab_bar_wnd::onChainBrowerClick()
 {
+
 }
 
 void tab_bar_wnd::onChainAttestationClick()
 {
+
 }
 
 void tab_bar_wnd::onNodeSetClick()
 {
+
 }
 
 void tab_bar_wnd::onDevModeClick()
 {
+
 }
 
 void tab_bar_wnd::tabClick(E_TAB_TYPE type)
 {
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 void tab_bar_wnd::showHyperChain()
 {
+
+
 }
 
 void tab_bar_wnd::showChainBrower()
 {
+
+
 }
 
 void tab_bar_wnd::showAttestation()
 {
+
+
 }
 
 void tab_bar_wnd::showNodeSet()
 {
+
+
 }
 
 void tab_bar_wnd::showDevMode()
 {
+
+
 }
 
 void tab_bar_wnd::hideWnd()
 {
 
+
+
+
+
+
+
 }
 
 void tab_bar_wnd::resizeChild()
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 

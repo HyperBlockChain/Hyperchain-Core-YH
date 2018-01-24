@@ -27,7 +27,7 @@
 #include <QWidget>
 #include <QLabel>
 
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 
 class hc_label : public QLabel
 {

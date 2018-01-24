@@ -43,7 +43,6 @@ enum E_TAB_TYPE{
 };
 
 
-
 class mine_hyperchain;
 class chain_browser;
 class attestation_reg;

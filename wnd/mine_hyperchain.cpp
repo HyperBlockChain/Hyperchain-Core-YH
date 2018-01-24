@@ -24,7 +24,7 @@
 #include "ui_mine_hyperchain.h"
 
 #include "block_info_dlg.h"
-#include "p2p/interface/QtInterface.h"
+#include "HChainP2PManager/interface/QtInterface.h"
 #include "util/commonutil.h"
 #include "mainwindow.h"
 
@@ -109,19 +109,49 @@ void mine_hyperchain::onHideNodeInfoDlgTimer()
 
 void mine_hyperchain::onUpdateTimer()
 {
-	uint64 curFirstBlockNum = GetLatestHyperBlockNo();
-	uint64 lastBlockNum = GetLatestHyperBlockNo();
+<<<<<<< .mine
 
+||||||| .r191
+    //数据链状态
+=======
+>>>>>>> .r192
+    uint64 curFirstBlockNum = GetCurBlockNumOfAllNode();
+    uint64 lastBlockNum = GetCurBlockNumOfAllNode();
+
+<<<<<<< .mine
+
+||||||| .r191
+    //test
+=======
+>>>>>>> .r192
     ui->labelChainDataStatus->setBlockNum(curFirstBlockNum, lastBlockNum);
 
-	VEC_T_BLOCKINFO vec = GetBlockInfoByIndex(0, lastBlockNum);
+<<<<<<< .mine
+
+||||||| .r191
+    //目前看接口，UI只能每个块去获取信息
+=======
+>>>>>>> .r192
+    VEC_T_BLOCKINFO vec = GetBlockInfo(0, lastBlockNum);
     QList<QSharedPointer<TBLOCKINFO> > li;
 
     if(vec.empty()){
+<<<<<<< .mine
+
+||||||| .r191
+        //this block just for test data
+=======
+>>>>>>> .r192
         ui->labelChainDataStatus->setBlockNum(2, 3);
 
         QSharedPointer<TBLOCKINFO> info = QSharedPointer<TBLOCKINFO>(new TBLOCKINFO);
 		info->iBlockNo = 0;
+<<<<<<< .mine
+   
+||||||| .r191
+        //--sjc-- 测试时间戳
+=======
+>>>>>>> .r192
 		info->tPoeRecordInfo.tRegisTime = 1497694933456;
         li.push_back(info);
 
@@ -140,6 +170,7 @@ void mine_hyperchain::onUpdateTimer()
 		info2->tPoeRecordInfo.iFileState = 4;
 		info2->tPoeRecordInfo.tRegisTime = 1497694953456;
 		info2->tPoeRecordInfo.iFileSize = 1048579;
+
 
         li.push_back(info2);
 
@@ -162,25 +193,27 @@ void mine_hyperchain::onUpdateTimer()
     ui->labelChainDataStatus->setBlocks(li);
     ui->labelChainDataStatus->update();
 
-    
-	int64 baseBlockNum = GetLatestHyperBlockNo();
+<<<<<<< .mine
+||||||| .r191
+    //链运行状态
+    //获取基块块号
+=======
+  
+>>>>>>> .r192
+    int64 baseBlockNum = GetBaseBlockNum();
     ui->labelBaseNodeNum->setText(QString("%1").arg(baseBlockNum));
 
     ui->labelAlternativeBlockNum->setText(tr("Alternative BN %1").arg(baseBlockNum + 1));
 
-   
-	uint16 allChainNum = GetElaspedTimeOfCurrentConsensus();
+    uint16 allChainNum = GetAllChainNum();
     ui->labelPartnerCount->setText(tr("All partner chain %1 rds").arg(allChainNum));
 
-   
-	uint16 confirmed = GetConfirmedChainNum();
+    uint16 confirmed = GetHaveConfirmChainNum();
     ui->labelConfirmed->setText(tr("Confirmed %1").arg(confirmed));
 
-   
-	int64 consensusTime = GetElaspedTimeOfCurrentConsensus();
+    int64 consensusTime = GetTimeOfConsensus();
     ui->labelConsensusTime->setText(tr("ConsensusTime %1").arg(secsToHourMinSecs(consensusTime)));
 
-  
 	VEC_T_NODEINFO vec1 = GetMyLocalChain();
     if(vec1.empty()){
         ui->myPartenerFrame->setNodeInfo(1);
@@ -188,7 +221,12 @@ void mine_hyperchain::onUpdateTimer()
         ui->myPartenerFrame->setNodeInfo(vec1);
     }
     ui->myPartenerFrame->showNodes();
-    
+<<<<<<< .mine
+
+||||||| .r191
+    //其它伙伴链2
+=======
+>>>>>>> .r192
 	VEC_T_NODEINFO vec2 = GetOtherLocalChain(2);
     if(vec2.empty()){
         ui->otherPartnerFrame0->setNodeInfo(2);
@@ -196,7 +234,30 @@ void mine_hyperchain::onUpdateTimer()
         ui->otherPartnerFrame0->setNodeInfo(vec2);
     }
     ui->otherPartnerFrame0->showNodes();
+<<<<<<< .mine
+
+    //VEC_T_NODEINFO vec3 = GetOtherFriendChainInfo(3);
+    //if(vec3.empty()){
+    //    ui->otherPartnerFrame1->setNodeInfo(3);
+    //}else{
+    //    ui->otherPartnerFrame1->setNodeInfo(vec3);
+    //}
+    //ui->otherPartnerFrame1->showNodes();
+
+||||||| .r191
+    ////其它伙伴链3
+    //VEC_T_NODEINFO vec3 = GetOtherFriendChainInfo(3);
+    //if(vec3.empty()){
+    //    ui->otherPartnerFrame1->setNodeInfo(3);
+    //}else{
+    //    ui->otherPartnerFrame1->setNodeInfo(vec3);
+    //}
+    //ui->otherPartnerFrame1->showNodes();
+
+    //伙伴链信息
+=======
    
+>>>>>>> .r192
 	VEC_T_NODEINFO v = GetMyLocalChain();
     ui->labelMyPartnerFlag->setText(QString("%1").arg(1));
     ui->labelMyPartnerCount->setText(QString("%1").arg(v.size()));
@@ -207,22 +268,45 @@ void mine_hyperchain::onUpdateTimer()
 
 	
   
-	uint32 responseWell = GetStrongNodeNum();
+
+<<<<<<< .mine
+    ////////////////////////////////////////
+
+||||||| .r191
+    ////////////////////////////////////////
+    //节点链接状态
+=======
+    
+>>>>>>> .r192
+    uint32 responseWell = GetBetterNodeNum();
     ui->chainConectStatusWell->setText(QString("%1").arg(responseWell));
 
-	uint32 normalNode = GetAverageNodeNum();
+    uint32 normalNode = GetNormalNodeNum();
     ui->chainConectStatusOccasionallyNoResponse->setText(QString("%1").arg(normalNode));
 
-	uint32 badNodeNum = GetWeakNodeNum();
+    uint32 badNodeNum = GetBadNodeNum();
     ui->chainConectStatusOccasionallyResponse->setText(QString("%1").arg(badNodeNum));
 
-	uint32 downNode = GetOfflineNodeNum();
+    uint32 downNode = GetDownNodeNum();
     ui->chainConectStatusNoResponse->setText(QString("%1").arg(downNode));
 
-  
+<<<<<<< .mine
+
     uint32 reqSend = GetSendRegisReqNum(SEND);                  //已发送
     uint32 reqConfirming = GetSendRegisReqNum(CONFIRMING);      //待确认
     uint32 reqConfirmed =  GetSendRegisReqNum(CONFIRMED);       //已确认
+//    uint32 reqRefused =   GetSendRegisReqNum(OTHERREFUSEME);    //被拒绝
+||||||| .r191
+    //我的登记请求
+    uint32 reqSend = GetSendRegisReqNum(SEND);                  //已发送
+    uint32 reqConfirming = GetSendRegisReqNum(CONFIRMING);      //待确认
+    uint32 reqConfirmed =  GetSendRegisReqNum(CONFIRMED);       //已确认
+//    uint32 reqRefused =   GetSendRegisReqNum(OTHERREFUSEME);    //被拒绝
+=======
+    uint32 reqSend = GetSendRegisReqNum(SEND);                  
+    uint32 reqConfirming = GetSendRegisReqNum(CONFIRMING);      
+    uint32 reqConfirmed =  GetSendRegisReqNum(CONFIRMED);       
+>>>>>>> .r192
     ui->labelMyRegSended->setText(QString("%1").arg(reqSend));
     ui->labelMyRegWaitforConfirm->setText(QString("%1").arg(reqConfirming));
     ui->labelMyRegConfirmed->setText(QString("%1").arg(reqConfirmed));
@@ -232,9 +316,9 @@ void mine_hyperchain::onUpdateTimer()
         g_mainWindow()->updateEvidence();
     }
 
-    uint32 repRecved = GetRecvRegisRegNum(RECV);                //已收到
-    uint32 repConfirming = GetRecvRegisRegNum(CONFIRMING);      //待确认
-    uint32 repConfirmed = GetRecvRegisRegNum(CONFIRMED);        //已确认
+    uint32 repRecved = GetRecvRegisRegNum(RECV);                
+    uint32 repConfirming = GetRecvRegisRegNum(CONFIRMING);      
+    uint32 repConfirmed = GetRecvRegisRegNum(CONFIRMED);        
     ui->labelRecvRegSended->setText(QString("%1").arg(repRecved));
     ui->labelRecvRegWaitforConfirm->setText(QString("%1").arg(repConfirming));
     ui->labelRecvRegConfirmed->setText(QString("%1").arg(repConfirmed));

@@ -47,7 +47,6 @@ void reg_verification_frameless::updateDetail(QVariantMap generalInfo)
         return;
     }
 
-    //设置数据
     verification_wnd_->updateInfo(generalInfo);
 
     show(true);

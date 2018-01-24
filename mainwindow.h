@@ -34,7 +34,7 @@
 
 #include "wnd/tab_bar_wnd.h"
 #include "customui/base_frameless_wnd.h"
-#include "p2p/headers/inter_public.h"
+#include "HChainP2PManager/headers/inter_public.h"
 
 class mine_hyperchain;
 class chain_browser;
@@ -88,8 +88,6 @@ public:
     void addEvidence(QSharedPointer<TEVIDENCEINFO> evi);
     void updateEvidence();
     QList<QSharedPointer<TEVIDENCEINFO> >& getEvidence();
-//////////////////////////////////////////////////////
-//////////////////////////////////////////////////////
 public slots:
     void onHyperChainClick();
     void onChainBrowerClick();
@@ -165,11 +163,12 @@ private:
     QMenu *trayIconMenu;
     QSystemTrayIcon *trayIcon;
 
-    int langIndex_ = 0; //0: english 2: zh
+    int langIndex_ = 0;
     QTranslator appTranslatorZh_;
     QTranslator appTranslatorEn_;
 
 private:
+   
     QList<QSharedPointer<TEVIDENCEINFO> > listEvi_;
 
     bool _verificationWndShow = false;

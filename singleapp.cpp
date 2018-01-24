@@ -24,7 +24,7 @@
 #include <QtNetwork/QLocalSocket>
 #include <QFileInfo>
 
-#define TIME_OUT                (500)    // 500ms
+#define TIME_OUT                (500)   
 
 
 SingleApplication::SingleApplication(int &argc, char **argv)
@@ -33,7 +33,6 @@ SingleApplication::SingleApplication(int &argc, char **argv)
     , _isRunning(false)
     , _localServer(NULL)
 {
-    //_serverName = QFileInfo(QCoreApplication::applicationFilePath()).fileName();
     _serverName = QString("com-hypercore-qt");
 
     _initLocalConnection();
@@ -50,7 +49,6 @@ void SingleApplication::_newLocalConnection() {
         socket->waitForReadyRead(2*TIME_OUT);
         delete socket;
 
-        // do sth else
         _activateWindow();
     }
 }
@@ -74,16 +72,13 @@ void SingleApplication::_initLocalConnection()
 void SingleApplication::_newLocalServer() {
     _localServer = new QLocalServer(this);
 
-    //connect for new connection
     connect(_localServer, SIGNAL(newConnection()), this, SLOT(_newLocalConnection()));
 
     if(!_localServer->listen(_serverName)) {
         if(_localServer->serverError() == QAbstractSocket::AddressInUseError) {
 
-            //this row is very important!!!
             QLocalServer::removeServer(_serverName);
 
-            //listen again
             _localServer->listen(_serverName);
         }
     }
