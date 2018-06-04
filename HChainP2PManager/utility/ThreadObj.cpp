@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -27,7 +27,6 @@
  int 	ERR_JTHREAD_NOTRUNNING 			= -4;
  int  	ERR_JTHREAD_ALREADYRUNNING		= -5;
  int    ERR_JTHREAD_NOT	 				= -6;
-
 
 CThreadObj::CThreadObj() : m_ThreadID(0)
 						, m_bIsRunning(false)
@@ -58,7 +57,7 @@ int CThreadObj::Start()
 		return ERR_JTHREAD_ALREADYRUNNING;
 	}
 	m_muxRunning.UnLock();
-	
+
 	m_muxContinue.Lock();
 
 #ifdef WIN32
@@ -67,7 +66,7 @@ int CThreadObj::Start()
 		int iRtn = (NULL == m_ThreadID) ? 1 : 0;
 #else
 		int iRtn = pthread_create(&m_ThreadID,NULL, ThreadEntry,this);
-#endif //WIN32
+#endif
 
 	if(0 != iRtn)
 	{
@@ -75,7 +74,6 @@ int CThreadObj::Start()
 		return  ERR_JTHREAD_CANTSTARTTHREAD;
 	}
 
-	
 	m_muxRunning.Lock();
 	while(!m_bIsRunning)
 	{
@@ -84,14 +82,14 @@ int CThreadObj::Start()
 		Sleep(1);
 #else
 		usleep(1000);
-#endif //WIN32
-	
+#endif
+
 		m_muxRunning.Lock();
 	}
 	m_muxRunning.UnLock();
 
 	m_muxContinue.UnLock();
-	
+
 	m_muxContinue2.Lock();
 	m_muxContinue2.UnLock();
 
@@ -102,7 +100,7 @@ int CThreadObj::Start(TCallbackFuncObj<pThreadCallbackFunc>* pCObj)
 {
 	if(NULL == pCObj && NULL == m_pCallbackFuncObj)
 		return ERR_JTHREAD_THREADFUNCNOTSET;
-	
+
 	if(NULL != pCObj)
 		m_pCallbackFuncObj = pCObj;
 
@@ -111,14 +109,14 @@ int CThreadObj::Start(TCallbackFuncObj<pThreadCallbackFunc>* pCObj)
 
 void CThreadObj::Join()
 {
-	if(!IsRunning())	
+	if(!IsRunning())
 		return;
 #ifdef WIN32
 	WaitForSingleObject(m_ThreadID, INFINITE);
 #else
-	pthread_join(m_ThreadID, NULL);	
-#endif //WIN32
-	
+	pthread_join(m_ThreadID, NULL);
+#endif
+
 }
 
 int CThreadObj::Kill()
@@ -134,8 +132,8 @@ int CThreadObj::Kill()
 	CloseHandle(m_ThreadID);
 #else
 	pthread_cancel(m_ThreadID);
-#endif //WIN32
-	
+#endif
+
 	m_ThreadID = 0;
 	m_bIsRunning = false;
 	m_muxRunning.UnLock();
@@ -162,7 +160,7 @@ void* CThreadObj::ThreadImp()
 {
 	return m_pCallbackFuncObj->GetCallbackFunc()(m_pCallbackFuncObj->GetCallbackParam());
 }
-	
+
 #ifdef WIN32
 DWORD CThreadObj::ThreadEntry( LPVOID param )
 #else
@@ -183,7 +181,7 @@ void* CThreadObj::ThreadEntry(void* param)
 	pThis->m_muxContinue.UnLock();
 
 	pRet = pThis->ThreadImp();
-		
+
 	pThis->m_muxRunning.Lock();
 	pThis->m_bIsRunning = false;
 	pThis->m_ThreadID = 0;
@@ -191,11 +189,4 @@ void* CThreadObj::ThreadEntry(void* param)
 
 	return 0;
 }
-
-
-
-
-
-
-	
 

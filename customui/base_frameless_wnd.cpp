@@ -1,9 +1,9 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
+/*file COPYING or https://opensource.org/licenses/MIT。
 /*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 /*software and associated documentation files (the "Software"), to deal in the Software
 /*without restriction, including without limitation the rights to use, copy, modify, merge,
 /*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
@@ -12,7 +12,7 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
@@ -21,7 +21,6 @@
 */
 
 #include "base_frameless_wnd.h"
-
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <windowsx.h>
@@ -36,6 +35,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTextCodec>
+
 
 const static unsigned char m_hexData[588] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
@@ -127,7 +127,7 @@ base_frameless_wnd::base_frameless_wnd(QWidget* parent, QString logoPath, bool s
 
 void base_frameless_wnd::init()
 {
-  
+
     this->setWindowFlags(Qt::FramelessWindowHint);
 
 #ifdef WIN32
@@ -135,9 +135,9 @@ void base_frameless_wnd::init()
 
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
-
     HWND hwnd = (HWND)this->winId();
     DWORD style = ::GetWindowLong(hwnd, GWL_STYLE);
+
 #endif
 
     title_ = new QFrame(this);
@@ -159,14 +159,13 @@ void base_frameless_wnd::init()
     content_->setMinimumSize(QSize(0, 0));
     content_->setMaximumSize(QSize(16777215, 16777215));
 
-
-
     title_->setStyleSheet(QString("background-color: rgb(255, 255, 255);"));
     content_->setStyleSheet(QString("background-color: rgb(255, 255, 255);"));
 
     widgetLayout_ = new QVBoxLayout(this);
     widgetLayout_->setObjectName(QStringLiteral("verticalLayout"));
     widgetLayout_->setSpacing(0);
+
 #ifdef WIN32
     widgetLayout_->setMargin(3);
 #else
@@ -250,6 +249,7 @@ void base_frameless_wnd::setMinMaxCloseButton(QSize btnSize,
         }
 
         minBtn_->setStyleSheet(minBtnStyle);
+
     }
 
     if(showMax){
@@ -258,6 +258,7 @@ void base_frameless_wnd::setMinMaxCloseButton(QSize btnSize,
         }
 
         maxBtn_->setStyleSheet(maxBtnStyle);
+
     }
 }
 
@@ -301,6 +302,7 @@ void base_frameless_wnd::leaveEvent(QEvent *event)
 #ifdef Q_OS_LINUX
     void base_frameless_wnd::mousePressEvent(QMouseEvent *event){
         if (event->button() == Qt::LeftButton) {
+
             QPoint Wndpoint = mapFromGlobal(event->globalPos());
             int xPos = Wndpoint.x();
             int yPos = Wndpoint.y();
@@ -356,7 +358,6 @@ void base_frameless_wnd::resetBtnPos()
     }
 }
 
-
 bool base_frameless_wnd::nativeEvent(const QByteArray &eventType, void *message, long *result)
 {
 #ifdef WIN32
@@ -381,6 +382,7 @@ bool base_frameless_wnd::winEvent(const QByteArray &eventType, void *message, lo
 
         if(closeBtn_){
             QRect rect = closeBtn_->geometry();
+
             if(rect.contains(xPos-6, yPos)){
                 return false;
             }
@@ -388,6 +390,7 @@ bool base_frameless_wnd::winEvent(const QByteArray &eventType, void *message, lo
 
         if(minBtn_){
             QRect rect = minBtn_->geometry();
+
             if(rect.contains(xPos-6, yPos)){
                 return false;
             }
@@ -439,6 +442,7 @@ bool base_frameless_wnd::winEvent(const QByteArray &eventType, void *message, lo
     case WM_GETMINMAXINFO:
     {
         if (::IsZoomed(msg->hwnd)) {
+
             RECT frame = { 0, 0, 0, 0 };
             AdjustWindowRectEx(&frame, WS_OVERLAPPEDWINDOW, FALSE, 0);
             frame.left = abs(frame.left);
@@ -468,7 +472,7 @@ void base_frameless_wnd::paintEvent(QPaintEvent *event)
 #ifdef WIN32
     QPainter painter(this);
 
-    static QColor colItemBg(255, 255, 255); 
+    static QColor colItemBg(255, 255, 255);
 
     QSize szThis = this->rect().size();
     QPixmap pixShadowBg = drawNinePatch(szThis, m_pixShadow);
@@ -476,10 +480,10 @@ void base_frameless_wnd::paintEvent(QPaintEvent *event)
     painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
     painter.fillRect(pixShadowBg.rect(), QColor(0, 0, 0, 150));
 
-    painter.setPen(colItemBg);   
+    painter.setPen(colItemBg);
     painter.setBrush(colItemBg);
     painter.drawRect(WndMargins, WndMargins, szThis.width() - WndMargins * 2, szThis.height() - WndMargins * 2);
-    this->setMask(pixShadowBg.mask()); 
+    this->setMask(pixShadowBg.mask());
 #endif
     QWidget::paintEvent(event);
 }
@@ -497,21 +501,29 @@ const QPixmap base_frameless_wnd::drawNinePatch(QSize szDst, const QPixmap &srcP
     int nH = szDst.height();
 
     int nWBg = srcPix.width();
-    int nHBg = srcPix.height();      
-	QPoint m_ptBgLT(WndMargins, WndMargins);
+    int nHBg = srcPix.height();
+    QPoint m_ptBgLT(WndMargins, WndMargins);
     QPoint m_ptBgRB(nWBg - WndMargins, nHBg - WndMargins);
 
     QPoint ptDstLT(m_ptBgLT.x(), m_ptBgLT.y());
     QPoint ptDstRB(nW - (nWBg - m_ptBgRB.x()), nH - (nHBg - m_ptBgRB.y()));
 
     painter.drawPixmap(QRect(0, 0, ptDstLT.x(), ptDstLT.y()), srcPix, QRect(0, 0, m_ptBgLT.x(), m_ptBgLT.y()));
+
     painter.drawPixmap(QRect(ptDstLT.x(), 0, ptDstRB.x() - ptDstLT.x(), ptDstLT.y()), srcPix, QRect(m_ptBgLT.x(), 0, m_ptBgRB.x() - m_ptBgLT.x(), m_ptBgLT.y()));
+
     painter.drawPixmap(QRect(ptDstRB.x(), 0, nW - ptDstRB.x(), ptDstLT.y()), srcPix, QRect(m_ptBgRB.x(), 0, nWBg - m_ptBgRB.x(), m_ptBgLT.y()));
+
     painter.drawPixmap(QRect(0, ptDstLT.y(), ptDstLT.x(), ptDstRB.y() - ptDstLT.y()), srcPix, QRect(0, m_ptBgLT.y(), m_ptBgLT.x(), m_ptBgRB.y() - m_ptBgLT.y()));
+
     painter.drawPixmap(QRect(ptDstLT.x(), ptDstLT.y(), ptDstRB.x() - ptDstLT.x(), ptDstRB.y() - ptDstLT.y()), srcPix, QRect(m_ptBgLT.x(), m_ptBgLT.y(), m_ptBgRB.x() - m_ptBgLT.x(), m_ptBgRB.y() - m_ptBgLT.y()));
+
     painter.drawPixmap(QRect(ptDstRB.x(), ptDstLT.y(), nW - ptDstRB.x(), ptDstRB.y() - ptDstLT.y()), srcPix, QRect(m_ptBgRB.x(), m_ptBgLT.y(), nWBg - m_ptBgRB.x(), m_ptBgRB.y() - m_ptBgLT.y()));
+
     painter.drawPixmap(QRect(0, ptDstRB.y(), ptDstLT.x(), nH - ptDstRB.y()), srcPix, QRect(0, m_ptBgRB.y(), m_ptBgLT.x(), nHBg - m_ptBgRB.y()));
+
     painter.drawPixmap(QRect(ptDstLT.x(), ptDstRB.y(), ptDstRB.x() - ptDstLT.x(), nH - ptDstRB.y()), srcPix, QRect(m_ptBgLT.x(), m_ptBgRB.y()-1, m_ptBgRB.x() - m_ptBgLT.x(), nHBg - m_ptBgRB.y()));
+
     painter.drawPixmap(QRect(ptDstRB.x(), ptDstRB.y(), nW - ptDstRB.x(), nH - ptDstRB.y()), srcPix, QRect(m_ptBgRB.x(), m_ptBgRB.y(), nWBg - m_ptBgRB.x(), nHBg - m_ptBgRB.y()));
 
     painter.end();

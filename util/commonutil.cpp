@@ -1,9 +1,9 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net  (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT.
 /*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
 /*software and associated documentation files (the "Software"), to deal in the Software
 /*without restriction, including without limitation the rights to use, copy, modify, merge,
 /*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
@@ -12,7 +12,7 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
@@ -86,10 +86,96 @@ QString imageRoot()
 #endif
 }
 
+QString translationRoot()
+{
+#ifdef Q_OS_LINUX
+	return QString(":/translation/translation");
+#else
+
+#ifdef QT_DEBUG
+#if defined(Q_OS_WIN)
+	QString uiroot = QString("%1/%2").arg(QApplication::applicationDirPath()).arg("../../translation");
+#else
+	QString uiroot = QString("%1/%2").arg(QApplication::applicationDirPath()).arg("../translation");
+#endif
+#else
+	QString uiroot = QString("%1/%2").arg(QApplication::applicationDirPath()).arg("translation");
+#endif
+
+	return uiroot;
+#endif
+}
+
+QString Trans_En_Path()
+{
+	QString EnPath = QString("%1/hyperchaincore_en.qm").arg(translationRoot());
+	return EnPath;
+}
+
+QString Trans_Zh_Path()
+{
+	QString ZhPath = QString("%1/hyperchaincore_zh.qm").arg(translationRoot());
+	return ZhPath;
+}
+
 QString logoPath()
 {
      QString logoPath = QString("%1/icon.jpg").arg(imageRoot());
      return logoPath;
+}
+
+QString ChainStatusPath()
+{
+	QString logoPath = QString("%1/chainstatus.png").arg(imageRoot());
+	return logoPath;
+}
+
+QString ChainRunStatusPath()
+{
+	QString logoPath = QString("%1/runstatus.png").arg(imageRoot());
+	return logoPath;
+}
+
+QString NodeConnectStatusPath()
+{
+	QString logoPath = QString("%1/connectstatus.png").arg(imageRoot());
+	return logoPath;
+}
+
+QString PoePath()
+{
+	QString logoPath = QString("%1/poe.png").arg(imageRoot());
+	return logoPath;
+}
+
+QString TokenPath()
+{
+	QString logoPath = QString("%1/token.png").arg(imageRoot());
+	return logoPath;
+}
+
+QString PassPath()
+{
+	QString logoPath = QString("%1/pass.png").arg(imageRoot());
+	return logoPath;
+}
+
+QString ScriptPath()
+{
+	QString logoPath = QString("%1/script.png").arg(imageRoot());
+	return logoPath;
+}
+
+QString ContractPath()
+{
+	QString logoPath = QString("%1/contract.png").arg(imageRoot());
+	return logoPath;
+}
+
+QString AboutLogoPath()
+{
+	QString logoPath = QString("%1/logo-about.png").arg(imageRoot());
+	return logoPath;
 }
 
 QString closeBtnStyle()
@@ -153,6 +239,8 @@ void convertEvidenceVariantMap2Struct(TEVIDENCEINFO *dest, const QVariantMap &ev
     dest->iFileState = evidenceInfo["iFileState"].toInt();
     dest->tRegisTime = evidenceInfo["tRegisTime"].toULongLong();
     dest->iFileSize  = evidenceInfo["iFileSize"].toULongLong();
+	dest->iBlocknum = evidenceInfo["iBlocknum"].toULongLong();
+
 }
 
 void convertEvidenceStruct2VariantMap(QVariantMap &info, const TEVIDENCEINFO *dest)
@@ -168,4 +256,5 @@ void convertEvidenceStruct2VariantMap(QVariantMap &info, const TEVIDENCEINFO *de
     info["iFileState"] = dest->iFileState;
     info["tRegisTime"] = dest->tRegisTime;
     info["iFileSize"] = dest->iFileSize;
+	info["iBlocknum"] = dest->iBlocknum;
 }

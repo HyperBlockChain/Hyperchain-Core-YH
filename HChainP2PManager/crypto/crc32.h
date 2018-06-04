@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -26,4 +26,4 @@
 bool crc32file(const char * const name, unsigned int* crc, long* charcnt);
 unsigned int crc32buf(char* buf, size_t len);
 
-#endif //_CRC32_H_
+#endif

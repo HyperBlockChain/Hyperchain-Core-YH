@@ -1,9 +1,9 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
+/*file COPYING or https://opensource.org/licenses/MIT。
 /*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 /*software and associated documentation files (the "Software"), to deal in the Software
 /*without restriction, including without limitation the rights to use, copy, modify, merge,
 /*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
@@ -12,7 +12,7 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
@@ -20,20 +20,25 @@
 /*DEALINGS IN THE SOFTWARE.
 */
 
-#include "chain_data_status.h"
-#include "wnd/block_info_dlg.h"
-
-
 #include <QPainter>
 #include <QtGlobal>
 #include <QMouseEvent>
 #include <QTime>
 #include <QFontMetrics>
 #include <QDebug>
+#include "blockinfo.h"
+#include "chain_data_status.h"
 
 chain_data_status::chain_data_status(QWidget *parent) : QLabel(parent)
 {
+
+	initstring();
     setMouseTracking(true);
+}
+void chain_data_status::initstring()
+{
+	genesisblock = tr("GENESIS BLOCK");
+	recentblocl = tr("THE LATEST BLOCK");
 }
 
 void chain_data_status::mouseMoveEvent(QMouseEvent *event)
@@ -41,18 +46,7 @@ void chain_data_status::mouseMoveEvent(QMouseEvent *event)
     int x = event->pos().x();
     int y = event->pos().y();
 
-
-    if(y > labelH_ || y <= 0){
-        emit sigHideNodeInfo();
-
-        event->accept();
-
-        return;
-    }
-
-    static bool s_showWnd = false;
-
-    QMapIterator<int, QSharedPointer<TBLOCKINFO> > item(mapPix_);
+	QMapIterator<int, uint64> item(map_BlockNum);
 
     while (item.hasNext()) {
         item.next();
@@ -61,25 +55,19 @@ void chain_data_status::mouseMoveEvent(QMouseEvent *event)
 #else
         if(y > 0 && y < labelH_ && (x >= item.key() - 4 && x <= item.key() + 4)){
 #endif
-            QSharedPointer<TBLOCKINFO> nodeInfo = item.value();
-			qDebug() << "nodeInfo , blockNum: " << nodeInfo->iBlockNo;
 
-            s_showWnd = true;
+			int x = this->width() + 20;
+			int y = 0;
+			QPoint p(x, y);
+			QPoint gp = mapToGlobal(p);
 
-            emit sigShowNodeInfo(event->globalPos(), nodeInfo);
+			emit sigShowNodeDlgInfo(gp, item.value());
 
             event->accept();
-
             return;
         }
     }
 
-    if(s_showWnd){
-        s_showWnd = false;
-
-        event->accept();
-        emit sigHideNodeInfo();
-    }
 }
 
 void chain_data_status::mousePressEvent(QMouseEvent *event)
@@ -95,40 +83,42 @@ void chain_data_status::mouseReleaseEvent(QMouseEvent *event)
 void chain_data_status::paintEvent(QPaintEvent *event)
 {
     QLabel::paintEvent(event);
-
     QPainter painter(this);
-
     static QFontMetrics fm = painter.fontMetrics();
 
-    painter.drawRect(QRect(labelLR_, 0, width() - (labelLR_ * 2), labelH_));
+	painter.drawRect(QRect(labelLR_, 0, width() - labelLR_ * 2 - ncutlen, labelH_));
 
-    mapPix_.clear();
-
+	map_BlockNum.clear();
 
     int index = 0;
-    for(auto item : items_){
-		int pos = calVLinePos(item->iBlockNo);
+
+	for (auto item : items_BlockNum)
+	{
+
+		int pos = calVLinePos(item);
 
         painter.drawLine(QPoint(labelLR_ + pos, 1), QPoint(labelLR_ + pos, labelH_-1));
 
         if(index == 0){
-            painter.fillRect(QRect(labelLR_+1, 1, 10, labelH_ - 1), Qt::green);
 
-            painter.drawText(QRect(18,labelH_ + 5, 20, 15), QStringLiteral("0"));
-            painter.drawText(QRect(8,labelH_ + 22, 80, 15), tr("FIRST BLOCK"));
+			painter.setPen(QColor(0, 160, 230));
+			painter.drawText(QRect(labelLR_ + 1, labelH_ + 5, 20, 15), QStringLiteral("0"));
+			painter.drawText(QRect(labelLR_ + 1, labelH_ + 22, 80, 15), genesisblock);
         }
 
-		if (item->iBlockNo == myFirstBlockNum_){
+		if (item == myFirstBlockNum_)
+		{
             QString numStr = QString("%1").arg(myFirstBlockNum_);
             int w = fm.width(numStr);
-            painter.drawText(QRect((labelLR_+pos) - (w/2) , labelH_ + 5, w, 15), QString("%1").arg(myFirstBlockNum_));
 
-            w = fm.width(tr("MY FIRST BLOCK"));
-            painter.drawText(QRect((labelLR_+pos) - (w/2), labelH_ + 22, w , 15), tr("MY FIRST BLOCK"));
+			painter.drawText(QRect((width() - w - labelLR_ - ncutlen), labelH_ + 5, w, 15), QString("%1").arg(myFirstBlockNum_));
+
+			w = fm.width(recentblocl);
+
+			painter.drawText(QRect((width() - w - labelLR_ - ncutlen), labelH_ + 22, w, 15), recentblocl);
         }
 
-        mapPix_.insert(labelLR_ + pos, item);
-
+		map_BlockNum.insert(labelLR_ + pos, item);
         index++;
     }
 }
@@ -140,10 +130,13 @@ void chain_data_status::resizeEvent(QResizeEvent *event)
 
 int chain_data_status::calVLinePos(uint64 num)
 {
-    int w = this->width() - labelLR_*2;
 
+	int w = this->width() - labelLR_ * 2 - ncutlen;
     int pos = (int)((num * 1.0) / lastBlockNum_ * w);
-
     return pos;
 }
 
+void chain_data_status::retranslateUi()
+{
+	initstring();
+}

@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -24,8 +24,7 @@
 
 #include "../headers/includeComm.h"
 
-
-class event_impl     
+class event_impl
 {
     public:
         event_impl();
@@ -40,12 +39,16 @@ class event_impl
         int term();
 
     public:
-     
+
         unsigned long wait( unsigned long ulMilliseconds );
-        int set_event_type( bool bManuleReset );     
-        int reset_event();     
+
+        int set_event_type( bool bManuleReset );
+
+        int reset_event();
+
         int set_event();
+
         int release();
 };
 
-#endif // __EVENT_IMPL_H__
+#endif

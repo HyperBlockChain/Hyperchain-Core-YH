@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -25,52 +25,102 @@
 
 #include "../headers/inter_public.h"
 #include "../HChainP2PManager.h"
-
+#include "QtNotify.h"
+#include "db/RestApi.h"
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 	CHChainP2PManager getManagerPtr();
+
 	void runP2P(int argc, char *argv[]);
-	uint64 GetCurBlockNumOfMyself();
-	uint64 GetCurBlockNumOfAllNode();
+
+	uint64 GetLocalLatestBlockNo();
+
+	uint64 GetLatestHyperBlockNo();
+
 	VEC_T_BLOCKINFO GetBlockInfo(uint64 start, uint64 end);
+
 	uint64 GetBaseBlockNum();
+
 	uint16 GetAllChainNum();
+
 	VEC_T_NODEINFO GetMyLocalChain();
+
 	VEC_T_NODEINFO GetOtherLocalChain(uint16 chainNum);
+
 	uint16 GetHaveConfirmChainNum();
+
 	uint64 GetTimeOfConsensus();
+
 	uint32 GetBetterNodeNum();
+
 	uint32 GetNormalNodeNum();
+
 	uint32 GetBadNodeNum();
+
 	uint32 GetDownNodeNum();
+
 	uint32 GetSendRegisReqNum(uint16 regisReq);
+
 	uint32 GetRecvRegisRegNum(uint16 regisReq);
+
 	void SetFilePoeRecord(P_TEVIDENCEINFO pSetInfo);
+
 	bool VerifyPoeRecord(string &checkFileHash, P_TEVIDENCEINFO pCheckInfo);
+
 	uint64 GetConnNodesNum();
+
 	uint64 GetNodeRunningTime();
+
 	uint32 GetAllPoeReqNum();
+
 	void GetSendingRate(string &sendRate);
+
 	void GetSentSize(string &allSendSize);
+
 	void GetRecvingRate(string &recvRate);
+
 	void GetRecvedSize(string &allRecvSize);
+
 	void GetChainSize(string &buffSize);
+
 	VEC_T_BROWSERSHOWINFO Query(string &searchInfo);
+
 	void GetChainData(string &chainData);
+
 	uint64 GetPoeReqTotalNum();
+
 	uint64 GetAllConnectedNodes();
+
 	uint64 GetAllConfirmingPoeReqNum();
+
 	uint64 GetStartTimeOfCurrentConsensus();
+
 	void GetNodeInfo(string &info, string &ip, uint16& port);
+
+	void setNotify(QtNotify * qnotify);
 	void ChainDataPersist();
 	uint16 getCsvFileNum();
 	void getHyperBlockFromLocal();
+	void getAllHyperBlockFromLocal();
 	uint64 GetOnChainState(string fileHash);
 	string Upqueue(string hash);
+
+	VEC_T_PPEERCONF GetPeerInfo();
+	json::value QueryByWeb(uint64 blockNum);
+	uint16 GetPoeRecordListNum();
+	LIST_T_LOCALCONSENSUS GetPoeRecordList();
+	void GetNodeRunTimeEnv(string &version, string &netType, string &protocolVersion, string &ip, uint16 &port, string &name);
+	uint16 GetStateOfCurrentConsensus(uint64 &blockNo, uint16 &blockNum, uint16 &chainNum);
+	uint32 GetConnectedNodesNum();
+	void SetScriptPoeRecord(string script);
+	void GetHyperBlockInfoFromP2P(uint64 start, uint64 end);
+
+	void GetHyperBlockNumInfoFromLocal();
+	void DeleteFailedPoe(string script, uint64 time);
 #ifdef __cplusplus
 }
 #endif
 
-#endif//__QT_INTERFACE_H__
+#endif

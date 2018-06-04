@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -21,68 +21,20 @@
 */
 #include "udpsocket.h"
 #define SEND_TIMES (5)
-
-#ifdef WIN32
-extern void win_gettimeofday(struct timeval *tp);
-#define GETTIMEOFDAY(ptr)	win_gettimeofday(ptr)
-#else
-#define GETTIMEOFDAY(ptr)	gettimeofday(ptr, 0)
-#endif
-
-#define MILI_UINT					(10000000)
-#define LEFT_SHIFT_32				(32)
-#define DELI_TEN					(10)
-#ifdef WIN32
-void win_gettimeofday(struct timeval *tp)
-{
-	uint64_t  intervals;
-	FILETIME  ft;
-
-	GetSystemTimeAsFileTime(&ft);
-
-	intervals = ((uint64_t)ft.dwHighDateTime << LEFT_SHIFT_32) | ft.dwLowDateTime;
-	intervals -= 116444736000000000;
-
-	tp->tv_sec = (long)(intervals / MILI_UINT);
-	tp->tv_usec = (long)((intervals % MILI_UINT) / DELI_TEN);
-}
-#endif
-
-#ifdef WIN32
-int gettimeofday(struct timeval *tp, void *tzp)
-{
-	time_t clock;
-	struct tm tm;
-	SYSTEMTIME wtm;
-	GetLocalTime(&wtm);
-	tm.tm_year = wtm.wYear - 1900;
-	tm.tm_mon = wtm.wMonth - 1;
-	tm.tm_mday = wtm.wDay;
-	tm.tm_hour = wtm.wHour;
-	tm.tm_min = wtm.wMinute;
-	tm.tm_sec = wtm.wSecond;
-	tm.tm_isdst = -1;
-	clock = mktime(&tm);
-	tp->tv_sec = clock;
-	tp->tv_usec = wtm.wMilliseconds * 1000;
-	return (0);
-}
-#endif
-
 CUdpSocket::CUdpSocket()
 {
 	m_packetNum = 0;
 	m_localIp = NULL;
-	m_localPort = 0;   
+	m_localPort = 0;
 	m_listenFd = -1;
 	m_bUsed = false;
 
-	
 #ifdef WIN32
 	WSADATA wsaData;
-	WORD sockVersion = MAKEWORD(2, 2);  
+	WORD sockVersion = MAKEWORD(2, 2);
 
-	if (WSAStartup(sockVersion, &wsaData) != 0)  
+	if (WSAStartup(sockVersion, &wsaData) != 0)
+
 	{
 		END_THREAD();
 		THREAD_EXIT;
@@ -98,8 +50,9 @@ CUdpSocket::~CUdpSocket()
 	m_localPort = 0;
 	m_listenFd = -1;
 #ifdef WIN32
-	WSACleanup(); 
+	WSACleanup();
 #endif
+
 }
 
 int CUdpSocket::Init(const char* localIp, unsigned int localPort)
@@ -111,24 +64,43 @@ int CUdpSocket::Init(const char* localIp, unsigned int localPort)
 	BEGIN_THREAD(thread1, SendAgainEntry, this);
 	SLEEP(1*1000);
 	BEGIN_THREAD(thread1, RecvDataEntry, this);
-	
-	return 1;	
+
+	return 1;
 }
 
 void THREAD_API CUdpSocket::RecvDataEntry(void* pParam)
-{        
+{
 	CUdpSocket* pThis = static_cast<CUdpSocket*>(pParam);
 	if(NULL != pThis)
 		pThis->RecvData();
-} 
+
+}
 
 void THREAD_API CUdpSocket::SendAgainEntry(void* pParam)
 {
 	CUdpSocket* pThis = static_cast<CUdpSocket*>(pParam);
 	if(NULL != pThis)
 		pThis->SendAgain();
+
 }
 
+uint64 CUdpSocket::GetRecvRate()
+{
+	return m_netRateRecv;
+}
+
+string CUdpSocket::GetRecvSize()
+{
+	return m_netRecv;
+}
+uint64 CUdpSocket::GetSendRate()
+{
+	return m_netRateSend;
+}
+string CUdpSocket::GetSendSize()
+{
+	return m_netSend;
+}
 void CUdpSocket::RecvData()
 {
 #ifndef WIN32
@@ -139,13 +111,13 @@ void CUdpSocket::RecvData()
 	if(recvBuf == NULL)
 	{
 		log_err(g_pLogHelper, "(US::RecvData) new buf failed(%s)", strerror(errno));
-	
+
 		END_THREAD();
 		THREAD_EXIT;
 	}
 
-	this->m_listenFd = socket(AF_INET, SOCK_DGRAM, 0);		
-	
+	this->m_listenFd = socket(AF_INET, SOCK_DGRAM, 0);
+
 #ifdef WIN32
 	if (this->m_listenFd == SOCKET_ERROR || this->m_listenFd == INVALID_SOCKET)
 #else
@@ -190,9 +162,10 @@ void CUdpSocket::RecvData()
 	}
 
 	struct timeval tvStart, tvEnd;
-	GETTIMEOFDAY(&tvStart);
+	CCommonStruct::gettimeofday_update(&tvStart);
 	while (1)
 	{
+
 		fd_set fd;
 		FD_ZERO(&fd);
 		FD_SET(this->m_listenFd, &fd);
@@ -201,15 +174,18 @@ void CUdpSocket::RecvData()
 		timeOut.tv_usec = 0;
 
 		int sleret = select(this->m_listenFd + 1, &fd, NULL, NULL, &timeOut);
-		
+
 		if (sleret == 0)
 		{
+
 			continue;
 		}
 		else if (sleret < 0)
 		{
+			log_err(g_pLogHelper, "(US::RecvData) select error(%s)", strerror(errno));
 			delete[] recvBuf;
 			recvBuf = NULL;
+
 			END_THREAD();
 			THREAD_EXIT;
 		}
@@ -229,44 +205,50 @@ void CUdpSocket::RecvData()
 
 			if (recvNum == -1)
 			{
+
 				continue;
 			}
 			else if (recvNum == 0)
 			{
+
 				continue;
 			}
 
-		
-			GETTIMEOFDAY(&tvEnd);
+			CCommonStruct::gettimeofday_update(&tvEnd);
 			m_netRecv = SetNetNum(m_netRecv, recvNum);
 			m_netRecvTemp += recvNum;
 			uint64 per = (tvEnd.tv_sec - tvStart.tv_sec)*1000 + (tvEnd.tv_usec - tvStart.tv_usec)/1000;
 			if (per >= 1000*60)
 			{
-				GETTIMEOFDAY(&tvStart);
+				CCommonStruct::gettimeofday_update(&tvStart);
 				m_netRateRecv = m_netRecvTemp / 60;
 				m_netRecvTemp = 0;
 			}
-	
-			if (((T_PUUSEEHEAD)recvBuf)->uiUuseeFlag != 123456)
+
+			if (((T_PUUSEEHEAD)recvBuf)->uiUuseeFlag != UDP_INIT_FLAG)
 			{
+
 				continue;
 			}
 
 			if (((T_PUUSEEHEAD)recvBuf)->Version > CURRENT_VERSION)
 			{
+
 				continue;
 			}
 
-			if (((T_PUUSEEHEAD)recvBuf)->PackType == '1')
+			if (((T_PUUSEEHEAD)recvBuf)->PackType == UDP_INIT_PAKTYPE)
 			{
+
 				this->m_testData.usRecvRspNum++;
 				this->m_recvListLock.Lock();
 				unsigned short usRecvNum = this->m_recvList.size();
 				this->m_testData.usRecvListNum = usRecvNum;
 				if (usRecvNum > MAX_RECV_LIST_COUNT)
 				{
+
 					this->m_recvListLock.UnLock();
+
 					continue;
 				}
 				this->m_recvListLock.UnLock();
@@ -274,19 +256,22 @@ void CUdpSocket::RecvData()
 				unsigned int uiCrc = crc32buf((recvBuf + sizeof(T_UUSEEHEAD)), ((T_PUUSEEHEAD)recvBuf)->uiBufLen);
 				if (uiCrc == ((T_PUUSEEHEAD)recvBuf)->uiSendBufCrc)
 				{
+
 					unsigned int acklen = sizeof(T_UUSEEHEAD);
 					char *ackBuf = (char*)malloc(sizeof(T_UUSEEHEAD));
 					memset(ackBuf, 0, acklen);
-					((T_PUUSEEHEAD)recvBuf)->PackType = '2';
+					((T_PUUSEEHEAD)recvBuf)->PackType = UDP_ACK_PAKTYPE;
 					((T_PUUSEEHEAD)recvBuf)->uiSendBufCrc = 0;
 					memcpy(ackBuf, (T_PUUSEEHEAD)recvBuf, acklen);
 
 					int sendNum = sendto(this->m_listenFd, ackBuf, acklen, 0, (struct sockaddr*)&fromAdd, fromLen);
 					if (sendNum == -1)
 					{
+
 					}
 					else if (sendNum > 0)
 					{
+
 						this->m_testData.usSendRspAckNum++;
 					}
 
@@ -306,21 +291,26 @@ void CUdpSocket::RecvData()
 				}
 				else
 				{
+
 				}
 			}
-			else if (((T_PUUSEEHEAD)recvBuf)->PackType == '2')
+			else if (((T_PUUSEEHEAD)recvBuf)->PackType == UDP_ACK_PAKTYPE)
 			{
+
 				this->m_sendMapLock.Lock();
 				this->m_testData.usRecvReqAckNum++;
 
 				ITR_MAP_T_PSENDNODE iter = this->m_sendMap.find(((T_PUUSEEHEAD)recvBuf)->usPackNum);
 				if (iter != this->m_sendMap.end())
 				{
+
 					(iter->second)->usFlag = ACK_FALG;
 
 					struct timeval tempTime;
+
 					uint64 lastTime = (iter->second)->uiLastSendTime;
-					gettimeofday(&tempTime, NULL);
+				//	gettimeofday(&tempTime, NULL);
+					CCommonStruct::gettimeofday_update(&tempTime);
 					unsigned int useTime = ((tempTime.tv_sec * 1000) + (tempTime.tv_usec / 1000)) - lastTime;
 					if (useTime < this->m_testData.usFastTime)
 					{
@@ -338,7 +328,7 @@ void CUdpSocket::RecvData()
 		}
 	}
 	delete []recvBuf;
-	recvBuf = NULL;	
+	recvBuf = NULL;
 }
 
 string CUdpSocket::SetNetNum(string netSize, uint64 recvNum)
@@ -349,6 +339,7 @@ string CUdpSocket::SetNetNum(string netSize, uint64 recvNum)
 
 	char buf[16];
 	memset(buf, 0, 16);
+
 	retNum = atof(strTemp.substr(0, len - 1).c_str());
 
 	if (strTemp[len] == 'B')
@@ -372,7 +363,7 @@ string CUdpSocket::SetNetNum(string netSize, uint64 recvNum)
 	}
 
 	retNum += recvNum;
-	
+
 	memset(buf, 0, 16);
 	if (strTemp[len] == 'B')
 	{
@@ -407,6 +398,7 @@ string CUdpSocket::GetStatus()
 }
 void CUdpSocket::OupPutTestData()
 {
+	log_info(g_pLogHelper, "(CUdpSocket::OutPutTestData) insertSendListNum:%d RetryTimes:%d ActualSendReqNum:%d RecvReqAckNum:%d RecvRspNum:%d SendRspAckNum:%d SendFaied:%d  sendListTaskNum:%u FastTime:%d SlowTime:%d ", m_GetData.usInsertSendListNum, m_GetData.usRetryTimes, m_GetData.usActualSendReqNum, m_GetData.usRecvReqAckNum, m_GetData.usRecvRspNum, m_GetData.usSendRspAckNum, m_GetData.usSendFailed, m_GetData.usSendListCount, m_GetData.usFastTime, m_GetData.usSlowTime);
 }
 
 void CUdpSocket::SendAgain()
@@ -417,18 +409,19 @@ void CUdpSocket::SendAgain()
 #endif
 
 	struct timeval  tmOutPutControlTime;
-	gettimeofday(&tmOutPutControlTime, NULL);
+	CCommonStruct::gettimeofday_update(&tmOutPutControlTime);
 
 	unsigned int sendControlNum = 0;
 	time_t       tmLastTime = 0;
 
 	struct timeval timeBefore,timeEnd, tvStart, tvEnd;
-	GETTIMEOFDAY(&tvStart);
+	CCommonStruct::gettimeofday_update(&tvStart);
 	while(1)
 	{
 		this->m_sendMapLock.Lock();
 		if(this->m_sendList.empty())
 		{
+
 			this->m_sendMapLock.UnLock();
 			SLEEP(5);
 			continue;
@@ -438,7 +431,7 @@ void CUdpSocket::SendAgain()
 
 		SLEEP(10);
 
-		gettimeofday(&timeBefore, NULL);
+		CCommonStruct::gettimeofday_update(&timeBefore);
 		this->m_sendMapLock.Lock();
 		ITR_LIST_T_PSENDNODE iter;
 		struct timeval tmNow, tmTemp;
@@ -456,9 +449,10 @@ void CUdpSocket::SendAgain()
 				testIp.s_addr = (*iter)->uiIp;
 				unsigned int uiTempPack = ((T_PUUSEEHEAD)((*iter)->sendBuf))->usPackNum;
 
-				bool bFlag = false;	
+				bool bFlag = false;
 				if((*iter)->usFlag == ACK_FALG)
-				{			
+				{
+
 					bFlag = true;
 				}
 
@@ -467,9 +461,10 @@ void CUdpSocket::SendAgain()
 					if ((*iter)->uiRetryTimes >= SEND_TIMES)
 					{
 						this->m_testData.usSendFailed ++;
+
 					}
 				}
-				
+
 				ITR_MAP_T_PSENDNODE iter_map;
 				iter_map = this->m_sendMap.find(uiTempPack);
 				if(iter_map != this->m_sendMap.end())
@@ -484,12 +479,12 @@ void CUdpSocket::SendAgain()
 				else
 				{
 				}
-				
+
 				if((*iter)->sendBuf != NULL)
 				{
 					delete [](*iter)->sendBuf;
 					(*iter)->sendBuf = NULL;
-				}	
+				}
 				if((*iter) != NULL)
 				{
 					delete (*iter);
@@ -497,15 +492,16 @@ void CUdpSocket::SendAgain()
 				}
 				iter = this->m_sendList.erase(iter);
 
-
-				continue; 
+				continue;
 			}
 
-			gettimeofday(&tmNow, NULL);
+			CCommonStruct::gettimeofday_update(&tmNow);
+
 			unsigned int intervalTime = ((tmNow.tv_sec) * 1000 + (tmNow.tv_usec) / 1000) - (*iter)->uiLastSendTime;
 			if(((*iter)->uiRetryTimes == 0) || (intervalTime > 200))
-			{	
+			{
 				this->m_testData.usActualSendReqNum ++;
+
 				this->m_testData.usSendListCount = this->m_sendMap.size();
 				if((*iter)->uiRetryTimes == 0)
 				{
@@ -514,6 +510,7 @@ void CUdpSocket::SendAgain()
 				else if((*iter)->uiRetryTimes > 0)
 				{
 					this->m_testData.usRetryTimes ++;
+
 				}
 
 				struct sockaddr_in serverAdd;
@@ -524,33 +521,37 @@ void CUdpSocket::SendAgain()
 
 				if(this->m_listenFd == -1)
 				{
+
 					iter ++;
 					continue;
 				}
 
 				int sedNum = sendto(this->m_listenFd, (*iter)->sendBuf, (*iter)->uiSendLen, 0, (struct sockaddr*)&serverAdd, sizeof(serverAdd));
+
 				if(sedNum < 0)
 				{
+
 					iter ++;
 					continue;
 				}
 
-				GETTIMEOFDAY(&tvEnd);
+				CCommonStruct::gettimeofday_update(&tvEnd);
 				m_netSend = SetNetNum(m_netSend, sedNum);
 				m_netSendTemp += sedNum;
 				uint64 per = (tvEnd.tv_sec - tvStart.tv_sec) * 1000 + (tvEnd.tv_usec - tvStart.tv_usec) / 1000;
 				if (per >= 1000 * 60)
 				{
-					GETTIMEOFDAY(&tvStart);
+					CCommonStruct::gettimeofday_update(&tvStart);
 					m_netRateSend = m_netSendTemp / 60;
 					m_netSendTemp = 0;
 				}
-				
-				gettimeofday(&tmTemp, NULL);
+
+				CCommonStruct::gettimeofday_update(&tmTemp);
+
 				(*iter)->uiLastSendTime = tmTemp.tv_sec * 1000 + tmTemp.tv_usec/1000;
 				(*iter)->uiRetryTimes ++;
 
-				this->m_sendList.push_back(*iter);		
+				this->m_sendList.push_back(*iter);
 				iter = this->m_sendList.erase(iter);
 
 				tempNum ++;
@@ -561,11 +562,11 @@ void CUdpSocket::SendAgain()
 				break;
 			}
 		}
-		gettimeofday(&timeEnd, NULL);
+		CCommonStruct::gettimeofday_update(&timeEnd);
 		int useTime = (timeEnd.tv_sec - timeBefore.tv_sec)*1000 + (timeEnd.tv_usec - timeBefore.tv_usec)/1000;
 
 		struct timeval outPutTempTime;
-		gettimeofday(&outPutTempTime, NULL);
+		CCommonStruct::gettimeofday_update(&outPutTempTime);
 		bool bOutPutFlag = false;
 		if(((outPutTempTime.tv_sec - tmOutPutControlTime.tv_sec)*1000 + (outPutTempTime.tv_usec - tmOutPutControlTime.tv_usec)/1000) >= 1000)
 		{
@@ -574,15 +575,15 @@ void CUdpSocket::SendAgain()
 			this->m_testData.usInsertSendListNum = 0;
 			this->m_testData.usRetryTimes = 0;
 			this->m_testData.usActualSendReqNum = 0;
-			this->m_testData.usRecvReqAckNum = 0; 
-			this->m_testData.usRecvRspNum = 0; 
+			this->m_testData.usRecvReqAckNum = 0;
+			this->m_testData.usRecvRspNum = 0;
 			this->m_testData.usSendRspAckNum = 0;
-			this->m_testData.usSendFailed = 0; 
+			this->m_testData.usSendFailed = 0;
 			this->m_testData.usSendListCount = 0;
 			this->m_testData.usFastTime = 100;
 			this->m_testData.usSlowTime = 0;
 
-			gettimeofday(&tmOutPutControlTime, NULL);
+			CCommonStruct::gettimeofday_update(&tmOutPutControlTime);
 			bOutPutFlag = true;
 		}
 		this->m_sendMapLock.UnLock();
@@ -590,15 +591,15 @@ void CUdpSocket::SendAgain()
 	}
 }
 
-
 int CUdpSocket::Send(unsigned int ip, unsigned short port, const char* buf, unsigned int len)
 {
+
 	m_sendMapLock.Lock();
 
 	T_UUSEEHEAD tUuseeHead;
-	tUuseeHead.uiUuseeFlag    = 123456;
-	tUuseeHead.Version        = '1';
-	tUuseeHead.PackType       = '1';
+	tUuseeHead.uiUuseeFlag	  = UDP_INIT_FLAG;
+	tUuseeHead.Version		  = CURRENT_VERSION;
+	tUuseeHead.PackType		  = UDP_INIT_PAKTYPE;
 	tUuseeHead.usPackNum      = m_packetNum;
 	tUuseeHead.uiBufLen       = len;
 	tUuseeHead.uiSendBufCrc   = crc32buf((char*)buf, len);
@@ -614,9 +615,11 @@ int CUdpSocket::Send(unsigned int ip, unsigned short port, const char* buf, unsi
 	tpSendNode->usPort 		= htons(port);
 	tpSendNode->uiSendLen		= sizeof(T_UUSEEHEAD) + len;
 	tpSendNode->uiRetryTimes  = 0;
+
 	struct timeval timeTemp;
-	gettimeofday(&timeTemp, NULL);
+	CCommonStruct::gettimeofday_update(&timeTemp);
 	tpSendNode->uiLastSendTime = timeTemp.tv_sec * 1000 + timeTemp.tv_usec / 1000;
+
 	m_sendList.push_front(tpSendNode);
 	ITR_MAP_T_PSENDNODE iter = m_sendMap.find(m_packetNum);
 	if(iter != m_sendMap.end())
@@ -637,32 +640,32 @@ int CUdpSocket::Recv(unsigned int &ip, unsigned short &port, char* buf, unsigned
 
 	m_recvListLock.Lock();
 	if(m_recvList.empty())
-	{   
-		m_recvListLock.UnLock();    
+	{
+		m_recvListLock.UnLock();
 		return nRet;
-	}   
+	}
 
 	T_SENDNODE sendNode;
 	sendNode = m_recvList.front();
 	ip = sendNode.uiIp;
 	port = sendNode.usPort;
 	if(len < sendNode.uiSendLen)
-	{   
+	{
 		nRet =  RECV_BUF_NOT_ENOUGH;
-	}   
+	}
 	else
-	{   
+	{
 		memcpy(buf, sendNode.sendBuf, sendNode.uiSendLen);
 		nRet = RECV_SUCCESS;
-	}   
+	}
 
 	len = sendNode.uiSendLen;
 
 	if(sendNode.sendBuf != NULL)
-	{   
+	{
 		delete [] sendNode.sendBuf;
 		sendNode.sendBuf = NULL;
-	}   
+	}
 	m_recvList.pop_front();
 	m_recvListLock.UnLock();
 
@@ -672,25 +675,9 @@ int CUdpSocket::Recv(unsigned int &ip, unsigned short &port, char* buf, unsigned
 unsigned int CUdpSocket::GetSendListNum()
 {
 	m_sendMapLock.Lock();
+
 	unsigned int mapRet = m_sendMap.size();
 	m_sendMapLock.UnLock();
+
 	return mapRet;
-}
-
-uint64 CUdpSocket::GetRecvRate()
-{
-	return m_netRateRecv;
-}
-
-string CUdpSocket::GetRecvSize()
-{
-	return m_netRecv;
-}
-uint64 CUdpSocket::GetSendRate()
-{
-	return m_netRateSend;
-}
-string CUdpSocket::GetSendSize()
-{
-	return m_netSend;
 }

@@ -1,4 +1,4 @@
-/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+/*Copyright 2017 hyperchain.net  (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT.
@@ -30,7 +30,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <algorithm> 
+#include <algorithm>
 
 #ifndef _WIN32
 # define __STDC_LIMIT_MACROS
@@ -44,15 +44,14 @@
 
 using namespace std;
 
-
 typedef map<uint64, T_HYPERBLOCKDBINFO> LocalBlockDB;
 
 typedef map<uint64, LocalBlockDB> LocalChainDB;
 
 struct HyperBlockDB
 {
-	T_HYPERBLOCKDBINFO hyperBlock;	
-	LocalChainDB mapLocalChain;		
+	T_HYPERBLOCKDBINFO hyperBlock;
+	LocalChainDB mapLocalChain;
 };
 
 typedef map<uint64, HyperBlockDB> HyperchainDB;
@@ -60,7 +59,7 @@ typedef map<uint64, HyperBlockDB> HyperchainDB;
 class CHyperchainDB
 {
 public:
-	
+
 	static int cleanTmp(HyperchainDB &hyperchainDB);
 	static int AddHyperBlockDataRecord(HyperchainDB &hyperchainDB, T_HYPERBLOCKDBINFO blockInfo);
 
@@ -68,18 +67,20 @@ public:
 	CHyperchainDB();
 	~CHyperchainDB();
 public:
-	
+
 	static int saveHyperBlockToDB(const T_HYPERBLOCKDBINFO &hyperblock);
-	
+
 	static int saveHyperBlocksToDB(const vector<T_HYPERBLOCKDBINFO> &vHyperblock);
-	
+
 	static int getHyperBlocks(HyperchainDB &hyperchainDB, uint64 nStartHyperID, uint64 nEndHyperID);
-	
+
 	static int getAllHyperBlocks(HyperchainDB &hyperchainDB);
 
 	static uint64 GetLatestHyperBlockNo();
 
-	static int GetLatestHyperBlock(HyperBlockDB &hyperblockDB);	
+	static int GetLatestHyperBlock(HyperBlockDB &hyperblockDB);
+
+	static int GetHyperBlockNumInfo(std::list<uint64> &HyperBlockNum);
 
 };
-#endif //__HYPERCHAIN_DB_H__
+#endif

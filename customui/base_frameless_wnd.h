@@ -1,9 +1,9 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
+/*file COPYING or https://opensource.org/licenses/MIT。
 /*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 /*software and associated documentation files (the "Software"), to deal in the Software
 /*without restriction, including without limitation the rights to use, copy, modify, merge,
 /*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
@@ -12,13 +12,15 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 /*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /*DEALINGS IN THE SOFTWARE.
 */
+
+
 
 #ifndef BASE_FRAMELESS_WND_H
 #define BASE_FRAMELESS_WND_H
@@ -37,8 +39,8 @@ class QPushButton;
 enum WndShowMode
 {
     e_WndShow_Unknow = 0,
-    e_WndShow_Show, 
-    e_WndShow_Hide 
+    e_WndShow_Show,
+    e_WndShow_Hide
 
 };
 
@@ -57,7 +59,6 @@ public:
     void addWidget(QWidget* widget);
     void showTitleBar(bool show);
 
-  
     void setLogoPic(QString picPath, int size = 30, QPoint topLeft = QPoint(0,0), int scaleType = 1);
 
     void setMinMaxCloseButton(QSize btnSize=QSize(30,30),
@@ -95,8 +96,6 @@ private:
     void init();
     void resetBtnPos();
 
-
-
 #ifdef WIN32
 private:
     bool winEvent(const QByteArray &eventType, void *message, long *result);
@@ -114,8 +113,6 @@ public:
 private:
     QPixmap m_pixShadow;
 
-
-   
     bool ifScale_ = true;
     bool showTitleBar_ = true;
 
@@ -135,4 +132,4 @@ private:
     QVBoxLayout *contentLayout_ = nullptr;
 };
 
-#endif // BASE_FRAMELESS_WND_H
+#endif

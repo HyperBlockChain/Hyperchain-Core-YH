@@ -1,4 +1,4 @@
-/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+/*Copyright 2017 hyperchain.net  (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT.
@@ -41,8 +41,6 @@ using namespace http::experimental::listener;
 using namespace web::http;
 using namespace web::http::client;
 
-
-
 class CommandHandler
 {
 public:
@@ -51,7 +49,7 @@ public:
 	pplx::task<void> open() { return m_listener.open(); }
 	pplx::task<void> close() { return m_listener.close(); }
 private:
-	
+
 	void handle_get(http_request message);
 	void handle_post(http_request message);
 	void handle_put(http_request message);
@@ -59,24 +57,26 @@ private:
 	http_listener m_listener;
 };
 
-
 class RestApi
 {
 public:
 	RestApi() {}
 	~RestApi() {}
 public:
-	
+
 	static int startRest();
 public:
 	json::value blockToJsonValue(T_HYPERBLOCKDBINFO blockDBInfo);
-	
+	json::value blockHeadToJsonValue(T_HYPERBLOCKDBINFO blockDBInfo);
+
 	json::value MakeRegistration(string strUserData);
-	
+
 	json::value getHyperblocks(uint64_t nStartId, uint64_t nNum);
-	
+
 	json::value RestApi::getOnchainState(string queueId);
+
+	json::value getHyperblocksHead(uint64_t nStartId);
+	int RestApi::getLatestHyperBlockNo();
 };
 
-
-#endif //__RESTAPI_H__
+#endif

@@ -1,9 +1,9 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*Copyright 2017 hyperchain.net  (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT.
 /*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
 /*software and associated documentation files (the "Software"), to deal in the Software
 /*without restriction, including without limitation the rights to use, copy, modify, merge,
 /*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
@@ -12,34 +12,59 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 /*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /*DEALINGS IN THE SOFTWARE.
 */
-
 #include "reg_verification.h"
 #include "ui_reg_verification.h"
 
-#include "util/commonutil.h"
 #include "HChainP2PManager/interface/QtInterface.h"
 
 #include <QDragEnterEvent>
 #include <QMimeData>
 #include <QCryptographicHash>
+#include <QPushButton>
+#include <QFileDialog>
 
 reg_verification::reg_verification(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::reg_verification)
 {
     ui->setupUi(this);
+	connect(ui->pushButton_openfile, &QPushButton::clicked, this, &reg_verification::onOpenFile);
 }
 
 reg_verification::~reg_verification()
 {
     delete ui;
+}
+
+QString reg_verification::getfilesize(uint64 nsize)
+{
+	double dsize = nsize;
+	QString unit = " B";
+	if (dsize > 1024)
+	{
+		dsize /= 1024;
+		unit = " KB";
+		if (dsize > 1024)
+		{
+			dsize /= 1024;
+			unit = " MB";
+			if (dsize > 1024)
+			{
+				dsize /= 1024;
+				unit = " GB";
+			}
+		}
+	}
+	QString textSize = QString::number(dsize, 'f', 1);
+	textSize.append(unit);
+	return textSize;
 }
 
 void reg_verification::updateInfo(QVariantMap info)
@@ -49,7 +74,8 @@ void reg_verification::updateInfo(QVariantMap info)
     QString fname = info["cFileName"].toString();
     ui->labelFileName->setText(fname);
 
-    QString fsize = QString::number(info["iFileSize"].toLongLong());
+	QString fsize = getfilesize(info["iFileSize"].toLongLong());
+
     ui->labelFileSzie->setText(fsize);
 
     sha512_ = info["cFileHash"].toString();
@@ -71,7 +97,7 @@ void reg_verification::retranslateUI()
 }
 
 void reg_verification::dragEnterEvent(QDragEnterEvent *event){
-    //http://blog.csdn.net/a3631568/article/details/53819972
+
     event->acceptProposedAction();
 }
 
@@ -92,7 +118,7 @@ void reg_verification::dropEvent(QDropEvent *event){
         QFile f(path);
 
         if(f.open(QIODevice::ReadOnly)){
-            //save file path
+
             QString fpath_ = path;
 
             QCryptographicHash h(QCryptographicHash::Sha512);
@@ -107,7 +133,6 @@ void reg_verification::dropEvent(QDropEvent *event){
             QString str512 = QString("%1 %2 %3 %4").arg(s1).arg(s2).arg(s3).arg(s4);
             ui->labelCheckedHash_2->setText(str512);
 
-
             TEVIDENCEINFO evi;
             convertEvidenceVariantMap2Struct(&evi, evidenceInfo_);
 
@@ -117,11 +142,45 @@ void reg_verification::dropEvent(QDropEvent *event){
             }else{
                 ui->labelIfMatch->setText(tr("file \n unmatch"));
             }
-//            if(sha == sha512_){
-//                ui->labelIfMatch->setText(tr("file \n match"));
-//            }else{
-//                ui->labelIfMatch->setText(tr("file \n unmatch"));
-//            }
+
         }
     }
+}
+
+void reg_verification::onOpenFile()
+{
+	QFile f;
+	QString path = QFileDialog::getOpenFileName(this, QString("Select File"), QString("/"), QString("(*.*)"));
+	f.setFileName(path);
+	if (f.open(QIODevice::ReadOnly))
+	{
+		QString fpath_ = path;
+
+		QCryptographicHash h(QCryptographicHash::Sha512);
+		h.addData(&f);
+
+		QString sha = h.result().toHex();
+		QString s1 = sha.mid(0, 32);
+		QString s2 = sha.mid(32, 32);
+		QString s3 = sha.mid(64, 32);
+		QString s4 = sha.mid(96, 32);
+
+		QString str512 = QString("%1 %2 %3 %4").arg(s1).arg(s2).arg(s3).arg(s4);
+		ui->labelCheckedHash_2->setText(str512);
+
+		TEVIDENCEINFO evi;
+		convertEvidenceVariantMap2Struct(&evi, evidenceInfo_);
+
+		std::string shautf8 = sha.toStdString();
+		if (VerifyPoeRecord(shautf8, &evi))
+		{
+			ui->labelIfMatch->setText(tr("file \n match"));
+		}
+		else
+		{
+			ui->labelIfMatch->setText(tr("file \n unmatch"));
+		}
+
+		f.close();
+	}
 }

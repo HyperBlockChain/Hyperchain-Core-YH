@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*Copyright 2017 hyperchain.net  (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT.
@@ -46,14 +46,18 @@ public:
     int insertEvidence(const TEVIDENCEINFO& evidence);
     int getEvidences(QList<TEVIDENCEINFO>& evidences, int page, int size = 20);
     int updateEvidence(const TEVIDENCEINFO& evidence, int type = 1);
+	int getNoConfiringList(QList<TEVIDENCEINFO>& evidences);
     int delEvidence(std::string hash);
+	int delEvidence(const TEVIDENCEINFO &evidence);
 	int insertHyperblock(const T_HYPERBLOCKDBINFO &hyperblock);
 	int updateHyperblock(const T_HYPERBLOCKDBINFO &hyperblock);
 	int existHyperblock(const T_HYPERBLOCKDBINFO &hyperblock);
 	int getHyperblock(QList<T_HYPERBLOCKDBINFO> &list, int page, int size);
+	int getHyperblockshead(QList<T_HYPERBLOCKDBINFO> &queue, int nStartHyperID);
+	int getAllHyperblockNumInfo(std::list<uint64> &queue);
 	int getHyperblocks(QList<T_HYPERBLOCKDBINFO> &queue, int nStartHyperID, int nEndHyperID);
     int getUpqueue(QList<TUPQUEUE> &queue, int page, int size);
-    int delUpqueue(std::string hash);
+	int delUpqueue(std::string hash);
 	int addUpqueue(string sHash);
 
 	int getLatestHyperBlockNo();
@@ -73,6 +77,7 @@ private:
 
 private:
     bool ifColExist(const char* tbl, const char* col);
+
     bool ifTblOrIndexExist(const char* name, int type = 1);
 
 private:

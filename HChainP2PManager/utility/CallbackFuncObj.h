@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -23,7 +23,6 @@
 #ifndef __CALLBACK_FUNCTION_BOJ_H__
 #define __CALLBACK_FUNCTION_BOJ_H__
 
-
 #include <stdio.h>
 #include <iostream>
 
@@ -34,7 +33,7 @@ public:
 	TCallbackFuncObj();
 	TCallbackFuncObj(pCallbackFunc pCF, void* pCParam);
 	~TCallbackFuncObj();
-	
+
 	inline void Set(pCallbackFunc pCF, void* pCParam);
 	inline pCallbackFunc GetCallbackFunc();
 	inline void* GetCallbackParam();
@@ -42,7 +41,7 @@ public:
 private:
 	TCallbackFuncObj(const TCallbackFuncObj& crs);
 	TCallbackFuncObj& operator=(const TCallbackFuncObj& crs );
-	
+
 private:
 	pCallbackFunc	m_pCF;
 	void* 			m_pCParam;
@@ -102,8 +101,4 @@ TCallbackFuncObj<pCallbackFunc>& TCallbackFuncObj<pCallbackFunc>::operator=(cons
 	return *this;
 }
 
-
-
-
-
-#endif   
+#endif

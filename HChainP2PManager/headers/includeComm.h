@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -21,7 +21,6 @@
 */
 #ifndef __INCLUDE_COMM_H
 #define __INCLUDE_COMM_H
-
 
 #include <map>
 #include <list>
@@ -48,7 +47,7 @@
 #else
 #include <stdint.h>
 #include <pthread.h>
-#include <unistd.h>  
+#include <unistd.h>
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -61,18 +60,16 @@
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <sys/errno.h>
-#endif// WIN32
+#endif
 
 using namespace std;
 
 #ifdef WIN32
-#define SLEEP(x)                    Sleep(x) 
+#define SLEEP(x)                    Sleep(x)
 #define IERROR GetLastError()
 #else
-#define SLEEP(x)                    usleep(x*1000)	
+#define SLEEP(x)                    usleep(x*1000)
 #define IERROR errno
 #endif
 
-
-
-#endif //__INCLUDE_COMM_H
+#endif

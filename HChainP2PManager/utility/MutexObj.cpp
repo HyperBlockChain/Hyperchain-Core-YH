@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -19,19 +19,18 @@
 /*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /*DEALINGS IN THE SOFTWARE.
 */
-                                                
-#include "MutexObj.h"
 
+#include "MutexObj.h"
 
 CMutexObj::CMutexObj()
 {
 #ifdef WIN32
 	InitializeCriticalSection(&m_oSection);
 #else
-	
-	pthread_mutexattr_t   attr;   
-	pthread_mutexattr_init(&attr);   
-	pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);   
+
+	pthread_mutexattr_t   attr;
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);
 	pthread_mutex_init(&m_hMutex,&attr);
 #endif
 }
