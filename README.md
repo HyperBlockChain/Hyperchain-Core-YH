@@ -1,5 +1,5 @@
-# HyperchainCore
-HyperchainCore is a software with a plugin-enable cross-platform application framework, P2P node layer and protocol stack implementation of Hyper Block Chain. Please refer to [Hyper Block Chain Whitepaper](http://www.hyperchain.net/blog/archives/311) about the fundamental and the design.
+# Hyperchain-Core
+Hyperchain-Core is a software with a plugin-enable cross-platform application framework, P2P node layer and protocol stack implementation of Hyperchain. Please refer to [Hyperchain Whitepaper](http://www.hyperchain.net/blog/archives/311) about the fundamental and the design.
 
 ## Prerequisite 
 ### Windows: 
@@ -32,4 +32,4 @@ HyperchainCore is a software with a plugin-enable cross-platform application fra
     * CppRestSDK 2.9.1
 
 ## About
-Visit [Hyperchain Official](http://www.hyperchain.net "Hyper Block Chain Homepage") for more about us.
+Visit [Hyperchain Official Site](http://www.hyperchain.net "Hyperchain Homepage") for more about us.
