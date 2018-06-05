@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -22,7 +22,7 @@
 #ifndef __P2P_PROTOCOL_H__
 #define __P2P_PROTOCOL_H__
 
-#include "../headers/commonstruct.h" 
+#include "../headers/commonstruct.h"
 
 enum _ep2pprotocoltype
 {
@@ -84,12 +84,14 @@ typedef struct _tp2pprotocoltype
 {
 	uint8 ucType;
 	uint64 uiTimeStamp;
+
 }T_P2PPROTOCOLTYPE, *T_PP2PPROTOCOLTYPE;
 
 typedef struct _tp2pprotocolrsp
 {
 	T_P2PPROTOCOLTYPE	tType;
 	uint8				iResult;
+
 }T_P2PPROTOCOLRSP, *T_PP2PPROTOCOLRSP;
 
 typedef struct _tp2pprotocolpingreq
@@ -112,13 +114,14 @@ typedef struct _tp2pprotocolgethyperblockbynoreq
 {
 	T_P2PPROTOCOLTYPE tType;
 	uint64 uiBlockNum;
+
 }T_P2PPROTOCOLGETHYPERBLOCKBYNOREQ, *T_PP2PPROTOCOLGETHYPERBLOCKBYNOREQ;
 
 typedef struct _tp2pprotocolgethyperblockbynorsp
 {
 	T_P2PPROTOCOLRSP tResult;
-}T_P2PPROTOCOLGETHYPERBLOCKBYNORSP, *T_PP2PPROTOCOLGETHYPERBLOCKBYNORSP;
 
+}T_P2PPROTOCOLGETHYPERBLOCKBYNORSP, *T_PP2PPROTOCOLGETHYPERBLOCKBYNORSP;
 
 typedef struct _tp2pprotocolpeerlistreq
 {
@@ -155,12 +158,13 @@ typedef struct _tp2pprotocolonchainreq
 	uint64  uiBlockCount;
 }T_P2PPROTOCOLONCHAINREQ, *T_PP2PPROTOCOLONCHAINREQ;
 
-
 typedef struct _tp2pprotocolonchainrsp
 {
 	T_P2PPROTOCOLRSP tResult;
 	uint64 uiHyperBlockNum;
+
 	uint64  uiBlockCount;
+
 	int8 strHash[DEF_STR_HASH256_LEN];
 }T_P2PPROTOCOLONCHAINRSP, *T_PP2PPROTOCOLONCHAINRSP;
 
@@ -168,25 +172,28 @@ typedef struct _tp2pprotocolonchainconfirm
 {
 	T_P2PPROTOCOLRSP tResult;
 	int8 strHash[DEF_STR_HASH256_LEN];
+
 }T_P2PPROTOCOLONCHAINCONFIRM, *T_PP2PPROTOCOLONCHAINCONFIRM;
 
 typedef struct _tp2pprotocolonchainconfirmrsp
 {
 	T_P2PPROTOCOLRSP tResult;
 	int8 strHash[DEF_STR_HASH256_LEN];
+
 }T_P2PPROTOCOLONCHAINCONFIRMRSP, *T_PP2PPROTOCOLONCHAINCONFIRMRSP;
 
 typedef struct _tp2pprotocolonchainconfirmfin
 {
 	T_P2PPROTOCOLRSP tResult;
 	int8 strHash[DEF_STR_HASH256_LEN];
-}T_P2PPROTOCOLONCHAINCONFIRMFIN, *T_PP2PPROTOCOLONCHAINCONFIRMFIN;
 
+}T_P2PPROTOCOLONCHAINCONFIRMFIN, *T_PP2PPROTOCOLONCHAINCONFIRMFIN;
 
 typedef struct _tp2pprotocolrefusereq
 {
 	T_P2PPROTOCOLTYPE tType;
 	int8 strHash[DEF_STR_HASH256_LEN];
+
 	uint8 uSubType;
 }T_P2PPROTOCOLREFUSEREQ, *T_PP2PPROTOCOLREFUSEREQ;
 
@@ -194,19 +201,21 @@ typedef struct _tp2pprotocolglobalconsensusreq
 {
 	T_P2PPROTOCOLTYPE tType;
 	T_PEERADDRESS	tPeerAddr;
+
 	uint64  uiBlockCount;
 	uint64  uiChainCount;
-}T_P2PPROTOCOLGLOBALBUDDYREQ, *T_PP2PPROTOCOLGLOBALBUDDYREQ;
 
+}T_P2PPROTOCOLGLOBALBUDDYREQ, *T_PP2PPROTOCOLGLOBALBUDDYREQ;
 
 typedef struct _tp2pprotocolglobalconsensusrsp
 {
 	T_P2PPROTOCOLRSP tResult;
 	T_PEERADDRESS	tPeerAddr;
+
 	uint64  uiBlockCount;
 	uint64  uiChainCount;
-}T_P2PPROTOCOLGLOBALBUDDYRSP, *T_PP2PPROTOCOLGLOBALBUDDYRSP;
 
+}T_P2PPROTOCOLGLOBALBUDDYRSP, *T_PP2PPROTOCOLGLOBALBUDDYRSP;
 
 typedef struct _tp2pprotocolcopyhyperblockreq
 {
@@ -216,8 +225,8 @@ typedef struct _tp2pprotocolcopyhyperblockreq
 	uint16  uiSendTimes;
 	uint64  uiBlockCount;
 	uint64  uiChainCount;
-}T_P2PPROTOCOLCOPYHYPERBLOCKREQ, *T_PP2PPROTOCOLCOPYHYPERBLOCKREQ;
 
+}T_P2PPROTOCOLCOPYHYPERBLOCKREQ, *T_PP2PPROTOCOLCOPYHYPERBLOCKREQ;
 
 typedef struct _tp2pprotocolcopyhyperblockrsp
 {
@@ -227,18 +236,21 @@ typedef struct _tp2pprotocolcopyhyperblockrsp
 	uint16  uiSendTimes;
 	uint64  uiBlockCount;
 	uint64  uiChainCount;
+
 }T_P2PPROTOCOLCOPYHYPERBLOCKRSP, *T_PP2PPROTOCOLCOPYHYPERBLOCKRSP;
 
 typedef struct _tp2pprotocolcopyblockreq
 {
 	T_P2PPROTOCOLTYPE tType;
 	uint64	uiBlockNum;
+
 	uint16  uiSendTimes;
 }T_P2PPROTOCOLCOPYBLOCKREQ, *T_PP2PPROTOCOLCOPYBLOCKREQ;
 
 typedef struct _tp2pprotocolcopyblockrsp
 {
 	T_P2PPROTOCOLRSP tResult;
+
 	uint16  uiSendTimes;
 	uint64  uiBlockCount;
 }T_P2PPROTOCOLCOPYBLOCKRSP, *T_PP2PPROTOCOLCOPYBLOCKRSP;
@@ -280,11 +292,10 @@ typedef struct _tp2pprotocolgetchainstatersp
 class CP2pProtocol
 {
 public:
-	
+
 	CP2pProtocol();
 	virtual ~CP2pProtocol();
 
 };
 
-
-#endif //__P2P_PROTOCOL_H__
+#endif

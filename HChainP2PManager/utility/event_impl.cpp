@@ -1,7 +1,7 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https:
+/*file COPYING or https://opensource.org/licenses/MIT。
 /*
 /*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 /*software and associated documentation files (the "Software"), to deal in the Software
@@ -33,7 +33,6 @@
         term();
     }
 
-
     int event_impl::init()
     {
         int nRet = 0;
@@ -64,7 +63,6 @@
         return nRet;
     }
 
-
     unsigned long event_impl::wait( unsigned long ulMilliseconds )
     {
 		unsigned long ulRet = 0;
@@ -87,6 +85,7 @@
         }
 
         return ulRet;
+
     }
 
     int event_impl::set_event_type( bool bManulReset )

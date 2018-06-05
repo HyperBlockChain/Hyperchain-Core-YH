@@ -129,6 +129,7 @@ CppSQLite3Exception::~CppSQLite3Exception()
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Buffer::CppSQLite3Buffer()
 {
@@ -164,6 +165,7 @@ const char* CppSQLite3Buffer::format(const char* szFormat, ...)
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Binary::CppSQLite3Binary() :
 mpBuf(0),
@@ -193,7 +195,7 @@ void CppSQLite3Binary::setEncoded(const unsigned char* pBuf)
     clear();
 
     mnEncodedLen = strlen((const char*)pBuf);
-    mnBufferLen = mnEncodedLen + 1; 
+    mnBufferLen = mnEncodedLen + 1; // Allow for NULL terminator
 
     mpBuf = (unsigned char*)malloc(mnBufferLen);
 
@@ -228,6 +230,7 @@ const unsigned char* CppSQLite3Binary::getBinary()
 {
     if (mbEncoded)
     {
+        // in/out buffers can be the same
         mnBinaryLen = sqlite3_decode_binary(mpBuf, mpBuf);
 
         if (mnBinaryLen == -1)
@@ -255,7 +258,9 @@ unsigned char* CppSQLite3Binary::allocBuffer(int nLen)
 {
     clear();
 
-  
+    // Allow extra space for encoded binary as per comments in
+    // SQLite encode.c See bottom of this file for implementation
+    // of SQLite functions use 3 instead of 2 just to be sure ;-)
     mnBinaryLen = nLen;
     mnBufferLen = 3 + (257*nLen)/254;
 
@@ -286,6 +291,7 @@ void CppSQLite3Binary::clear()
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Query::CppSQLite3Query()
 {
@@ -299,6 +305,7 @@ CppSQLite3Query::CppSQLite3Query()
 CppSQLite3Query::CppSQLite3Query(const CppSQLite3Query& rQuery)
 {
     mpVM = rQuery.mpVM;
+    // Only one object can own the VM
     const_cast<CppSQLite3Query&>(rQuery).mpVM = 0;
     mbEof = rQuery.mbEof;
     mnCols = rQuery.mnCols;
@@ -341,6 +348,7 @@ CppSQLite3Query& CppSQLite3Query::operator=(const CppSQLite3Query& rQuery)
     {
     }
     mpVM = rQuery.mpVM;
+    // Only one object can own the VM
     const_cast<CppSQLite3Query&>(rQuery).mpVM = 0;
     mbEof = rQuery.mbEof;
     mnCols = rQuery.mnCols;
@@ -577,10 +585,12 @@ void CppSQLite3Query::nextRow()
 
     if (nRet == SQLITE_DONE)
     {
+        // no rows
         mbEof = true;
     }
     else if (nRet == SQLITE_ROW)
     {
+        // more rows, nothing to do
     }
     else
     {
@@ -620,6 +630,7 @@ void CppSQLite3Query::checkVM()
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Table::CppSQLite3Table()
 {
@@ -633,6 +644,7 @@ CppSQLite3Table::CppSQLite3Table()
 CppSQLite3Table::CppSQLite3Table(const CppSQLite3Table& rTable)
 {
     mpaszResults = rTable.mpaszResults;
+    // Only one object can own the results
     const_cast<CppSQLite3Table&>(rTable).mpaszResults = 0;
     mnRows = rTable.mnRows;
     mnCols = rTable.mnCols;
@@ -671,6 +683,7 @@ CppSQLite3Table& CppSQLite3Table::operator=(const CppSQLite3Table& rTable)
     {
     }
     mpaszResults = rTable.mpaszResults;
+    // Only one object can own the results
     const_cast<CppSQLite3Table&>(rTable).mpaszResults = 0;
     mnRows = rTable.mnRows;
     mnCols = rTable.mnCols;
@@ -874,6 +887,7 @@ void CppSQLite3Table::checkResults()
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 
 CppSQLite3Statement::CppSQLite3Statement()
 {
@@ -886,6 +900,7 @@ CppSQLite3Statement::CppSQLite3Statement(const CppSQLite3Statement& rStatement)
 {
     mpDB = rStatement.mpDB;
     mpVM = rStatement.mpVM;
+    // Only one object can own VM
     const_cast<CppSQLite3Statement&>(rStatement).mpVM = 0;
 }
 
@@ -913,6 +928,7 @@ CppSQLite3Statement& CppSQLite3Statement::operator=(const CppSQLite3Statement& r
 {
     mpDB = rStatement.mpDB;
     mpVM = rStatement.mpVM;
+    // Only one object can own VM
     const_cast<CppSQLite3Statement&>(rStatement).mpVM = 0;
     return *this;
 }

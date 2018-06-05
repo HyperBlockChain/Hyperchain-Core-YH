@@ -1,9 +1,9 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*Copyright 2017 hyperchain.net  (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT.
 /*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
 /*software and associated documentation files (the "Software"), to deal in the Software
 /*without restriction, including without limitation the rights to use, copy, modify, merge,
 /*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
@@ -12,23 +12,25 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 /*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /*DEALINGS IN THE SOFTWARE.
 */
-
 #include "mine_hyperchain.h"
 #include "ui_mine_hyperchain.h"
 
-#include "block_info_dlg.h"
+#include "blockinfo.h"
 #include "HChainP2PManager/interface/QtInterface.h"
 #include "util/commonutil.h"
 #include "mainwindow.h"
 
 #include <QDebug>
+#include <QImage>
+#include <QPixmap>
+#include "statusbar.h"
 
 extern MainWindow* g_mainWindow();
 
@@ -38,16 +40,47 @@ mine_hyperchain::mine_hyperchain(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    hideCheckBtn();
-    ui->frame_13->hide();
+	_minehy_statusBar = new statusbar(this);
+	ui->verticalLayout->addWidget(_minehy_statusBar);
 
-    nid_ = new block_info_dlg(this);
+	binfo = new blockinfo(this);
+	ui->labelChainDataStatus->setblockinfo(binfo);
 
-    connect(ui->labelChainDataStatus, &chain_data_status::sigShowNodeInfo, this, &mine_hyperchain::onSigShowNodeInfo);
-    connect(ui->labelChainDataStatus, &chain_data_status::sigHideNodeInfo, this, &mine_hyperchain::onSigHideNodeInfo);
-    connect(&hideTimer_, &QTimer::timeout, this, &mine_hyperchain::onHideNodeInfoDlgTimer);
+	ui->labelMyRegSended->SetMes("How many registration requests this node has sent");
+	ui->labelRecvRegSended->SetMes("How many registration requests this node has received");
 
-    onUpdateTimer();
+	ui->chainConectStatusWell->SetMes("How many Hyperchain nodes in strong connection state");
+	ui->chainConectStatusOccasionallyNoResponse->SetMes("How many Hyperchain nodes in good connection state");
+	ui->chainConectStatusOccasionallyResponse->SetMes("How many Hyperchain nodes in average connection state");
+	ui->chainConectStatusNoResponse->SetMes("How many Hyperchain nodes in bad connection state");
+
+	ui->labelBuddyChainCount->SetMes("How many Local Chains found in this round of consensus");
+	ui->labelBuddyStatus->SetMes("Consensus Phase should be Local or Global");
+	ui->labelCurrentBlockNumber->SetMes("The Hyperblock which now consensus is based");
+	ui->labelNextBlockNumber->SetMes("The HyperBlock which now consensus will produce");
+
+	ShowPng();
+	li.clear();
+	list_ChainData.clear();
+
+	InitDate();
+	InitBuddyTime();
+
+	connect(ui->labelChainDataStatus, &chain_data_status::sigShowNodeDlgInfo, this, &mine_hyperchain::onSigShowNodeDlgInfo);
+	connect(binfo, &blockinfo::sigShowBrowserInfo, this, &mine_hyperchain::onSigShowBrowserInfo);
+
+	connect(ui->labelMyRegSended, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+	connect(ui->labelRecvRegSended, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+
+	connect(ui->chainConectStatusWell, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+	connect(ui->chainConectStatusOccasionallyNoResponse, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+	connect(ui->chainConectStatusOccasionallyResponse, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+	connect(ui->chainConectStatusNoResponse, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+	connect(ui->labelBuddyChainCount, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+	connect(ui->labelBuddyStatus, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+	connect(ui->labelCurrentBlockNumber, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+	connect(ui->labelNextBlockNumber, &statulabel::sigSendStatusMes, this, &mine_hyperchain::onSigShowStatusMes);
+
 }
 
 mine_hyperchain::~mine_hyperchain()
@@ -55,286 +88,356 @@ mine_hyperchain::~mine_hyperchain()
     delete ui;
 }
 
+void mine_hyperchain::InitDate()
+{
+	m_gbuddychainnum = 0;
+	m_betternum = 0;
+	m_normalnum = 0;
+	m_badnum = 0;
+	m_downnum = 0;
+	m_sendpoenum = 0;
+	m_recvepoenum = 0;
+	m_buddystatus = 0;
+	m_currentblocknumber = 0;
+	m_nextblocknumber = m_currentblocknumber + 1;
+
+	QString qsloading = tr("Synchronize");
+	ui->labelCurrentBlockNumber->setText(qsloading);
+	ui->labelNextBlockNumber->setText(qsloading);
+	ui->labelBuddyChainCount->setText(qsloading);
+	ui->labelBuddyStatus->setText(qsloading);
+
+}
+
 void mine_hyperchain::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    if(nid_){
-        nid_->setLanguage(g_mainWindow()->getLanguage());
-    }
 }
 
-void mine_hyperchain::onSigShowNodeInfo(QPoint gpos, QSharedPointer<TBLOCKINFO> pNodeInfo)
+void mine_hyperchain::onSigShowNodeDlgInfo(QPoint gpos, uint64 blocknum)
 {
-    static QSharedPointer<TBLOCKINFO> sP;
 
-    bool bChanged = false;
-	if (sP.data() == nullptr || sP->iBlockNo != pNodeInfo->iBlockNo){
-        bChanged = true;
-        sP = pNodeInfo;
-    }
+	static uint64 sblocknum;
 
-    if(bChanged){
-        nid_->refreshNodeInfo(pNodeInfo);
-    }else{
-        ;
-    }
+	bool bChanged = false;
+	if (sblocknum != blocknum)
+	{
+		bChanged = true;
+		sblocknum = blocknum;
+	}
 
-    if(!isNidShow_){
-        isNidShow_ = true;
+	if (bChanged)
+	{
 
-        nid_->setGeometry(QRect(gpos.x(),gpos.y(), 200, 300));
-        nid_->show(true);
+		binfo->refreshNodeDlgInfo(blocknum);
+	}
 
-        nid_->setFocus();
-    }
+	if (binfo->isHidden())
+	{
+		binfo->setGeometry(QRect(gpos.x(), gpos.y(), 224, 250));
+		binfo->show(true);
+		binfo->setFocus();
+	}
 }
 
-void mine_hyperchain::onSigHideNodeInfo()
+void mine_hyperchain::onSigShowBrowserInfo(string blocknum)
 {
-    if(isNidShow_){
-        hideTimer_.start(100);
-    }
+	emit SIG_BrowserInfo(blocknum);
 }
 
-void mine_hyperchain::onHideNodeInfoDlgTimer()
+void mine_hyperchain::clearDate_Buddy()
 {
-    if(!nid_->hasFcous()){
-        isNidShow_ = false;
-        nid_->show(false);
-
-        hideTimer_.stop();
-    }
+	StopBuddyTime();
+	Update_GlobleBuddyChainNum(0);
+	Update_NodeStatus(IDLE);
+	ui->myPartenerFrame->clearNodes();
 }
 
-void mine_hyperchain::onUpdateTimer()
+void mine_hyperchain::Update_HyperBlock(string hash, time_t time, uint64 blocknumber)
 {
-<<<<<<< .mine
+	if (!hash.empty() && time > 0)
+	{
 
-||||||| .r191
-    //数据链状态
-=======
->>>>>>> .r192
-    uint64 curFirstBlockNum = GetCurBlockNumOfAllNode();
-    uint64 lastBlockNum = GetCurBlockNumOfAllNode();
+		g_mainWindow()->updateEvidenceByHash(hash, time, blocknumber);
+	}
 
-<<<<<<< .mine
+	if (m_currentblocknumber != blocknumber)
+	{
+		m_currentblocknumber = blocknumber;
+		m_nextblocknumber = m_currentblocknumber + 1;
+		ui->labelCurrentBlockNumber->setText(QString("%1").arg(m_currentblocknumber));
+		ui->labelNextBlockNumber->setText(QString("%1").arg(m_nextblocknumber));
+		ui->labelChainDataStatus->setBlockNum(m_currentblocknumber, m_currentblocknumber);
 
-||||||| .r191
-    //test
-=======
->>>>>>> .r192
-    ui->labelChainDataStatus->setBlockNum(curFirstBlockNum, lastBlockNum);
+		list_ChainData.push_back(m_currentblocknumber);
+		ui->labelChainDataStatus->setBlocksNum(list_ChainData);
+		ui->labelChainDataStatus->update();
 
-<<<<<<< .mine
-
-||||||| .r191
-    //目前看接口，UI只能每个块去获取信息
-=======
->>>>>>> .r192
-    VEC_T_BLOCKINFO vec = GetBlockInfo(0, lastBlockNum);
-    QList<QSharedPointer<TBLOCKINFO> > li;
-
-    if(vec.empty()){
-<<<<<<< .mine
-
-||||||| .r191
-        //this block just for test data
-=======
->>>>>>> .r192
-        ui->labelChainDataStatus->setBlockNum(2, 3);
-
-        QSharedPointer<TBLOCKINFO> info = QSharedPointer<TBLOCKINFO>(new TBLOCKINFO);
-		info->iBlockNo = 0;
-<<<<<<< .mine
-   
-||||||| .r191
-        //--sjc-- 测试时间戳
-=======
->>>>>>> .r192
-		info->tPoeRecordInfo.tRegisTime = 1497694933456;
-        li.push_back(info);
-
-        QSharedPointer<TBLOCKINFO> info1 = QSharedPointer<TBLOCKINFO>(new TBLOCKINFO);
-		info1->iBlockNo = 1;
-		info1->tPoeRecordInfo.tRegisTime = 1497694943456;
-        li.push_back(info1);
-
-        QSharedPointer<TBLOCKINFO> info2 = QSharedPointer<TBLOCKINFO>(new TBLOCKINFO);
-		info2->iBlockNo = 2;
-
-		info2->tPoeRecordInfo.cFileName = QStringLiteral("沈加成.txt").toStdString();
-		info2->tPoeRecordInfo.cCustomInfo = "asdfasd";
-		info2->tPoeRecordInfo.cRightOwner = "sjc";
-		info2->tPoeRecordInfo.cFileHash = "12345678123456781234567812345678012345678123456781234567812345678";
-		info2->tPoeRecordInfo.iFileState = 4;
-		info2->tPoeRecordInfo.tRegisTime = 1497694953456;
-		info2->tPoeRecordInfo.iFileSize = 1048579;
-
-
-        li.push_back(info2);
-
-        QSharedPointer<TBLOCKINFO> info3 = QSharedPointer<TBLOCKINFO>(new TBLOCKINFO);
-		info3->iBlockNo = 3;
-        li.push_back(info3);
-
-    }else{
-        for(auto item : vec){
-            QSharedPointer<TBLOCKINFO> info = QSharedPointer<TBLOCKINFO>(new TBLOCKINFO);
-			info->iBlockNo = item->iBlockNo;
-			info->tPoeRecordInfo = item->tPoeRecordInfo;
-
-            delete item;
-
-            li.push_back(info);
-        }
-    }
-
-    ui->labelChainDataStatus->setBlocks(li);
-    ui->labelChainDataStatus->update();
-
-<<<<<<< .mine
-||||||| .r191
-    //链运行状态
-    //获取基块块号
-=======
-  
->>>>>>> .r192
-    int64 baseBlockNum = GetBaseBlockNum();
-    ui->labelBaseNodeNum->setText(QString("%1").arg(baseBlockNum));
-
-    ui->labelAlternativeBlockNum->setText(tr("Alternative BN %1").arg(baseBlockNum + 1));
-
-    uint16 allChainNum = GetAllChainNum();
-    ui->labelPartnerCount->setText(tr("All partner chain %1 rds").arg(allChainNum));
-
-    uint16 confirmed = GetHaveConfirmChainNum();
-    ui->labelConfirmed->setText(tr("Confirmed %1").arg(confirmed));
-
-    int64 consensusTime = GetTimeOfConsensus();
-    ui->labelConsensusTime->setText(tr("ConsensusTime %1").arg(secsToHourMinSecs(consensusTime)));
-
-	VEC_T_NODEINFO vec1 = GetMyLocalChain();
-    if(vec1.empty()){
-        ui->myPartenerFrame->setNodeInfo(1);
-    }else{
-        ui->myPartenerFrame->setNodeInfo(vec1);
-    }
-    ui->myPartenerFrame->showNodes();
-<<<<<<< .mine
-
-||||||| .r191
-    //其它伙伴链2
-=======
->>>>>>> .r192
-	VEC_T_NODEINFO vec2 = GetOtherLocalChain(2);
-    if(vec2.empty()){
-        ui->otherPartnerFrame0->setNodeInfo(2);
-    }else{
-        ui->otherPartnerFrame0->setNodeInfo(vec2);
-    }
-    ui->otherPartnerFrame0->showNodes();
-<<<<<<< .mine
-
-    //VEC_T_NODEINFO vec3 = GetOtherFriendChainInfo(3);
-    //if(vec3.empty()){
-    //    ui->otherPartnerFrame1->setNodeInfo(3);
-    //}else{
-    //    ui->otherPartnerFrame1->setNodeInfo(vec3);
-    //}
-    //ui->otherPartnerFrame1->showNodes();
-
-||||||| .r191
-    ////其它伙伴链3
-    //VEC_T_NODEINFO vec3 = GetOtherFriendChainInfo(3);
-    //if(vec3.empty()){
-    //    ui->otherPartnerFrame1->setNodeInfo(3);
-    //}else{
-    //    ui->otherPartnerFrame1->setNodeInfo(vec3);
-    //}
-    //ui->otherPartnerFrame1->showNodes();
-
-    //伙伴链信息
-=======
-   
->>>>>>> .r192
-	VEC_T_NODEINFO v = GetMyLocalChain();
-    ui->labelMyPartnerFlag->setText(QString("%1").arg(1));
-    ui->labelMyPartnerCount->setText(QString("%1").arg(v.size()));
-
-	v = GetOtherLocalChain(2);
-    ui->labelOtherPartnerFlag1->setText(QString("%1").arg(2));
-    ui->labelOtherPartnerCount1->setText(QString("%1").arg(v.size()));
-
-	
-  
-
-<<<<<<< .mine
-    ////////////////////////////////////////
-
-||||||| .r191
-    ////////////////////////////////////////
-    //节点链接状态
-=======
-    
->>>>>>> .r192
-    uint32 responseWell = GetBetterNodeNum();
-    ui->chainConectStatusWell->setText(QString("%1").arg(responseWell));
-
-    uint32 normalNode = GetNormalNodeNum();
-    ui->chainConectStatusOccasionallyNoResponse->setText(QString("%1").arg(normalNode));
-
-    uint32 badNodeNum = GetBadNodeNum();
-    ui->chainConectStatusOccasionallyResponse->setText(QString("%1").arg(badNodeNum));
-
-    uint32 downNode = GetDownNodeNum();
-    ui->chainConectStatusNoResponse->setText(QString("%1").arg(downNode));
-
-<<<<<<< .mine
-
-    uint32 reqSend = GetSendRegisReqNum(SEND);                  //已发送
-    uint32 reqConfirming = GetSendRegisReqNum(CONFIRMING);      //待确认
-    uint32 reqConfirmed =  GetSendRegisReqNum(CONFIRMED);       //已确认
-//    uint32 reqRefused =   GetSendRegisReqNum(OTHERREFUSEME);    //被拒绝
-||||||| .r191
-    //我的登记请求
-    uint32 reqSend = GetSendRegisReqNum(SEND);                  //已发送
-    uint32 reqConfirming = GetSendRegisReqNum(CONFIRMING);      //待确认
-    uint32 reqConfirmed =  GetSendRegisReqNum(CONFIRMED);       //已确认
-//    uint32 reqRefused =   GetSendRegisReqNum(OTHERREFUSEME);    //被拒绝
-=======
-    uint32 reqSend = GetSendRegisReqNum(SEND);                  
-    uint32 reqConfirming = GetSendRegisReqNum(CONFIRMING);      
-    uint32 reqConfirmed =  GetSendRegisReqNum(CONFIRMED);       
->>>>>>> .r192
-    ui->labelMyRegSended->setText(QString("%1").arg(reqSend));
-    ui->labelMyRegWaitforConfirm->setText(QString("%1").arg(reqConfirming));
-    ui->labelMyRegConfirmed->setText(QString("%1").arg(reqConfirmed));
-
-
-    if(0 == reqConfirming){
-        g_mainWindow()->updateEvidence();
-    }
-
-    uint32 repRecved = GetRecvRegisRegNum(RECV);                
-    uint32 repConfirming = GetRecvRegisRegNum(CONFIRMING);      
-    uint32 repConfirmed = GetRecvRegisRegNum(CONFIRMED);        
-    ui->labelRecvRegSended->setText(QString("%1").arg(repRecved));
-    ui->labelRecvRegWaitforConfirm->setText(QString("%1").arg(repConfirming));
-    ui->labelRecvRegConfirmed->setText(QString("%1").arg(repConfirmed));
-
-    g_mainWindow()->updateFinish();
+	}
 }
 
-void mine_hyperchain::hideCheckBtn()
+string mine_hyperchain::w2s(const wstring& ws)
 {
-    ui->btnViewMyRegSend->hide();
-    ui->btnViewMyRegConfirmed->hide();
-    ui->btnViewMyRegWaitConfirm->hide();
-    ui->btnViewMyRegRefused->hide();
+	string curLocale = setlocale(LC_ALL, NULL);
 
-    ui->btnViewRecvRegSend->hide();
-    ui->btnViewRecvRegConfirmed->hide();
-    ui->btnViewRecvRegWaitforConfirm->hide();
-    ui->btnViewRecvRegRefused->hide();
+	setlocale(LC_ALL, "chs");
+
+	const wchar_t* _Source = ws.c_str();
+	size_t _Dsize = 2 * ws.size() + 1;
+	char *_Dest = new char[_Dsize];
+	memset(_Dest, 0, _Dsize);
+	wcstombs(_Dest, _Source, _Dsize);
+	string result = _Dest;
+	delete[]_Dest;
+
+	setlocale(LC_ALL, curLocale.c_str());
+
+	return result;
+}
+
+bool mine_hyperchain::GetHBlockDlgInfo(uint64 blocknum, THBLOCKDLGINFO & hinfo)
+{
+	bool bret = false;
+	wostringstream oss;
+	wstring wsNum;
+	uint64 num = 0;
+
+	oss << blocknum;
+	wsNum = oss.str();
+
+	json::value  root = QueryByWeb(blocknum);
+	num = root[wsNum].size();
+	if (num > 0)
+	{
+		bret = true;
+
+		hinfo.iBlockNo = blocknum;
+		hinfo.iCreatTime = root[wsNum][0][L"ctime"].as_number().to_uint64();
+		hinfo.iLocalBlockNum = num - 1;
+		hinfo.strHHash = w2s(root[wsNum][0][L"hhash"].to_string());
+	}
+
+	return bret;
+}
+
+void mine_hyperchain::Update_NodeStatus(uint16 status)
+{
+	if (m_buddystatus != status)
+	{
+		m_buddystatus = status;
+
+		switch (m_buddystatus)
+		{
+		case IDLE:
+
+			ui->labelBuddyStatus->setText("IDLE");
+			break;
+
+		case LOCAL_BUDDY:
+
+			ui->labelBuddyStatus->setText("LOCAL_BUDDY");
+			break;
+
+		case GLOBAL_BUDDY:
+
+			ui->labelBuddyStatus->setText("GLOBAL_BUDDY");
+			break;
+
+		default:
+
+			ui->labelBuddyStatus->setText("IDLE");
+			break;
+		}
+
+	}
+
+}
+
+void mine_hyperchain::Update_BuddyStartTime(time_t stime, uint64 blocknumber)
+{
+
+	StartBuddyTime();
+}
+
+void mine_hyperchain::Update_BuddyStop()
+{
+
+	clearDate_Buddy();
+}
+
+void mine_hyperchain::Update_GlobleBuddyChainNum(uint16 number)
+{
+	if (m_gbuddychainnum != number)
+	{
+		m_gbuddychainnum = number;
+		ui->labelBuddyChainCount->setText(tr("%1 rds").arg(m_gbuddychainnum));
+
+	}
+
+}
+
+void mine_hyperchain::Update_LocalBuddyChainInfo(LIST_T_LOCALCONSENSUS chaininfo)
+{
+	VEC_T_NODEINFO vecnode;
+	for (auto item : chaininfo)
+	{
+		TNODEINFO info;
+		info.strNodeIp = to_string(item.tPeer.tPeerAddrOut.uiIP) + ":" + to_string(item.tPeer.tPeerAddrOut.uiPort);
+		info.uiNodeState = CONFIRMED;
+		vecnode.push_back(info);
+
+	}
+	if (!vecnode.empty())
+	{
+		ui->myPartenerFrame->setNodeInfo(vecnode);
+		ui->myPartenerFrame->showNodes();
+	}
+}
+
+void mine_hyperchain::Update_ConnectNodeUpdate(uint32 betternum, uint32 normalnum, uint32 badnum, uint32 downnum)
+{
+	if (m_betternum != betternum)
+	{
+		m_betternum = betternum;
+		ui->chainConectStatusWell->setText(QString("%1").arg(m_betternum));
+
+	}
+
+	if (m_normalnum != normalnum)
+	{
+		m_normalnum = normalnum;
+		ui->chainConectStatusOccasionallyNoResponse->setText(QString("%1").arg(m_normalnum));
+
+	}
+
+	if (m_badnum != badnum)
+	{
+		m_badnum = badnum;
+		ui->chainConectStatusOccasionallyResponse->setText(QString("%1").arg(m_badnum));
+
+	}
+
+	if (m_downnum != downnum)
+	{
+		m_downnum = downnum;
+		ui->chainConectStatusNoResponse->setText(QString("%1").arg(m_downnum));
+
+	}
+
+}
+
+void mine_hyperchain::Update_SendPoeNum(uint32 number)
+{
+	if (m_sendpoenum != number)
+	{
+		m_sendpoenum = number;
+		ui->labelMyRegSended->setText(QString("%1").arg(m_sendpoenum));
+
+	}
+
+}
+
+void mine_hyperchain::Update_ReceivePoeNum(uint32 number)
+{
+	if (m_recvepoenum != number)
+	{
+		m_recvepoenum = number;
+		ui->labelRecvRegSended->setText(QString("%1").arg(m_recvepoenum));
+
+	}
+}
+
+void mine_hyperchain::InitBuddyTime()
+{
+	m_timer = new QTimer;
+	m_timerecord = new QTime(0, 0, 0);
+
+	ui->lcdBuddyTime->display(m_timerecord->toString("hh:mm:ss"));
+	connect(m_timer, SIGNAL(timeout()), this, SLOT(updateTime()));
+}
+
+void mine_hyperchain::StartBuddyTime()
+{
+	m_bstart = true;
+	m_timer->start(1000);
+
+}
+
+void mine_hyperchain::StopBuddyTime()
+{
+	m_bstart = false;
+	m_timer->stop();
+	m_timerecord->setHMS(0, 0, 0);
+	ui->lcdBuddyTime->display(m_timerecord->toString("hh:mm:ss"));
+
+}
+
+void mine_hyperchain::updateTime()
+{
+	*m_timerecord = m_timerecord->addSecs(1);
+	ui->lcdBuddyTime->display(m_timerecord->toString("hh:mm:ss"));
+}
+
+void mine_hyperchain::ShowPng()
+{
+	QPixmap pix;
+	QString strChainStatusPath = ChainStatusPath();
+	QString strChainRunStatusPath = ChainRunStatusPath();
+	QString strNodeConnectStatusPath = NodeConnectStatusPath();
+	QString strPoePath = PoePath();
+
+	pix.load(strChainStatusPath);
+	ui->png_ChainStatus->setPixmap(pix);
+
+	pix.load(strChainRunStatusPath);
+	ui->png_ChainRunStatus->setPixmap(pix);
+
+	pix.load(strNodeConnectStatusPath);
+	ui->png_Nodeconnectstatus->setPixmap(pix);
+
+	pix.load(strPoePath);
+	ui->png_Poe->setPixmap(pix);
+
+}
+
+void mine_hyperchain::hideblockinfo()
+{
+	if (binfo && !binfo->isHidden())
+	{
+		binfo->hide();
+	}
+}
+
+void mine_hyperchain::Update_HyperBlockNumFromLocal(list<uint64> HyperBlockNum)
+{
+
+	for (list<uint64>::iterator it = HyperBlockNum.begin(); it != HyperBlockNum.end(); it++)
+	{
+		list_ChainData.push_back(*it);
+	}
+
+	if (HyperBlockNum.size() > 0)
+	{
+		ui->labelChainDataStatus->setBlocksNum(list_ChainData);
+		ui->labelChainDataStatus->update();
+	}
+}
+
+void mine_hyperchain::onSigShowStatusMes(QString msg)
+{
+	_minehy_statusBar->OutPutString(msg);
+}
+
+void mine_hyperchain::mousePressEvent(QMouseEvent *event)
+{
+	if (!binfo->isHidden())
+	{
+		binfo->hide();
+	}
+}
+
+void mine_hyperchain::Update_StatusMes(string msg)
+{
+	_minehy_statusBar->OutPutString(QString::fromLocal8Bit(msg.c_str()), "color: rgb(131, 186, 38)");
 }

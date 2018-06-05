@@ -17,10 +17,8 @@ public:
 
 protected:
 
-
 private:
-
 
 };
 
-#endif // HANDBUTTON_H
+#endif

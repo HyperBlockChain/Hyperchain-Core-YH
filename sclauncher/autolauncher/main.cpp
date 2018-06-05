@@ -1,3 +1,24 @@
+/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+/*
+/*Distributed under the MIT software license, see the accompanying
+/*file COPYING or https://opensource.org/licenses/MIT.
+/*
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*software and associated documentation files (the "Software"), to deal in the Software
+/*without restriction, including without limitation the rights to use, copy, modify, merge,
+/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+/*to whom the Software is furnished to do so, subject to the following conditions:
+/*
+/*The above copyright notice and this permission notice shall be included in all copies or
+/*substantial portions of the Software.
+/*
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/*DEALINGS IN THE SOFTWARE.
+*/
 #include <windows.h>
 #include <TlHelp32.h>
 #include <iostream>
@@ -10,9 +31,7 @@ using namespace std;
 
 #pragma comment(lib, "Advapi32.lib")
 
-
 #define MAX_LOADSTRING 100
-
 
 DWORD GetExplorerToken(OUT PHANDLE  phExplorerToken);
 
@@ -31,13 +50,13 @@ int main()
 	ZeroMemory(&pi, sizeof(pi));
 
 	DWORD dwError;
-    //if (!CreateProcessWithTokenW(hPtoken, LOGON_WITH_PROFILE, NULL, const_cast<LPWSTR>(L"E:\\me\\code\\wk\\gy\\FilesNew\\hc.exe"), NULL, NULL, NULL, &si, &pi))
+
     if (!CreateProcessWithTokenW(hPtoken, LOGON_WITH_PROFILE, NULL, const_cast<LPWSTR>(L"hc.exe"), NULL, NULL, NULL, &si, &pi))
     {
 		dwError = GetLastError();
 		if (dwError == 1314)
 		{
-            //MessageBox(NULL, _T("启动进程权限不够(需要管理员权限)"), _T("提示"), MB_OK);
+
 		}
 
         this_thread::sleep_for(std::chrono::milliseconds(200));

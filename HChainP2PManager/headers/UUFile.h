@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -12,7 +12,7 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF A NY KIND, EXPRESS OR IMPLIED, 
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
@@ -21,7 +21,6 @@
 */
 #ifndef _UUFILE_H
 #define _UUFILE_H
-
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -34,21 +33,23 @@
 
 #else
 #include <winsock2.h>
+
 #pragma comment(lib,"IPHLPAPI.lib")
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>  
+#include <windows.h>
 #include<atlconv.h>
-#include <iostream> 
+#include <iostream>
 #include <iphlpapi.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include<WS2tcpip.h> 
+#include<WS2tcpip.h>
 
 #pragma comment(lib,"IPHLPAPI.lib")
 using namespace std;
 #endif
 
 #include <string.h>
+
 #include <string>
 #include <vector>
 #include "../debug/Log.h"
@@ -60,28 +61,27 @@ using namespace std;
 #define MALLOC（x）HeapAlloc（GetProcessHeap（），0，（x））
 #define FREE（x）HeapFree（GetProcessHeap（），0，（x））
 
-
 #define NAME_MAX 1024
 #define MAX_SIZE 1024
 class UUFile
 {
 public:
 	UUFile()
-	{	
+	{
 	}
 	~UUFile()
 	{}
-	
+
 	int getlocalip(char* outip)
 	{
-#ifndef WIN32  
+#ifndef WIN32
 		int i = 0;
 		int sockfd;
 		struct ifconf ifconf;
 		char buf[512];
 		struct ifreq *ifreq;
 		char* ip;
-		
+
 		ifconf.ifc_len = 512;
 		ifconf.ifc_buf = buf;
 		strcpy(outip, "127.0.0.1");
@@ -89,16 +89,15 @@ public:
 		{
 			return -1;
 		}
-		ioctl(sockfd, SIOCGIFCONF, &ifconf);     
+		ioctl(sockfd, SIOCGIFCONF, &ifconf);
 		close(sockfd);
-		
+
 		ifreq = (struct ifreq*)buf;
 		for (i = (ifconf.ifc_len / sizeof(struct ifreq)); i>0; i--)
 		{
 			ip = inet_ntoa(((struct sockaddr_in*)&(ifreq->ifr_addr))->sin_addr);
 
-
-			if (strcmp(ip, "127.0.0.1") == 0)  
+			if (strcmp(ip, "127.0.0.1") == 0)
 			{
 				ifreq++;
 				continue;
@@ -106,7 +105,7 @@ public:
 		}
 		strcpy(outip, ip);
 		return 0;
-#else  
+#else
 		PIP_ADAPTER_ADDRESSES pAddresses = NULL;
 		IP_ADAPTER_DNS_SERVER_ADDRESS *pDnServer = NULL;
 		ULONG outBufLen = 0;
@@ -120,9 +119,9 @@ public:
 
 		pAddresses = (IP_ADAPTER_ADDRESSES*)malloc(outBufLen);
 
-		if ((dwRetVal = GetAdaptersAddresses(AF_INET, GAA_FLAG_SKIP_ANYCAST, NULL, pAddresses, &outBufLen)) == NO_ERROR) 
+		if ((dwRetVal = GetAdaptersAddresses(AF_INET, GAA_FLAG_SKIP_ANYCAST, NULL, pAddresses, &outBufLen)) == NO_ERROR)
 		{
-			while (pAddresses) 
+			while (pAddresses)
 			{
 				PIP_ADAPTER_UNICAST_ADDRESS pUnicast = pAddresses->FirstUnicastAddress;
 				pDnServer = pAddresses->FirstDnsServerAddress;
@@ -155,23 +154,23 @@ public:
 							if ((0 != strcmp(bufTemp, "127.0.0.1")) && (NULL == wcsstr(ptr, L"Network")))
 							{
 								strcpy(outip, bufTemp);
-								
+
 							}
 						}
 					}
-					
+
 					pUnicast = pUnicast->Next;
 				}
-				
+
 				pAddresses = pAddresses->Next;
 			}
 		}
-		
+
 		free(pAddresses);
 
 		return 0;
-		
-#endif  
+
+#endif
 	}
 
 	void ReplaceAll(string& str,const string& old_value,const string& new_value)
@@ -239,7 +238,6 @@ public:
 		if (mssAppPath.size() > 0)
 			return mssAppPath;
 
-		
 		char lcAppPath[NAME_MAX+1];
 		char lcFullPath[NAME_MAX+1];
 
@@ -266,9 +264,51 @@ public:
 
 	bool mkdirEx(const char *Path)
 	{
+
 		return true;
 	}
 
+	string LoadFile(string &path)
+	{
+		FILE* f=fopen(path.c_str(),"rb");
+		if(f==NULL)
+			return "";
+		fseek(f,0,SEEK_END);
+		int flen=ftell(f);
+		fseek(f,0,SEEK_SET);
+		char* buf=new char[flen+1];
+		flen=fread(buf,1,flen,f);
+		buf[flen]='\0';
+		fclose(f);
+		string result=string(buf,flen);
+		delete [] buf;
+		buf = NULL;
+		return result;
+	}
+
+	bool SaveFile(string &path,const string& content)
+	{
+		ReparePath(path);
+
+		FILE* f=fopen(path.c_str(),"wb");
+		if(f==NULL)
+			return false;
+		fwrite(content.c_str(),1,content.length(),f);
+		fclose(f);
+		return true;
+	}
+
+	bool SaveFileAdd(string &path,const string& content)
+	{
+		ReparePath(path);
+
+		FILE* f=fopen(path.c_str(),"a+");
+		if(f==NULL)
+			return false;
+		fwrite(content.c_str(),1,content.length(),f);
+		fclose(f);
+		return true;
+	}
 
 	string GetItemData(string aLineData, string aItem)
 	{
@@ -326,6 +366,7 @@ public:
 			if (End > Start) {
 				string LineData = FileContent.substr(Start+strStart.size(), End-Start-strStart.size());
 				StringList.push_back(LineData);
+
 				Start = End;
 			} else break;
 		}
@@ -348,6 +389,7 @@ public:
 			if (End > Start) {
 				string LineData = FileContent.substr(Start+strItem1.size(), End-Start-strItem1.size());
 				StringList.push_back(LineData);
+
 				Start = End;
 			} else break;
 		}
@@ -355,46 +397,5 @@ public:
 		return StringList;
 	}
 
-		string LoadFile(string &path)
-	{
-		FILE* f=fopen(path.c_str(),"rb");
-		if(f==NULL)
-			return "";
-		fseek(f,0,SEEK_END);
-		int flen=ftell(f);
-		fseek(f,0,SEEK_SET);
-		char* buf=new char[flen+1];
-		flen=fread(buf,1,flen,f);
-		buf[flen]='\0';
-		fclose(f);
-		string result=string(buf,flen);
-		delete [] buf;
-		buf = NULL;
-		return result;
-	}
-
-	bool SaveFile(string &path,const string& content)
-	{
-		ReparePath(path);
-
-		FILE* f=fopen(path.c_str(),"wb");
-		if(f==NULL)
-			return false;
-		fwrite(content.c_str(),1,content.length(),f);
-		fclose(f);
-		return true;
-	}
-
-	bool SaveFileAdd(string &path,const string& content)
-	{
-		ReparePath(path);
-
-		FILE* f=fopen(path.c_str(),"a+");
-		if(f==NULL)
-			return false;
-		fwrite(content.c_str(),1,content.length(),f);
-		fclose(f);
-		return true;
-	}
 };
 #endif

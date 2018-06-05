@@ -1,9 +1,9 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
+/*file COPYING or https://opensource.org/licenses/MIT。
 /*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 /*software and associated documentation files (the "Software"), to deal in the Software
 /*without restriction, including without limitation the rights to use, copy, modify, merge,
 /*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
@@ -12,7 +12,7 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
@@ -20,12 +20,14 @@
 /*DEALINGS IN THE SOFTWARE.
 */
 
-#include "tab_label.h"
+
 #include <QTextCodec>
 #include <QFont>
+#include "tab_label.h"
 
-QColor tab_label::NORMAL_COLOR = QColor(136, 136, 136);
-QColor tab_label::SELECTED_COLOR = QColor(106, 176, 239);
+QColor tab_label::NORMAL_COLOR = QColor(255, 255, 255);
+
+QColor tab_label::SELECTED_COLOR = QColor(131, 186, 38);
 
 tab_label::tab_label(QWidget *parent) : QLabel(parent)
 {
@@ -42,7 +44,7 @@ void tab_label::resetFont(QColor color)
     pe.setColor(QPalette::WindowText, color);
     setPalette(pe);
 
-    QFont font(QString::fromLocal8Bit("微软雅黑"));
+	QFont font(QString::fromLocal8Bit("微软雅黑"));
     font.setPointSize(12);
     setFont(font);
 }

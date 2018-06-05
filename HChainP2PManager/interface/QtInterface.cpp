@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -39,9 +39,9 @@
 #endif
 
 #include <QCryptographicHash>
-#define MAX_TEMP_BUF_LEN (512)
 
 uint64 gStartTime = time(NULL);
+
 CHChainP2PManager gP2PManager;
 
 UUFile uufileTest;
@@ -49,6 +49,11 @@ uint16 g_csvfileNum;
 
 void analysisCsvTest(string ip)
 {
+
+	{
+
+	}
+
 	uint64 blockNum = 0;
 	while (1)
 	{
@@ -61,7 +66,7 @@ void analysisCsvTest(string ip)
 				continue;
 			}
 
-			char line[MAX_TEMP_BUF_LEN] = { 0 };
+			char line[512] = { 0 };
 			time_t tempTime = time(NULL);
 			struct tm * t;
 			t = localtime(&tempTime);
@@ -84,6 +89,7 @@ void analysisCsvTest(string ip)
 			strncpy(tempbuf, testBuf, 8);
 
 			TEVIDENCEINFO FileInfo;
+
 			FileInfo.cFileName = ip.c_str();
 			FileInfo.cFileName += "_";
 			char num[64] = { 0 };
@@ -92,6 +98,7 @@ void analysisCsvTest(string ip)
 			FileInfo.cFileName += ".txt";
 			FileInfo.cFileHash = testBuf;
 			FileInfo.cCustomInfo = tempbuf;
+
 			FileInfo.cRightOwner = tempbuf;
 
 			FileInfo.tRegisTime = time(NULL);
@@ -101,6 +108,7 @@ void analysisCsvTest(string ip)
 			std::thread thr(SetFilePoeRecord, &FileInfo);
 			thr.detach();
 			blockNum++;
+
 			SLEEP(2 * 60 * 1000);
 		}
 	}
@@ -111,36 +119,55 @@ uint16 getCsvFileNum()
 	return g_csvfileNum;
 }
 
+void getAllHyperBlockFromLocal()
+{
+
+}
+
 void getHyperBlockFromLocal()
 {
 	gP2PManager.GetHyperBlockInfoFromLocal();
 }
 
+void GetHyperBlockNumInfoFromLocal()
+{
+	gP2PManager.GetHyperBlockNumInfoFromLocal();
+}
+
 string Upqueue(string hash)
 {
-	int randNum = rand() % 150;
+
 	{
+		int randNum = rand() % 150;
+
 		{
-			TEVIDENCEINFO FileInfo;
-			FileInfo.cFileName = "uyoo";
-			FileInfo.cFileHash = hash.c_str();
-			FileInfo.cCustomInfo = "";
-			FileInfo.cRightOwner = "";
 
-			FileInfo.tRegisTime = time(NULL);
-			FileInfo.iFileState = 0;
-			FileInfo.iFileSize = 1024;
+			{
 
-			char line[MAX_TEMP_BUF_LEN] = { 0 };
-			time_t tempTime = time(NULL);
-			struct tm * t;
-			t = localtime(&tempTime);
-			sprintf(line, "%d-%d-%d-%d:%d:%d--%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, randNum);
+				TEVIDENCEINFO FileInfo;
+				FileInfo.cFileName = "uyoo";
+				FileInfo.cFileHash = hash.c_str();
+				FileInfo.cCustomInfo = "";
+				FileInfo.cRightOwner = "";
 
-			gP2PManager.AddNewBlock(FileInfo, line);
-			return line;
+				FileInfo.tRegisTime = time(NULL);
+				FileInfo.iFileState = 0;
+				FileInfo.iFileSize = 1024;
+
+				char line[512] = { 0 };
+				time_t tempTime = time(NULL);
+				struct tm * t;
+				t = localtime(&tempTime);
+				sprintf(line, "%d-%d-%d-%d:%d:%d--%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, randNum);
+
+				gP2PManager.AddNewBlock(FileInfo, line);
+				return line;
+
+			}
 		}
+
 	}
+
 }
 void runP2P(int argc, char *argv[])
 {
@@ -151,21 +178,23 @@ void runP2P(int argc, char *argv[])
 	strLogFile += "hyperchain_p2p.log";
 	g_pLogHelper = open_logfile(strLogFile.c_str());
 
-	
+
 	string ipTemp = CCommonStruct::GetLocalIp();
 
 	gP2PManager.Init();
 	gP2PManager.Start();
+
 }
 
-uint64 GetCurBlockNumOfMyself()
+uint64 GetLocalLatestBlockNo()
 {
-	return gP2PManager.GetCurBlockNumOfMyself();
+	return gP2PManager.GetLocalLatestBlockNo();
 }
 
-uint64 GetCurBlockNumOfAllNode()
+uint64 GetLatestHyperBlockNo()
+
 {
-	return gP2PManager.GetCurBlockNumOfAllNode();
+	return gP2PManager.GetLatestHyperBlockNo();
 }
 
 VEC_T_BLOCKINFO GetBlockInfo(uint64 start, uint64 end)
@@ -195,6 +224,7 @@ uint16 GetHaveConfirmChainNum()
 
 uint64 GetTimeOfConsensus()
 {
+
 	return gP2PManager.GetElaspedTimeOfCurrentConsensus();
 }
 uint64 GetStartTimeOfCurrentConsensus()
@@ -214,24 +244,23 @@ VEC_T_NODEINFO GetOtherLocalChain(uint16 chainNum)
 
 uint32 GetBetterNodeNum()
 {
-	return gP2PManager.GetStrongHyperBlockNo();
+	return gP2PManager.GetStrongNodeNum();
 }
 
 uint32 GetNormalNodeNum()
 {
-	return gP2PManager.GetAverageHyperBlockNo();
+	return gP2PManager.GetAverageNodeNum();
 }
 
 uint32 GetBadNodeNum()
 {
-	return gP2PManager.GetWeakHyperBlockNo();
+	return gP2PManager.GetWeakNodeNum();
 }
 
 uint32 GetDownNodeNum()
 {
-	return gP2PManager.GetOfflineHyperBlockNo();
+	return gP2PManager.GetOfflineNodeNum();
 }
-
 
 uint32 GetSendRegisReqNum(uint16 regisReq)
 {
@@ -247,10 +276,11 @@ uint32 GetSendRegisReqNum(uint16 regisReq)
 	case CONFIRMED:
 		index = gP2PManager.GetSendRegisReqNum() - gP2PManager.GetSendConfirmingRegisReqNum();
 		break;
+
 	default:
 		break;
 	}
-	return index;   
+	return index;
 }
 
 uint32 GetRecvRegisRegNum(uint16 regisReq)
@@ -267,12 +297,12 @@ uint32 GetRecvRegisRegNum(uint16 regisReq)
 	case CONFIRMED:
 		index = gP2PManager.GetRecvRegisReqNum() - gP2PManager.GetRecvConfirmingRegisReqNum();
 		break;
+
 	default:
 		break;
 	}
 	return index;
 }
-
 
 void AddNewBlock(P_TEVIDENCEINFO pSetInfo, string queueId)
 {
@@ -297,7 +327,7 @@ void SetFilePoeRecord(P_TEVIDENCEINFO pSetInfo)
 
 bool VerifyPoeRecord(string &checkFileHash, P_TEVIDENCEINFO pCheckInfo)
 {
-	return gP2PManager.MatchFile(checkFileHash, pCheckInfo);
+	return gP2PManager.VerifyPoeRecord(checkFileHash, pCheckInfo);
 }
 
 uint64 GetConnNodesNum()
@@ -307,7 +337,7 @@ uint64 GetConnNodesNum()
 
 uint64 GetNodeRunningTime()
 {
-	return time(NULL); 
+	return time(NULL);
 }
 
 uint32 GetAllPoeReqNum()
@@ -316,10 +346,10 @@ uint32 GetAllPoeReqNum()
 }
 
 void GetSendingRate(string &sendRate)
-{	
+{
 	gP2PManager.GetSendingRate(sendRate);
 }
- 
+
 void GetSentSize(string &allSendSize)
 {
 	gP2PManager.GetSentSize(allSendSize);
@@ -339,7 +369,6 @@ void GetChainSize(string &buffSize)
 {
 	buffSize = "25MB";
 }
-
 
 bool isNum(string searchInfo)
 {
@@ -382,6 +411,22 @@ VEC_T_BROWSERSHOWINFO Query(string &searchInfo)
 	}
 }
 
+json::value QueryByWeb(uint64 blockNum)
+{
+	RestApi* api = new RestApi;
+	json::value vRet = api->getHyperblocks(blockNum, 1);
+	if (vRet.is_null())
+	{
+		GetHyperBlockInfoFromP2P(blockNum, 1);
+	}
+
+	if (api != NULL)
+	{
+		delete api;
+	}
+	return vRet;
+}
+
 void GetChainData(string &chainData)
 {
     chainData = gP2PManager.GetChainData();
@@ -389,11 +434,11 @@ void GetChainData(string &chainData)
 
 uint64 GetPoeReqTotalNum()
 {
-	return GetCurBlockNumOfAllNode();
+	return GetLatestHyperBlockNo();
 }
 
 uint64 GetAllConnectedNodes()
-{    
+{
 	return gP2PManager.GetAllNodesInTheNet();
 }
 
@@ -407,7 +452,67 @@ void GetNodeInfo(string &info, string &ip, uint16 &port)
 	gP2PManager.GetNodeDescription(info, ip, port);
 }
 
+VEC_T_PPEERCONF GetPeerInfo()
+{
+	return gP2PManager.GetPeerInfo();
+}
 
 void ChainDataPersist()
 {
+
+}
+
+void setNotify(QtNotify * qnotify)
+{
+	gP2PManager.SetQtNotify(qnotify);
+}
+
+uint16 GetPoeRecordListNum()
+{
+	return gP2PManager.GetPoeRecordListNum();
+}
+
+LIST_T_LOCALCONSENSUS GetPoeRecordList()
+{
+	return gP2PManager.GetPoeRecordList();
+}
+
+void GetHyperBlockInfoFromP2P(uint64 start, uint64 end)
+{
+	return gP2PManager.GetHyperBlockInfoFromP2P(start, end);
+}
+
+void GetNodeRunTimeEnv(string &version, string &netType, string &protocolVersion, string &ip, uint16 &port, string &name)
+{
+	gP2PManager.GetNodeDescription(name, ip, port);
+	version = "V1.0";
+	netType = "GLOBAL";
+	protocolVersion = "V1.0";
+}
+
+uint16 GetStateOfCurrentConsensus(uint64 &blockNo,uint16 &blockNum, uint16 &chainNum)
+{
+	return gP2PManager.GetStateOfCurrentConsensus(blockNo, blockNum, chainNum);
+}
+
+uint32 GetConnectedNodesNum()
+{
+	return gP2PManager.GetConnectedNodesNum();
+}
+
+void SetScriptPoeRecord(string script)
+{
+	int randNum = rand() % 150;
+	char line[512] = { 0 };
+	time_t tempTime = time(NULL);
+	struct tm * t;
+	t = localtime(&tempTime);
+	sprintf(line, "%d-%d-%d-%d:%d:%d--%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, randNum);
+
+	gP2PManager.AddNewScriptBlock(script, line);
+}
+
+void DeleteFailedPoe(string script, uint64 time)
+{
+	gP2PManager.DeleteFailedPoe(script, time);
 }

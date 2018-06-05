@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -32,14 +32,16 @@
 #include <winsock2.h>
 #endif
 
-#define MAX_RECV_BUF_SIZE 1024*16
+#define MAX_RECV_BUF_SIZE (1024*16)
 #define MAX_BUF_LEN (1024 * 32)
-#define MAX_RECV_LIST_COUNT 20000
-#define MAX_INTER_FACES 16
-#define MAX_CRC_LEN 16
-#define CURRENT_VERSION '1'
-#define MAX_LIST_NUM 4294967295
-
+#define MAX_RECV_LIST_COUNT (20000)
+#define MAX_INTER_FACES (16)
+#define MAX_CRC_LEN (16)
+#define CURRENT_VERSION ('1')
+#define MAX_LIST_NUM (4294967295)
+#define UDP_INIT_FLAG (123456)
+#define UDP_INIT_PAKTYPE ('1')
+#define UDP_ACK_PAKTYPE  ('2')
 
 enum _esendtype
 {
@@ -65,7 +67,7 @@ typedef struct _ttestdata
 	unsigned int   usSendListCount;
 	unsigned short usFastTime;
 	unsigned short usSlowTime;
-	unsigned short usRecvListNum;	
+	unsigned short usRecvListNum;
 
 	_ttestdata()
 	{
@@ -102,7 +104,6 @@ typedef struct _ttestdata
 	}
 }T_TESTDATA, *T_PTESTDATA;
 
-
 typedef struct _tsendnode
 {
 	 unsigned short				usPort;
@@ -110,8 +111,9 @@ typedef struct _tsendnode
 	 unsigned int 				uiSendLen;
 	 unsigned int 				uiRetryTimes;
 	 char 						*sendBuf;
+
 	 uint64						uiLastSendTime;
-	 unsigned short				usFlag;	 
+	 unsigned short				usFlag;
 }T_SENDNODE, *T_PSENDNODE;
 
 typedef struct _tuuseehead
@@ -121,7 +123,7 @@ typedef struct _tuuseehead
 	 unsigned int   uiSendBufCrc;
      unsigned int  	uiBufLen;
 	 char		  	PackType;
-	 char			Version; 
+	 char			Version;
 }T_UUSEEHEAD, *T_PUUSEEHEAD;
 
 #pragma pack()
@@ -132,14 +134,13 @@ typedef LIST_T_SENDNODE::iterator    ITR_LIST_T_SENDNODE;
 typedef list<T_PSENDNODE>            LIST_T_PSENDNODE;
 typedef LIST_T_PSENDNODE::iterator   ITR_LIST_T_PSENDNODE;
 
-
 typedef map<unsigned int, T_PSENDNODE>		MAP_T_PSENDNODE;
 typedef MAP_T_PSENDNODE::iterator    ITR_MAP_T_PSENDNODE;
 
 class CUdpSocket
 {
 public:
-	
+
 	CUdpSocket();
 	virtual ~CUdpSocket();
 
@@ -175,7 +176,7 @@ private:
 	void SendAgain();
 	static void THREAD_API RecvDataEntry(void* pParam);
 	static void THREAD_API SendAgainEntry(void* pParam);
-	
+
 	string			GetLocalIp(int fd, const string& eth);
 	void 			OupPutTestData();
 	string			SetNetNum(string netSize, uint64 recvNum);
@@ -190,10 +191,11 @@ private:
 	int						m_listenFd;
 #endif
 	LIST_T_SENDNODE			m_recvList;
-	LIST_T_PSENDNODE		m_sendList;	
-	MAP_T_PSENDNODE			m_sendMap;  
+	LIST_T_PSENDNODE		m_sendList;
+	MAP_T_PSENDNODE			m_sendMap;
 	CMutexObj				m_recvListLock;
 	CMutexObj				m_sendMapLock;
+
 	int						m_networkCardNum;
 	T_TESTDATA				m_testData;
 	T_TESTDATA				m_GetData;
@@ -207,5 +209,4 @@ private:
 	uint64					m_netRateSend;
 };
 
-
-#endif //__UDP_SOCKET_H__
+#endif

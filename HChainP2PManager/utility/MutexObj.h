@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -23,7 +23,6 @@
 #ifndef __MUTEX_OBJ_H__
 #define __MUTEX_OBJ_H__
 
-
 #ifdef WIN32
 
 #define WIN32_LEAN_AND_MEAN
@@ -31,8 +30,7 @@
 #else
 #include <pthread.h>
 #include <unistd.h>
-#endif// WIN32
-
+#endif
 
 class CMutexObj
 {
@@ -44,7 +42,7 @@ public:
 	void UnLock();
 
 private:
-	
+
 #ifdef WIN32
 	CRITICAL_SECTION	m_oSection;
 #else
@@ -52,7 +50,6 @@ private:
 #endif
 
 };
-
 
 class CAutoMutexLock
 {
@@ -63,4 +60,4 @@ private:
 	CMutexObj& m_oCriticalSection;
 };
 
-#endif // __MUTEX_OBJ_H__
+#endif

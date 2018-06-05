@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -29,8 +29,7 @@
 #else
 #include <pthread.h>
 #include <unistd.h>
-#endif// WIN32
-
+#endif
 
 #include <stdio.h>
 
@@ -43,9 +42,7 @@ extern  int  	ERR_JTHREAD_THREADFUNCNOTSET;
 extern  int 	ERR_JTHREAD_NOTRUNNING;
 extern  int  	ERR_JTHREAD_ALREADYRUNNING;
 
-
 typedef void* (*pThreadCallbackFunc) (void* pParam);
-
 
 class CThreadObj
 {
@@ -58,7 +55,7 @@ public:
 	int Start(TCallbackFuncObj<pThreadCallbackFunc>* pCObj);
 	int Kill();
 	void Join();
-	bool IsRunning();	
+	bool IsRunning();
 
 	void ThreadStarted();
 
@@ -67,17 +64,17 @@ private:
 	static DWORD WINAPI ThreadEntry( LPVOID param );
 #else
 	static	void* ThreadEntry(void* param);
-#endif //WIN32
-	
+#endif
+
 	void* ThreadImp();
-	
+
 private:
 #ifdef WIN32
 	HANDLE		m_ThreadID;
 #else
 	pthread_t	m_ThreadID;
 #endif
-	
+
 	bool 		m_bIsRunning;
 	CMutexObj 	m_muxRunning;
 	CMutexObj 	m_muxContinue;
@@ -86,5 +83,5 @@ private:
 	TCallbackFuncObj<pThreadCallbackFunc>* 	m_pCallbackFuncObj;
 };
 
-#endif //__TRHEAD_OBJECT__
+#endif
 

@@ -1,9 +1,9 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*Copyright 2017 hyperchain.net  (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT.
 /*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
 /*software and associated documentation files (the "Software"), to deal in the Software
 /*without restriction, including without limitation the rights to use, copy, modify, merge,
 /*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
@@ -12,7 +12,7 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
@@ -25,6 +25,7 @@
 
 #include <QWidget>
 #include <QVariantMap>
+#include "util/commonutil.h"
 
 namespace Ui {
 class reg_verification;
@@ -41,6 +42,8 @@ public:
 public:
     void updateInfo(QVariantMap info);
     void retranslateUI();
+	void onOpenFile();
+	QString getfilesize(uint64 nsize);
 protected:
     virtual void dragEnterEvent(QDragEnterEvent *event);
     virtual void dropEvent(QDropEvent *event);
@@ -51,4 +54,4 @@ private:
     QString sha512_;
 };
 
-#endif // REG_VERIFICATION_H
+#endif

@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -29,13 +29,28 @@
 #include "headers/inter_public.h"
 #include <time.h>
 #include <mutex>
+#include "interface/QtNotify.h"
 
+class QtNotify;
+typedef struct _tBuddyInfo
+{
+	uint64 uiCurBuddyNo;
+	uint16 usBlockNum;
+	uint16 usChainNum;
+	uint8 eBuddyState;
+}T_STRUCTBUDDYINFO, *T_PSTRUCTBUDDYINFO;
+
+typedef struct _tOnChainHashInfo
+{
+	uint64 uiTime;
+	string strHash;
+}T_ONCHAINHASHINFO, *T_PONCHAINHASHINFO;
 typedef struct _tp2pmanagerstatus
 {
-	bool  bStartGlobalFlag;
+
+	bool bStartGlobalFlag;
 	bool  bHaveOnChainReq;
-	bool  bHaveRecvCopyHyperBlock;
-	bool bLocalBuddyChainState;
+	bool bHaveRecvCopyHyperBlock;
 	int32 uiMaxBlockNum;
 	uint16 usBuddyPeerCount;
 	uint16 uiNodeState;
@@ -45,10 +60,12 @@ typedef struct _tp2pmanagerstatus
 	uint64 uiRecvRegisReqNum;
 	T_HYPERBLOCK tPreHyperBlock;
 	T_LOCALBLOCK tPreLocalBlock;
+
 	uint64 uiStartTimeOfConsensus;
 	uint64 uiNextStartTimeNewest;
 	uint64 uiTimeOfConsensus;
 	uint16 usGlobalBuddyChainCount;
+	bool bLocalBuddyChainState;
 	T_PEERADDRESS tLocalBuddyAddr;
 	T_LOCALCONSENSUS curBuddyBlock;
 
@@ -57,7 +74,7 @@ typedef struct _tp2pmanagerstatus
 
 	CMutexObj		 MuxlistLocalBuddyChainInfo;
 	LIST_T_LOCALCONSENSUS listLocalBuddyChainInfo;
-	
+
 	CMutexObj		 MuxlistGlobalBuddyChainInfo;
 	LIST_LIST_GLOBALBUDDYINFO listGlobalBuddyChainInfo;
 
@@ -76,9 +93,17 @@ typedef struct _tp2pmanagerstatus
 	CMutexObj			MuxMapSearchOnChain;
 	MAP_T_SEARCHONCHAIN mapSearchOnChain;
 
+	T_ONCHAINHASHINFO tOnChainHashInfo;
+
+	uint64 uiSendPoeNum;
+	uint64 uiRecivePoeNum;
+
+	T_STRUCTBUDDYINFO tBuddyInfo;
+
 	void clearStatus()
 	{
 		bStartGlobalFlag = false;
+
 		bHaveOnChainReq = false;
 		bLocalBuddyChainState = false;
 		bHaveRecvCopyHyperBlock = false;
@@ -93,6 +118,14 @@ typedef struct _tp2pmanagerstatus
 		uiStartTimeOfConsensus = 0;
 		uiTimeOfConsensus = 0;
 		listLocalBuddyChainInfo.clear();
+		tOnChainHashInfo.strHash = "";
+		tOnChainHashInfo.uiTime = 0;
+		uiSendPoeNum = 0;
+		uiRecivePoeNum = 0;
+		tBuddyInfo.uiCurBuddyNo = 0;
+		tBuddyInfo.eBuddyState = IDLE;
+		tBuddyInfo.usBlockNum = 0;
+		tBuddyInfo.usChainNum = 0;
 	}
 
 	_tp2pmanagerstatus()
@@ -108,6 +141,7 @@ public:
 	~CHChainP2PManager(void);
 
 public:
+	bool SetQtNotify(QtNotify *pnotify);
 	bool Init();
 	bool Start();
 	void Stop();
@@ -115,22 +149,25 @@ public:
 	void Teardown();
 
 	void AddNewBlock(TEVIDENCEINFO tFileInfo, const char *rand);
-	uint64 GetCurBlockNumOfMyself();
-	uint64 GetCurBlockNumOfAllNode();
+	void AddNewScriptBlock(string script, const char *rand);
+	void DeleteFailedPoe(string script, uint64 time);
+	uint64 GetLocalLatestBlockNo();
+	//uint64 GetLatestHyperBlockNo();
 	VEC_T_BLOCKINFO GetBlockInfoByIndex(uint64 start, uint64 end);
 	string GetChainData();
-	
+
 	int64 GetOnChainState(string fileHash);
 	uint64 GetLatestHyperBlockNo();
-	uint32 GetStrongHyperBlockNo();
-	uint32 GetAverageHyperBlockNo();
-	uint32 GetWeakHyperBlockNo();
-	uint32 GetOfflineHyperBlockNo();
+	uint32 GetStrongNodeNum();
+	uint32 GetAverageNodeNum();
+	uint32 GetWeakNodeNum();
+	uint32 GetOfflineNodeNum();
 	uint32 GetSendRegisReqNum();
 	uint32 GetSendConfirmingRegisReqNum();
 	uint32 GetRecvRegisReqNum();
 	uint32 GetRecvConfirmingRegisReqNum();
-	bool MatchFile(string &checkFileHash, P_TEVIDENCEINFO pCheckInfo);
+	bool VerifyPoeRecord(string &checkFileHash, P_TEVIDENCEINFO pCheckInfo);
+
 	uint64 GetAllNodesInTheNet();
 	void GetSendingRate(string &sendRate);
 	void GetSentSize(string &allSendSize);
@@ -139,8 +176,11 @@ public:
 
 	VEC_T_NODEINFO GetOtherLocalChain(uint16 chainNum);
 	VEC_T_NODEINFO GetMyLocalChain();
-	
-	void GetNodeDescription(string &info, string &ip, uint16 &uiport); 
+
+	void GetNodeDescription(string &info, string &ip, uint16 &uiport);
+	VEC_T_PPEERCONF GetPeerInfo();
+	uint16 GetStateOfCurrentConsensus(uint64 &blockNo, uint16 &blockNum, uint16 &chainNum);
+	uint32 GetConnectedNodesNum();
 
 	VEC_T_HYPERBLOCKDBINFO ChainDataPersist();
 
@@ -155,25 +195,31 @@ public:
 	void SaveHyperBlockToLocal(T_HYPERBLOCK tHyperBlock);
 	void SaveLocalBlockToLocal(T_HYPERBLOCK tHyperBlock);
 	void GetHyperBlockInfoFromLocal();
+	void GetHyperBlockNumInfoFromLocal();
 	uint16 GetPoeRecordListNum();
+	LIST_T_LOCALCONSENSUS GetPoeRecordList();
+
+	void GetHyperBlockInfoFromP2P(uint64 start, uint64 end);
+
 private:
 	uint32 GetNodeNum(uint32 uiStart, uint32 uiEnd);
 
-	string getPeerListInfo();			
-	string getBlockInfo();				
+	string PrintAllPeerNodeList();
+	string PrintAllLocalBlocks();
 	string getBlockInfo(T_HYPERBLOCK hyperBlock);
-	string getBlockStateInfo();			
+	string PrintBlockNodeMap();
 
 	void WriteBlockLog(T_HYPERBLOCK hyperBlock);
-	void SendGetPeerListReq(int8 *strName, uint32 uiIP, uint16 usPort);		
-	void SavePeerList();													
-	void SendGetChainStateReq();											
-	void SendLoginReq(uint32 uiIP, uint16 usPort);							
+	void SendGetPeerListReq(int8 *strName, uint32 uiIP, uint16 usPort);
+	void SavePeerList();
+	void SendBlockNodeMapReq();
+	void SendLoginReq(uint32 uiIP, uint16 usPort);
 	void SearchPeerList(char *strName, uint32 uiIPIN, uint16 usPortIN, uint32 uiIPOUT, uint16 usPortOUT, bool bFlag, uint64 uiTime, uint16 uiNodeState);
-	void SendBlockToPeer(uint32 uiIP, uint16 usPort, uint64 uiBlockNum);	
-	void SendPeerListToPeer(uint32 uiIP, uint16 usPort);					
-	void SendToOutPeerWantNatTraversalReq(T_PPEERINFO tPpeerInfo);					
-	void CreateGenesisHyperBlock();
+	void SendBlockToPeer(uint32 uiIP, uint16 usPort, uint64 uiBlockNum);
+	void SendOneBlockToPeer(uint32 uiIP, uint16 usPort, uint64 uiBlockNum);
+	void SendPeerList(uint32 uiIP, uint16 usPort);
+	void SendToOutPeerWantNatTraversalReq(T_PPEERINFO tPpeerInfo);
+	void GreateGenesisBlock();
 	bool JudgExistAtGlobalBuddy(LIST_T_LOCALCONSENSUS listLocalBuddyChainInfo);
 	void SendDataToPeer(char *buf, uint32 bufLen);
 	void ChangeLocalBlockPreHash(LIST_T_LOCALCONSENSUS &localList);
@@ -187,17 +233,19 @@ private:
 	bool CreatHyperBlock();
 	void SendNodeState(uint8 nodeState);
 	void GetHyperBlockByNo(uint64 blockNum);
-	void CopyLocalBuddyList(LIST_T_LOCALCONSENSUS &endList, LIST_T_LOCALCONSENSUS fromList);
+
+	void copyLocalBuddyList(LIST_T_LOCALCONSENSUS &endList, LIST_T_LOCALCONSENSUS fromList);
 	void SendConfirmReq(char* pszIP, unsigned short usPort, string hash, uint8 state);
 	void SendConfirmRsp(char* pszIP, unsigned short usPort, string hash);
 	void SendRefuseReq(char* pszIP, unsigned short usPort, string hash, uint8 type);
 	void SendCopyLocalBlock(T_LOCALCONSENSUS localBlock);
-	void ReOnChainFunc();
+	void ReOnChainFun();
 	void GetNewHyperInfoAndReOnChain();
 	uint16 HyperBlockInListOrNot(uint64 blockNum, uint64 blockCount, T_SHA256 tHashSelf);
 	void SendConfirmFin(char* pszIP, unsigned short usPort, string hash);
 	bool CurBuddyBlockInTheHyperBlock(T_HYPERBLOCK blockInfos);
-	void SendOneHyperBlockByNo(uint32 uiIP, uint16 usPort, uint64 uiBlockNum);
+	int GetChainUsedMemory();
+	void ClearHalfMemoryCache();
 
 	void ProcessPingReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessPingRspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
@@ -206,19 +254,21 @@ private:
 	void ProcessWantNatTraversalReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessNatTraversalReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessSomeNodeWantToConnectYouReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
-	void ProcessGetBlockStateReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
+	void ProcessGetBlockNodeMapReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessAddBlockReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessOnChainReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessCopyBlockReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessOnChainRspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessOnChainConfirmMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
-	void ProcessGetBlockStateRspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
+	void ProcessGetBlockNodeMapRspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
+
 	void ProcessGlobalBuddyReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessGlobalBuddyRspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessCopyHyperBlockReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessCopyHyperBlockRspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessGetHyperBlockByNoReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessGetHyperBlockByNoRspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
+	void SendOneHyperBlockByNo(uint32 uiIP, uint16 usPort, uint64 uiBlockNum);
 	void ProcessOnChainAck1RspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessOnChainAck2RspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessOnChainFinRspMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
@@ -226,24 +276,27 @@ private:
 	void ProcessRefuseReqMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 	void ProcessOnChainConfirmFinMsg(char* pszIP, unsigned short usPort, char* pBuf, unsigned int uiBufLen);
 
-	static void* UdpProcessEntry(void* pParam);			
-	void UdpProcessImp();								
+	static void* UdpProcessEntry(void* pParam);
+	void UdpProcessImp();
 
 	static void* UpdateDataProcessEntry(void* pParam);
-	void UpdateDataProcessImp();						
+	void UpdateDataProcessImp();
 
-	static void* WriteStatusProcessEntry(void* pParam); 
+	static void* WriteStatusProcessEntry(void* pParam);
 	void WriteStatusProcessImp();
 
-	static void* RecvLocalBuddyPackReqThreadEntry(void* pParam); 
+	static void* MemCacheProcessEntry(void*pParam);
+	void MemCacheProcessImp();
+
+	static void* RecvLocalBuddyPackReqThreadEntry(void* pParam);
 	void RecvLocalBuddyPackReqThreadEntryImp();
 
-	static void* RecvLocalBuddyPackRspThreadEntry(void* pParam); 
+	static void* RecvLocalBuddyPackRspThreadEntry(void* pParam);
 	void RecvLocalBuddyPackRspThreadEntryImp();
 
-	static void* LocalBuddyThreadEntry(void* pParam); 
+	static void* LocalBuddyThreadEntry(void* pParam);
 	void LocalBuddyThreadEntryImp();
-	
+
 	static void* SearchOnChainStateEntry(void *pParam);
 	void SearchOnChainStateEntryImp();
 
@@ -256,10 +309,14 @@ private:
 	CThreadObj                              m_threadWriteStatusProcess;
 	TCallbackFuncObj<pThreadCallbackFunc>   m_funcWriteStatusProcess;
 
+	CThreadObj                              m_threadMemCacheProsess;
+	TCallbackFuncObj<pThreadCallbackFunc>   m_funcMemCacheProcess;
+
 	LIST_T_PPEERINFO m_PeerInfoList;
 	CMutexObj		 m_MuxPeerInfoList;
-	
+
 	LIST_T_HYPERBLOCK   m_HchainBlockList;
+	LIST_T_HYPERBLOCKNEW m_HchainBlockListNew;
 	CMutexObj			m_MuxHchainBlockList;
 
 	MAP_BLOCK_STATE m_BlockStateMap;
@@ -267,7 +324,7 @@ private:
 
 	CUdpSocket      m_UdpSocket;
 	T_PEERINFO		m_MyPeerInfo;
+	QtNotify		*m_qtnotify;
 
-	
 };
-#endif//__HCHAINP2P_MANAGER__
+#endif

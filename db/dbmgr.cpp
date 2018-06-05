@@ -1,10 +1,31 @@
-﻿#include "db/dbmgr.h"
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
+/*
+/*Distributed under the MIT software license, see the accompanying
+/*file COPYING or https://opensource.org/licenses/MIT。
+/*
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+/*software and associated documentation files (the "Software"), to deal in the Software
+/*without restriction, including without limitation the rights to use, copy, modify, merge,
+/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+/*to whom the Software is furnished to do so, subject to the following conditions:
+/*
+/*The above copyright notice and this permission notice shall be included in all copies or
+/*substantial portions of the Software.
+/*
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+/*DEALINGS IN THE SOFTWARE.
+*/
+#include "db/dbmgr.h"
 #include "util/cppsqlite3.h"
 #include "HChainP2PManager/headers/inter_public.h"
 #include "HChainP2PManager/headers/commonstruct.h"
 
 namespace DBSQL {
-	
+
 	const std::string EVIDENCES_TBL =
 		"CREATE TABLE IF NOT EXISTS evidence_tbl "
 		"("
@@ -17,7 +38,7 @@ namespace DBSQL {
 		"    [regtime]                              INTEGER DEFAULT 0,"
 		"    [filesize]                             INTEGER DEFAULT '',"
 		"    [extra]                                TEXT DEFAULT '',"
-		"    PRIMARY KEY(hash, blocknum)"
+		"    PRIMARY KEY(hash, regtime)"
 		");";
 
 	const std::string HYPERBLOCK_TBL =
@@ -44,15 +65,15 @@ namespace DBSQL {
 
 }
 
-
-
-
 static const std::string scEvidenceInsert = "INSERT OR REPLACE INTO evidence_tbl(hash,blocknum,filename,custominfo,owner,filestate,regtime,filesize,extra) "
                                          "VALUES(?,?,?,?,?,?,?,?,?);";
+
 static const std::string scHyperblockInsert = "INSERT OR REPLACE INTO hyperblock(hash,id,type,hid,hhash,hash_prev,payload,ctime,queue_id,chain_num)  "
 "VALUES(?,?,?,?,?,?,?,?,?,?);";
+
 static const std::string scUpqueueInsert = "INSERT OR REPLACE INTO upqueue(hash,ctime) "
 "VALUES(?,?);";
+
 DBmgr *DBmgr::instance()
 {
     static DBmgr s;
@@ -91,7 +112,7 @@ int DBmgr::open(const char *dbpath)
         _db->open(dbpath);
 
 #ifndef _DEBUG
-        //int result = sqlite3_key(_db->getDB(), "123456!@#$%^", 12);
+
 #endif
 
         int threadSafe = sqlite3_threadsafe();
@@ -184,9 +205,11 @@ int DBmgr::insertEvidence(const TEVIDENCEINFO &evidence)
 {
     try
     {
+
         CppSQLite3Statement stmt = _db->compileStatement(scEvidenceInsert.c_str());
         stmt.bind(1, evidence.cFileHash.c_str());
-        stmt.bind(2, 0);
+
+		stmt.bind(2, (int64)evidence.iBlocknum);
         stmt.bind(3, evidence.cFileName.c_str());
         stmt.bind(4, evidence.cCustomInfo.c_str());
         stmt.bind(5, evidence.cRightOwner.c_str());
@@ -230,6 +253,7 @@ int DBmgr::getEvidences(QList<TEVIDENCEINFO> &evidences, int page, int size)
         CppSQLite3Query query = stmt.execQuery();
         while (!query.eof())
         {
+
             TEVIDENCEINFO evi;
             evi.cFileHash = query.getStringField("hash");
             evi.cFileName = query.getStringField("filename");
@@ -238,6 +262,7 @@ int DBmgr::getEvidences(QList<TEVIDENCEINFO> &evidences, int page, int size)
             evi.iFileState = query.getIntField("filestate");
             evi.tRegisTime = query.getInt64Field("regtime");
             evi.iFileSize = query.getInt64Field("filesize");
+			evi.iBlocknum = query.getInt64Field("blocknum");
 
             evidences.append(evi);
 
@@ -252,21 +277,96 @@ int DBmgr::getEvidences(QList<TEVIDENCEINFO> &evidences, int page, int size)
     return ret;
 }
 
+int DBmgr::getNoConfiringList(QList<TEVIDENCEINFO>& evidences)
+{
+	int ret = 0;
+
+	try
+	{
+		CppSQLite3Statement stmt;
+		std::string sql;
+
+		sql = "SELECT * FROM evidence_tbl WHERE filestate!=? ORDER BY regtime DESC;";
+
+		stmt = _db->compileStatement(sql.c_str());
+		stmt.bind(1, CONFIRMED);
+
+		CppSQLite3Query query = stmt.execQuery();
+		while (!query.eof())
+		{
+
+			TEVIDENCEINFO evi;
+			evi.cFileHash = query.getStringField("hash");
+			evi.cFileName = query.getStringField("filename");
+			evi.cCustomInfo = query.getStringField("custominfo");
+			evi.cRightOwner = query.getStringField("owner");
+			evi.iFileState = query.getIntField("filestate");
+			evi.tRegisTime = query.getInt64Field("regtime");
+			evi.iFileSize = query.getInt64Field("filesize");
+			evi.iBlocknum = query.getInt64Field("blocknum");
+
+			evidences.append(evi);
+
+			query.nextRow();
+		}
+	}
+	catch (CppSQLite3Exception& ex)
+	{
+		ret = ex.errorCode();
+	}
+
+	return ret;
+}
+
 int DBmgr::updateEvidence(const TEVIDENCEINFO &evidence, int type)
 {
     try
     {
+
         std::string sql;
         if (1 == type){
             sql = "UPDATE evidence_tbl SET filestate=?"
                   "WHERE hash=?;";
         }
+		else if (2 == type)
+		{
+			sql = "UPDATE evidence_tbl SET filestate=?"
+				"WHERE hash=? And regtime=?;";
+		}
+		else if (3 == type)
+		{
+			sql = "UPDATE evidence_tbl SET filestate=?"
+				"WHERE filestate=?;";
+		}
+		else if (4 == type)
+		{
+			sql = "UPDATE evidence_tbl SET filestate=?,blocknum=? "
+				"WHERE hash=? And regtime=?;";
+		}
 
         CppSQLite3Statement stmt = _db->compileStatement(sql.c_str());
         if (1 == type){
             stmt.bind(1,  evidence.iFileState);
             stmt.bind(2,  evidence.cFileHash.c_str());
         }
+		else if (2 == type)
+		{
+			stmt.bind(1, evidence.iFileState);
+			stmt.bind(2, evidence.cFileHash.c_str());
+			stmt.bind(3, (int64)evidence.tRegisTime);
+		}
+		else if (3 == type)
+		{
+			stmt.bind(1, REJECTED);
+			stmt.bind(2, CONFIRMING);
+		}
+		else if (4 == type)
+		{
+			stmt.bind(1, evidence.iFileState);
+			stmt.bind(2, (int64)evidence.iBlocknum);
+			stmt.bind(3, evidence.cFileHash.c_str());
+			stmt.bind(4, (int64)evidence.tRegisTime);
+		}
 
         stmt.execDML();
     }
@@ -294,6 +394,23 @@ int DBmgr::delEvidence(std::string hash)
     return 0;
 }
 
+int DBmgr::delEvidence(const TEVIDENCEINFO &evidence)
+{
+	try
+	{
+		CppSQLite3Statement stmt = _db->compileStatement("DELETE FROM evidence_tbl WHERE hash=? And regtime=?;");
+		stmt.bind(1, evidence.cFileHash.c_str());
+		stmt.bind(2, (int64)evidence.tRegisTime);
+		stmt.execDML();
+	}
+	catch (CppSQLite3Exception& ex)
+	{
+		return ex.errorCode();
+	}
+
+	return 0;
+}
+
 int DBmgr::createTbls()
 {
     _db->execDML(DBSQL::EVIDENCES_TBL.c_str());
@@ -307,7 +424,6 @@ int DBmgr::updateDB()
     return 0;
 }
 
-
 string DBmgr::hash256tostring(const unsigned char* hash)
 {
 	char szHash[512] = "";
@@ -318,41 +434,37 @@ string DBmgr::hash256tostring(const unsigned char* hash)
 	{
 		memset(ucBuf, 0, 10);
 		sprintf(ucBuf, "%02x", hash[uiNum]);
-		strcat(szHash, ucBuf);	
+		strcat(szHash, ucBuf);
 	}
 	string sHash = szHash;
 	return sHash;
 
 }
 
-
-
-
-
 void DBmgr::strtohash256(unsigned char* out, const char* szHash)
-
 {
+	if (strlen(szHash) != DEF_SHA256_LEN * 2)
+		return;
+    int len = DEF_SHA256_LEN * 2;
+    char str[DEF_SHA256_LEN * 2];
+    memset(str, 0, len);
+    memcpy(str, szHash, len);
+    for (int i = 0; i < len; i+=2) {
 
+        if(str[i] >= 'a' && str[i] <= 'f') str[i] = str[i] & ~0x20;
+        if(str[i+1] >= 'a' && str[i] <= 'f') str[i+1] = str[i+1] & ~0x20;
 
-	int len = DEF_SHA256_LEN * 2;
-	char str[DEF_SHA256_LEN * 2];
-	memset(str, 0, len);
-	memcpy(str, szHash, len);
-	for (int i = 0; i < len; i += 2) {
-		if (str[i] >= 'a' && str[i] <= 'f') str[i] = str[i] & ~0x20;
-		if (str[i + 1] >= 'a' && str[i] <= 'f') str[i + 1] = str[i + 1] & ~0x20;
-		if (str[i] >= 'A' && str[i] <= 'F')
-			out[i / 2] = (str[i] - 'A' + 10) << 4;
-		else
-			out[i / 2] = (str[i] & ~0x30) << 4;
-		if (str[i + 1] >= 'A' && str[i + 1] <= 'F')
-			out[i / 2] |= (str[i + 1] - 'A' + 10);
-		else
-			out[i / 2] |= (str[i + 1] & ~0x30);
-	}
+        if(str[i] >= 'A' && str[i] <= 'F')
+            out[i/2] = (str[i]-'A'+10)<<4;
+        else
+            out[i/2] = (str[i] & ~0x30)<<4;
 
+        if(str[i+1] >= 'A' && str[i+1] <= 'F')
+            out[i/2] |= (str[i+1]-'A'+10);
+        else
+            out[i/2] |= (str[i+1] & ~0x30);
+    }
 }
-
 
 int DBmgr::insertHyperblock(const T_HYPERBLOCKDBINFO &hyperblock)
 {
@@ -401,6 +513,7 @@ int DBmgr::updateHyperblock(const T_HYPERBLOCKDBINFO &hyperblock)
 		"queue_id=?,"
 		"chain_num=?"
 		" WHERE hid=? and type=? and id=?;";
+
 		CppSQLite3Statement stmt = _db->compileStatement(sqlUpdate.c_str());
 		stmt.bind(1, hash256tostring(hyperblock.strHashSelf).c_str());
 		stmt.bind(2, (int64)hyperblock.uiBlockId);
@@ -507,7 +620,6 @@ int DBmgr::getHyperblock(QList<T_HYPERBLOCKDBINFO> &queue, int page, int size)
 	return ret;
 }
 
-
 int DBmgr::getHyperblocks(QList<T_HYPERBLOCKDBINFO> &queue, int nStartHyperID, int nEndHyperID)
 {
 	int ret = 0;
@@ -551,6 +663,75 @@ int DBmgr::getHyperblocks(QList<T_HYPERBLOCKDBINFO> &queue, int nStartHyperID, i
 	return ret;
 }
 
+int DBmgr::getAllHyperblockNumInfo(std::list<uint64> &queue)
+{
+	int ret = 0;
+
+	try
+	{
+		CppSQLite3Statement stmt;
+		std::string sql = "SELECT * FROM hyperblock WHERE type==1 ORDER BY hid;";
+
+		stmt = _db->compileStatement(sql.c_str());
+
+		CppSQLite3Query query = stmt.execQuery();
+		while (!query.eof())
+		{
+
+			uint64 num = query.getIntField("id");
+			queue.push_back(num);
+			query.nextRow();
+		}
+	}
+	catch (CppSQLite3Exception& ex)
+	{
+		ret = ex.errorCode();
+	}
+
+	return ret;
+}
+int DBmgr::getHyperblockshead(QList<T_HYPERBLOCKDBINFO> &queue, int nStartHyperID)
+{
+	int ret = 0;
+
+	try
+	{
+		CppSQLite3Statement stmt;
+		std::string sql = "SELECT * FROM hyperblock WHERE hid==? AND type==1 ORDER BY hid;";
+
+		stmt = _db->compileStatement(sql.c_str());
+
+		stmt.bind(1, nStartHyperID);
+
+		CppSQLite3Query query = stmt.execQuery();
+		while (!query.eof())
+		{
+			T_HYPERBLOCKDBINFO info;
+			strtohash256(info.strHashSelf, query.getStringField("hash"));
+
+			info.uiBlockId = query.getIntField("id");
+			info.ucBlockType = query.getIntField("type");
+			info.uiReferHyperBlockId = query.getIntField("hid");
+
+			strtohash256(info.strHyperBlockHash, query.getStringField("hhash"));
+			strtohash256(info.strPreHash, query.getStringField("hash_prev"));
+
+			info.strPayload = query.getStringField("payload");
+			info.uiBlockTimeStamp = query.getIntField("ctime");
+			info.uiLocalChainId = query.getIntField("chain_num");
+
+			queue.append(info);
+			query.nextRow();
+		}
+	}
+	catch (CppSQLite3Exception& ex)
+	{
+		ret = ex.errorCode();
+	}
+
+	return ret;
+
+}
 
 int DBmgr::delUpqueue(std::string hash)
 {
@@ -587,7 +768,6 @@ int DBmgr::addUpqueue(string sHash)
 
 	return 0;
 
-
 }
 
 int DBmgr::getUpqueue(QList<TUPQUEUE> &queue, int page, int size)
@@ -615,6 +795,7 @@ int DBmgr::getUpqueue(QList<TUPQUEUE> &queue, int page, int size)
 		CppSQLite3Query query = stmt.execQuery();
 		while (!query.eof())
 		{
+
 			TUPQUEUE evi;
 			evi.uiID = query.getIntField("id");
 			evi.strHash = query.getStringField("hash");
@@ -653,6 +834,7 @@ int DBmgr::getLatestHyperBlockNo()
 	}
 	catch (CppSQLite3Exception& ex)
 	{
+
 	}
 
 	return ret;

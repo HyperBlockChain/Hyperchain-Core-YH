@@ -1,9 +1,9 @@
-/*Copyright 2017 hyperchain.net  (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
+/*file COPYING or https://opensource.org/licenses/MIT。
 /*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
+/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 /*software and associated documentation files (the "Software"), to deal in the Software
 /*without restriction, including without limitation the rights to use, copy, modify, merge,
 /*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
@@ -12,7 +12,7 @@
 /*The above copyright notice and this permission notice shall be included in all copies or
 /*substantial portions of the Software.
 /*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
 /*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 /*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 /*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
@@ -42,10 +42,10 @@ int CHyperchainDB::AddHyperBlockDataRecord(HyperchainDB &hyperchainDB, T_HYPERBL
 
 	HyperchainDB::iterator it = hyperchainDB.find(uiHyperID);
 	if(it == hyperchainDB.end()) {
-	   
+
 		HyperBlockDB hyperBlock;
 
-		if (uiType == HYPER_BLOCK) { 
+		if (uiType == HYPER_BLOCK) {
 			hyperBlock.hyperBlock = blockInfo;
 		}
 		else if (uiType == LOCAL_BLOCK)
@@ -56,14 +56,13 @@ int CHyperchainDB::AddHyperBlockDataRecord(HyperchainDB &hyperchainDB, T_HYPERBL
 			mapLocalBlock.insert(LocalBlockDB::value_type(blockInfo.uiBlockId, blockInfo));
 			hyperBlock.mapLocalChain.insert(LocalChainDB::value_type(blockInfo.uiLocalChainId, mapLocalBlock));
 		}
-		else 
+		else
 			return 1;
 
-		
 		hyperchainDB.insert(HyperchainDB::value_type(uiHyperID, hyperBlock));
 	}
 	else {
-		
+
 		HyperBlockDB hyperBlock = it->second;
 		if (uiType == HYPER_BLOCK) {
 			hyperBlock.hyperBlock = blockInfo;
@@ -72,7 +71,7 @@ int CHyperchainDB::AddHyperBlockDataRecord(HyperchainDB &hyperchainDB, T_HYPERBL
 		{
 			qDebug(blockInfo.strPayload.c_str());
 			LocalChainDB::iterator itLocalChain = hyperBlock.mapLocalChain.find(blockInfo.uiLocalChainId);
-			if (itLocalChain == hyperBlock.mapLocalChain.end()) { 
+			if (itLocalChain == hyperBlock.mapLocalChain.end()) {
 				LocalChainDB mapLocalChain;
 				LocalBlockDB mapLocalBlock;
 				mapLocalBlock.insert(LocalBlockDB::value_type(blockInfo.uiBlockId, blockInfo));
@@ -81,7 +80,7 @@ int CHyperchainDB::AddHyperBlockDataRecord(HyperchainDB &hyperchainDB, T_HYPERBL
 			else {
 				LocalBlockDB mapLocalBlock = itLocalChain->second;
 				LocalBlockDB::iterator itLocalBlock = mapLocalBlock.find(blockInfo.uiBlockId);
-				if (itLocalBlock == mapLocalBlock.end()) { 
+				if (itLocalBlock == mapLocalBlock.end()) {
 					mapLocalBlock.insert(LocalBlockDB::value_type(blockInfo.uiBlockId, blockInfo));
 					hyperBlock.mapLocalChain[blockInfo.uiLocalChainId] = mapLocalBlock;
 				}
@@ -90,20 +89,19 @@ int CHyperchainDB::AddHyperBlockDataRecord(HyperchainDB &hyperchainDB, T_HYPERBL
 		else
 			return 1;
 
-		
 		hyperchainDB[uiHyperID] = hyperBlock;
-	} 
+	}
 
 	return 0;
 }
 
 int CHyperchainDB::cleanTmp(HyperchainDB &hyperchainDB)
 {
-	
+
 	if (hyperchainDB.size() > 0)
 	{
 		HyperchainDB::iterator it = hyperchainDB.begin();
-		  for (;it != hyperchainDB.end();++it)  
+		  for (;it != hyperchainDB.end();++it)
 		  {
 				HyperBlockDB hyperBlock = it->second;
 				LocalChainDB mapLocalChain = hyperBlock.mapLocalChain;
@@ -126,7 +124,7 @@ int CHyperchainDB::getHyperBlocks(HyperchainDB &hyperchainDB, uint64 nStartHyper
 		QList<T_HYPERBLOCKDBINFO> queue;
 		int nRet = DBmgr::instance()->getHyperblocks(queue, nStartHyperID, nEndHyperID);
 		if (nRet == 0)
-		{ 
+		{
 			int i = 0;
 			for (; i != queue.size(); ++i) {
 				T_HYPERBLOCKDBINFO info = queue.at(i);
@@ -145,7 +143,7 @@ int CHyperchainDB::getAllHyperBlocks(HyperchainDB &hyperchainDB)
 	QList<T_HYPERBLOCKDBINFO> queue;
 	int nRet = DBmgr::instance()->getHyperblock(queue, 1, -1);
 	if (nRet == 0)
-	{ 
+	{
 		int i = 0;
 		for (; i != queue.size(); ++i) {
 			T_HYPERBLOCKDBINFO info = queue.at(i);
@@ -154,15 +152,20 @@ int CHyperchainDB::getAllHyperBlocks(HyperchainDB &hyperchainDB)
 		}
 		return i;
 	}
-	 
+
 	return 0;
 }
-
-
 
 uint64 CHyperchainDB::GetLatestHyperBlockNo()
 {
 	return DBmgr::instance()->getLatestHyperBlockNo();
+}
+
+int CHyperchainDB::GetHyperBlockNumInfo(std::list<uint64> &HyperBlockNum)
+{
+	int nRet = DBmgr::instance()->getAllHyperblockNumInfo(HyperBlockNum);
+
+	return 0;
 }
 
 int CHyperchainDB::GetLatestHyperBlock(HyperBlockDB &hyperblockDB)
@@ -185,7 +188,7 @@ int CHyperchainDB::GetLatestHyperBlock(HyperBlockDB &hyperblockDB)
 				else if (uiType == LOCAL_BLOCK) {
 
 					LocalChainDB::iterator itLocalChain = hyperblockDB.mapLocalChain.find(blockInfo.uiLocalChainId);
-					if (itLocalChain == hyperblockDB.mapLocalChain.end()) { 
+					if (itLocalChain == hyperblockDB.mapLocalChain.end()) {
 						LocalChainDB mapLocalChain;
 						LocalBlockDB mapLocalBlock;
 						mapLocalBlock.insert(LocalBlockDB::value_type(blockInfo.uiBlockId, blockInfo));
@@ -194,7 +197,7 @@ int CHyperchainDB::GetLatestHyperBlock(HyperBlockDB &hyperblockDB)
 					else {
 						LocalBlockDB mapLocalBlock = itLocalChain->second;
 						LocalBlockDB::iterator itLocalBlock = mapLocalBlock.find(blockInfo.uiBlockId);
-						if (itLocalBlock == mapLocalBlock.end()) { 
+						if (itLocalBlock == mapLocalBlock.end()) {
 							mapLocalBlock.insert(LocalBlockDB::value_type(blockInfo.uiBlockId, blockInfo));
 							hyperblockDB.mapLocalChain[blockInfo.uiLocalChainId] = mapLocalBlock;
 						}
@@ -205,5 +208,4 @@ int CHyperchainDB::GetLatestHyperBlock(HyperBlockDB &hyperblockDB)
 	}
 	return 0;
 }
-
 

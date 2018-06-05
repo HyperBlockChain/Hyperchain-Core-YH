@@ -1,4 +1,4 @@
-﻿/*Copyright 2017 hyperchain.net (Hyper Block Chain)
+﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
 /*
 /*Distributed under the MIT software license, see the accompanying
 /*file COPYING or https://opensource.org/licenses/MIT。
@@ -21,6 +21,7 @@
 */
 #ifndef _SHA2_H_
 #define _SHA2_H_
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -78,9 +79,7 @@ extern void GetSHA256(unsigned char* sha256, const char* str, long long length)
 		sha256[20 + i] = ((unsigned char*)&H5)[3 - i];
 		sha256[24 + i] = ((unsigned char*)&H6)[3 - i];
 		sha256[28 + i] = ((unsigned char*)&H7)[3 - i];
-	}
-    
-
+	}  
 }
 
 void displayHash(unsigned char hash[32])
