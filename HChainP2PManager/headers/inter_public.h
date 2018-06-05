@@ -39,13 +39,13 @@
 #include "includeComm.h"
 using namespace std;
 
-#define MAX_SECS_COUNTER (9999999999)
+#define MAX_SECS_COUNTER                (9999999999)
 #define MAX_SEND_NAT_TRAVERSAL_NODE_NUM (2)
 #define MAX_SEND_PEERLIST_RSP_PERIOD	(5*60)
 #define MAX_SAVE_PEERLIST_PERIOD		(30*60)
 #define MAX_SEND_CHAIN_STATE_RSP_PERIOD	(5*60)
 #define MAX_RECV_UDP_BUF_LEN			(30*1024)
-#define	MAX_NATTRAVERSAL_PERIOD					(10*60)
+#define	MAX_NATTRAVERSAL_PERIOD			(10*60)
 #define RANDTIME						(60)
 #define LOCALBUDDYTIME                  (1*60)
 #define GLOBALBUDDYTIME                 (1.5*60)
@@ -62,13 +62,18 @@ using namespace std;
 #define TEST_SERVER1					("http://192.168.0.2/api/nodeinfo?node=")
 #define TEST_SERVER2					("http://192.168.0.3/api/nodeinfo?node=")
 #define ONE_SECOND						(1000)
-#define ONE_MINITE						(60*ONE_SECOND)
+#define ONE_MIN						    (60*ONE_SECOND)
 #define INIT_TIME						(10)
 #define ONE_KILO						(1024)
 #define FIVE_MINI						(5*60)  
 #define ONE_HOUR						(60*60)
+#define UNICODE_POS					    (2)
 #define DIVIDEND_NUM					(2)
 #define MAX_NUM_LEN						(256)
+#define ONE_LOCAL_BLOCK				    (1)
+#define NOT_START_BUDDY_NUM				(1)
+#define LEAST_START_GLOBAL_BUDDY_NUM    (2)
+#define HYPERBLOCK_SYNC_TIMES			(2)
 
 enum _ePoeReqState
 {
@@ -80,6 +85,12 @@ enum _ePoeReqState
 	CONFIRMED,
 	REJECTED,
 
+};
+
+enum _eblocktype
+{
+	HYPER_BLOCK = 1,
+	LOCAL_BLOCK
 };
 
 enum _eNodeState

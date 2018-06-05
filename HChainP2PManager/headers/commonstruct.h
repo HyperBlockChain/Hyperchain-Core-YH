@@ -31,16 +31,16 @@
 using namespace std;
 
 #define DEF_ONE_DAY     (60 * 60 * 24)
-#define MAX_IP_LEN		16
-#define MAX_RECV_BUF_LEN 1024
-#define MAX_SEND_BUF_LEN 1024
-#define MAX_FILE_NAME_LEN 1024
-#define MAX_NODE_NAME_LEN 64
-#define MAX_CUSTOM_INFO_LEN 512
+#define MAX_IP_LEN		(32)
+#define MAX_RECV_BUF_LEN (1024)
+#define MAX_SEND_BUF_LEN (1024)
+#define MAX_FILE_NAME_LEN (1024)
+#define MAX_NODE_NAME_LEN (64)
+#define MAX_CUSTOM_INFO_LEN (512)
 #define MAX_SCRIPT_LEN (1024*2)
-#define MAX_AUTH_LEN 64
-#define MAX_QUEED_LEN 32
-#define LISTEN_PORT 8115
+#define MAX_AUTH_LEN (64)
+#define MAX_QUEED_LEN (32)
+#define LISTEN_PORT (8115)
 
 typedef struct _tsha256
 {
@@ -199,6 +199,19 @@ enum _ep2pprotocoltypestate
 	RECV_CONFIRM,
 	SEND_CONFIRM_RSP,
 	RECV_CONFIRM_RSP
+};
+
+enum _erecvpagestate
+{
+	DEFAULT_RECV_STATE = 0,
+	RECV_RSP,
+	RECV_REQ
+};
+enum _eerrorno
+{
+	DEFAULT_ERROR_NO = 0,
+	ERROR_NOT_NEWEST,
+	ERROR_EXIST
 };
 
 typedef struct _tpeeraddress

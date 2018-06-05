@@ -54,7 +54,7 @@ void convertUnCharToStr(char* str, unsigned char* UnChar, int ucLen)
 	for (i = 0; i < ucLen; i++)
 	{
 
-		sprintf(str + i * 2, "%02x", UnChar[i]);
+		sprintf(str + i * UNICODE_POS, "%02x", UnChar[i]);
 	}
 }
 
@@ -306,7 +306,7 @@ bool CHChainP2PManager::Init()
 
 		}
 		pPeerInfo->uiNodeState = DEFAULT_REGISREQ_STATE;
-		pPeerInfo->uiTime = 10;
+		pPeerInfo->uiTime = INIT_TIME;
 		strncpy(pPeerInfo->strName, (*itr)->strName, MAX_NODE_NAME_LEN);
 		m_PeerInfoList.push_back(pPeerInfo);
 
@@ -343,7 +343,7 @@ bool CHChainP2PManager::Init()
 		return false;
 	m_UdpSocket.SetUsed(true);
 
-	SLEEP(1*1000);
+	SLEEP(1 * ONE_SECOND);
 	uint16 uiIndex = 0;
 
 	ITR_VEC_T_PPEERCONF itrConf = g_confFile.vecPeerConf.begin();
@@ -434,7 +434,7 @@ void CHChainP2PManager::SearchOnChainStateEntryImp()
 			}
 		}
 
-		SLEEP(5*60*1000);
+		SLEEP(5 * ONE_MIN);
 	}
 }
 void* CHChainP2PManager::LocalBuddyThreadEntry(void* pParam)
@@ -495,7 +495,7 @@ void CHChainP2PManager::GetNewHyperInfoAndReOnChain()
 			m_qtnotify->SetStatusMes(logBuf);
 
 			i++;
-			SLEEP(1 * 1000);
+			SLEEP(1 * ONE_SECOND);
 		}
 		else
 		{
@@ -532,7 +532,7 @@ void CHChainP2PManager::LocalBuddyThreadEntryImp()
 			}
 			if (tempNum != 0 || tempNum1 != 0)
 			{
-				SLEEP(2 * 1000);
+				SLEEP(2 * ONE_SECOND);
 				continue;
 			}
 
@@ -552,7 +552,7 @@ void CHChainP2PManager::LocalBuddyThreadEntryImp()
 			if (tempNum2 == 0)
 			{
 
-				SLEEP(2 * 1000);
+				SLEEP(2 * ONE_SECOND);
 				continue;
 			}
 
@@ -565,7 +565,7 @@ void CHChainP2PManager::LocalBuddyThreadEntryImp()
 			g_tP2pManagerStatus.tBuddyInfo.eBuddyState = LOCAL_BUDDY;
 			SendLocalBuddyReq();
 
-			SLEEP(2 * 1000);
+			SLEEP(2 * ONE_SECOND);
 		}
 		else if (((time(NULL) - g_tP2pManagerStatus.uiStartTimeOfConsensus) > LOCALBUDDYTIME) && ((time(NULL) - g_tP2pManagerStatus.uiStartTimeOfConsensus) <= GLOBALBUDDYTIME))
 		{
@@ -576,7 +576,7 @@ void CHChainP2PManager::LocalBuddyThreadEntryImp()
 			}
 			if (tempNum == 0 ||tempNum == 1)
 			{
-				SLEEP(2 * 1000);
+				SLEEP(2 * ONE_SECOND);
 				continue;
 			}
 
@@ -596,7 +596,7 @@ void CHChainP2PManager::LocalBuddyThreadEntryImp()
 
 				m_qtnotify->SetStatusMes("broadcast Global Consensus Request");
 			}
-			SLEEP(2*1000);
+			SLEEP(2 * ONE_SECOND);
 			continue;
 		}
 		else if (((time(NULL) - g_tP2pManagerStatus.uiStartTimeOfConsensus) > GLOBALBUDDYTIME) && ((time(NULL) - g_tP2pManagerStatus.uiStartTimeOfConsensus) <= NEXTBUDDYTIME))
@@ -641,7 +641,7 @@ void CHChainP2PManager::LocalBuddyThreadEntryImp()
 				}
 
 			}
-			SLEEP(2*1000);
+			SLEEP(2 * ONE_SECOND);
 		}
 		else
 		{
@@ -697,7 +697,7 @@ void CHChainP2PManager::LocalBuddyThreadEntryImp()
 
 				}
 			}
-			SLEEP(2 * 1000);
+			SLEEP(2 * ONE_SECOND);
 		}
 	}
 }
@@ -726,7 +726,7 @@ void CHChainP2PManager::RecvLocalBuddyPackRspThreadEntryImp()
 				CAutoMutexLock muxAuto(g_tP2pManagerStatus.MuxlistRecvLocalBuddyRsp);
 				g_tP2pManagerStatus.listRecvLocalBuddyRsp.clear();
 			}
-			SLEEP(2 * 1000);
+			SLEEP(2 * ONE_SECOND);
 			continue;
 		}
 
@@ -742,13 +742,13 @@ void CHChainP2PManager::RecvLocalBuddyPackRspThreadEntryImp()
 
 		if (tempNumTest == 0)
 		{
-			SLEEP(2 * 1000);
+			SLEEP(2 * ONE_SECOND);
 			continue;
 		}
 
 		if (tempNum > LIST_BUDDY_RSP_NUM)
 		{
-			SLEEP(2 * 1000);
+			SLEEP(2 * ONE_SECOND);
 			continue;
 		}
 		else
@@ -796,7 +796,7 @@ void CHChainP2PManager::RecvLocalBuddyPackReqThreadEntryImp()
 				CAutoMutexLock muxAuto(g_tP2pManagerStatus.MuxlistRecvLocalBuddyReq);
 				g_tP2pManagerStatus.listRecvLocalBuddyReq.clear();
 			}
-			SLEEP(2 * 1000);
+			SLEEP(2 * ONE_SECOND);
 			continue;
 		}
 
@@ -814,13 +814,13 @@ void CHChainP2PManager::RecvLocalBuddyPackReqThreadEntryImp()
 
 		if (tempNum == 0)
 		{
-			SLEEP(2 * 1000);
+			SLEEP(2 * ONE_SECOND);
 			continue;
 		}
 
 		if (tempNum1 > LIST_BUDDY_RSP_NUM)
 		{
-			SLEEP(2 * 1000);
+			SLEEP(2 * ONE_SECOND);
 			continue;
 		}
 		else
@@ -905,7 +905,7 @@ void CHChainP2PManager::UpdateDataProcessImp()
 			}
 		}
 
-		SLEEP(60*1000);
+		SLEEP(60 * ONE_SECOND);
 	}
 }
 
@@ -941,7 +941,7 @@ void CHChainP2PManager::WriteStatusProcessImp()
 	time_t tmNatTraversalTime;
 	time(&tmNatTraversalTime);
 
-	SLEEP(ONE_MINITE);
+	SLEEP(ONE_MIN);
 
 	while (!g_bWriteStatusIsSet)
 	{
@@ -1143,7 +1143,7 @@ string CHChainP2PManager::PrintAllLocalBlocks()
 	ITR_LIST_T_HYPERBLOCK itr = m_HchainBlockList.begin();
 	for (; itr != m_HchainBlockList.end(); itr++)
 	{
-		retData += "HyperBlockNum=";
+		retData += "HyperBlockNo=";
 		memset(buf, 0, BUFFERLEN);
 		sprintf(buf, "%d\n", itr->tBlockBaseInfo.uiID);
 		retData += buf;
@@ -1211,7 +1211,7 @@ string CHChainP2PManager::getBlockInfo(T_HYPERBLOCK hyperBlock)
 	retData += "==================BLOCKINFO==================\n";
 
 	{
-		retData += "Block Number:	";
+		retData += "Block No:	";
 		memset(buf, 0, BUFFERLEN);
 		sprintf(buf, "%d\n", hyperBlock.tBlockBaseInfo.uiID);
 		retData += buf;
@@ -1237,7 +1237,7 @@ string CHChainP2PManager::getBlockInfo(T_HYPERBLOCK hyperBlock)
 		retData += buf;
 		retData += "\n";
 
-		retData += "Extra:		";
+		retData += "Extra:		";	
 
 		retData += "Payload:\n";
 
@@ -1427,7 +1427,7 @@ void CHChainP2PManager::UdpProcessImp()
 			T_BUDDYINFO localBuddyInfo;
 			localBuddyInfo.tPeerAddrOut.uiIP = inet_addr(pszPeerIP);
 			localBuddyInfo.tPeerAddrOut.uiPort = usPeerPort;
-			localBuddyInfo.tType = 2;
+			localBuddyInfo.tType = RECV_REQ;
 			localBuddyInfo.bufLen = uiRecvBufLen;
 			localBuddyInfo.recvBuf = (char*)malloc(uiRecvBufLen);
 			memcpy(localBuddyInfo.recvBuf, pRecvBuf, uiRecvBufLen);
@@ -1459,7 +1459,7 @@ void CHChainP2PManager::UdpProcessImp()
 			T_BUDDYINFO localBuddyInfo;
 			localBuddyInfo.tPeerAddrOut.uiIP = inet_addr(pszPeerIP);
 			localBuddyInfo.tPeerAddrOut.uiPort = usPeerPort;
-			localBuddyInfo.tType = 1;
+			localBuddyInfo.tType = RECV_RSP;
 			localBuddyInfo.bufLen = uiRecvBufLen;
 			localBuddyInfo.recvBuf = (char*)malloc(uiRecvBufLen);
 			memcpy(localBuddyInfo.recvBuf, pRecvBuf, uiRecvBufLen);
@@ -1874,7 +1874,7 @@ void CHChainP2PManager::ProcessPingReqMsg(char* pszIP, unsigned short usPort, ch
 
 	SearchPeerList(pP2pProtocolPingReq->strName, pP2pProtocolPingReq->tPeerAddr.uiIP, pP2pProtocolPingReq->tPeerAddr.uiPort, inet_addr(pszIP), usPort, true, pP2pProtocolPingReq->tType.uiTimeStamp, pP2pProtocolPingReq->uiNodeState);
 
-	SLEEP(1*1000);
+	SLEEP(1 * ONE_SECOND);
 	SendPeerList(inet_addr(pszIP), usPort);
 
 	if (pP2pProtocolPingReq->uiMaxBlockNum < g_tP2pManagerStatus.uiMaxBlockNum)
@@ -1972,7 +1972,7 @@ void RecvBlockFun(void *param)
 	CHChainP2PManager *pManager = (CHChainP2PManager *)param;
 
 	int randNum = rand() % RANDTIME;
-	SLEEP(randNum * 1000);
+	SLEEP(randNum * ONE_SECOND);
 
 	g_tP2pManagerStatus.uiRecvConfirmingRegisReqNum = g_tP2pManagerStatus.uiRecvConfirmingRegisReqNum - 1;
 
@@ -1990,7 +1990,7 @@ void CHChainP2PManager::ProcessAddBlockReqMsg(char* pszIP, unsigned short usPort
 
 	uint16 uiRetNum = 0;
 	uiRetNum = HyperBlockInListOrNot(pP2pProtocolAddBlockReqRecv->uiBlockNum, pP2pProtocolAddBlockReqRecv->uiBlockCount, blockInfos.tBlockBaseInfo.tHashSelf);
-	if (uiRetNum == 2)
+	if (uiRetNum == ERROR_EXIST)
 	{
 		return;
 	}
@@ -2027,7 +2027,7 @@ void CHChainP2PManager::ProcessAddBlockReqMsg(char* pszIP, unsigned short usPort
 
 	m_HchainBlockList.push_back(blockInfos);
 	m_HchainBlockListNew.push_back(T_HYPERBLOCKNEW(blockInfos));
-	char pszPeerIP1[32] = { 0 };
+	char pszPeerIP1[MAX_IP_LEN] = { 0 };
 	struct in_addr addPeerIP1;
 	addPeerIP1.s_addr = m_MyPeerInfo.tPeerInfoByMyself.uiIP;
 	strcpy(pszPeerIP1, inet_ntoa(addPeerIP1));
@@ -2177,7 +2177,7 @@ void CHChainP2PManager::SendOnChainRsp(char* pszIP, unsigned short usPort, char*
 
 	bool index = false;
 
-	if (nodeSize == 1 || pP2pProtocolOnChainReqRecv->uiBlockCount == 1)
+	if (nodeSize == ONE_LOCAL_BLOCK || pP2pProtocolOnChainReqRecv->uiBlockCount == ONE_LOCAL_BLOCK)
 	{
 		index = true;
 	}
@@ -2188,7 +2188,7 @@ void CHChainP2PManager::SendOnChainRsp(char* pszIP, unsigned short usPort, char*
 	}
 
 	bool sendCopyIndex = false;
-	if (nodeSize > 1 && pP2pProtocolOnChainReqRecv->uiBlockCount == 1)
+	if (nodeSize > 1 && pP2pProtocolOnChainReqRecv->uiBlockCount == ONE_LOCAL_BLOCK)
 	{
 		sendCopyIndex = true;
 	}
@@ -2526,12 +2526,12 @@ void CHChainP2PManager::ProcessOnChainConfirmRspMsg(char* pszIP, unsigned short 
 		}
 		else
 		{
-			char pszPeerIP[64] = { 0 };
+			char pszPeerIP[MAX_IP_LEN] = { 0 };
 			struct in_addr addPeerIP;
 			addPeerIP.s_addr = (*itr).tPeerAddrOut.uiIP;
 			strcpy(pszPeerIP, inet_ntoa(addPeerIP));
 
-			SendRefuseReq(pszPeerIP, (*itr).tPeerAddrOut.uiPort, (*itr).strBuddyHash, 2);
+			SendRefuseReq(pszPeerIP, (*itr).tPeerAddrOut.uiPort, (*itr).strBuddyHash, RECV_REQ);
 
 			itr = g_tP2pManagerStatus.listCurBuddyRsp.erase(itr);
 		}
@@ -2547,12 +2547,12 @@ void CHChainP2PManager::ProcessOnChainConfirmRspMsg(char* pszIP, unsigned short 
 		}
 		else
 		{
-			char pszPeerIP[64] = { 0 };
+			char pszPeerIP[MAX_IP_LEN] = { 0 };
 			struct in_addr addPeerIP;
 			addPeerIP.s_addr = (*itrReq).tPeerAddrOut.uiIP;
 			strcpy(pszPeerIP, inet_ntoa(addPeerIP));
 
-			SendRefuseReq(pszPeerIP, (*itrReq).tPeerAddrOut.uiPort, (*itrReq).strBuddyHash, 1);
+			SendRefuseReq(pszPeerIP, (*itrReq).tPeerAddrOut.uiPort, (*itrReq).strBuddyHash, RECV_RSP);
 
 			itrReq = g_tP2pManagerStatus.listCurBuddyReq.erase(itrReq);
 		}
@@ -2569,7 +2569,7 @@ void CHChainP2PManager::ProcessRefuseReqMsg(char* pszIP, unsigned short usPort, 
 {
 	T_PP2PPROTOCOLREFUSEREQ pP2pProtocolRefuseReq = (T_PP2PPROTOCOLREFUSEREQ)(pBuf);
 
-	if (pP2pProtocolRefuseReq->uSubType == 1)
+	if (pP2pProtocolRefuseReq->uSubType == RECV_RSP)
 	{
 		CAutoMutexLock muxAuto(g_tP2pManagerStatus.MuxlistCurBuddyRsp);
 		ITR_LIST_T_BUDDYINFOSTATE itr = g_tP2pManagerStatus.listCurBuddyRsp.begin();
@@ -2588,7 +2588,7 @@ void CHChainP2PManager::ProcessRefuseReqMsg(char* pszIP, unsigned short usPort, 
 			}
 		}
 	}
-	else if (pP2pProtocolRefuseReq->uSubType == 2)
+	else if (pP2pProtocolRefuseReq->uSubType == RECV_REQ)
 	{
 		CAutoMutexLock muxAuto(g_tP2pManagerStatus.MuxlistCurBuddyReq);
 		ITR_LIST_T_BUDDYINFOSTATE itr = g_tP2pManagerStatus.listCurBuddyReq.begin();
@@ -2613,7 +2613,7 @@ void CHChainP2PManager::SendCopyLocalBlock(T_LOCALCONSENSUS localBlock)
 {
 	CAutoMutexLock muxAuto(g_tP2pManagerStatus.MuxlistLocalBuddyChainInfo);
 	uint8 nodeSize = g_tP2pManagerStatus.listLocalBuddyChainInfo.size();
-	if (nodeSize > 1)
+	if (nodeSize > NOT_START_BUDDY_NUM)
 	{
 
 		T_PP2PPROTOCOLCOPYBLOCKREQ pP2pProtocolCopyBlockReq = NULL;
@@ -2670,12 +2670,12 @@ void CHChainP2PManager::ProcessOnChainConfirmFinMsg(char* pszIP, unsigned short 
 		}
 		else
 		{
-			char pszPeerIP[64] = { 0 };
+			char pszPeerIP[MAX_IP_LEN] = { 0 };
 			struct in_addr addPeerIP;
 			addPeerIP.s_addr = (*itrRsp).tPeerAddrOut.uiIP;
 			strcpy(pszPeerIP, inet_ntoa(addPeerIP));
 
-			SendRefuseReq(pszPeerIP, (*itrRsp).tPeerAddrOut.uiPort, (*itrRsp).strBuddyHash, 2);
+			SendRefuseReq(pszPeerIP, (*itrRsp).tPeerAddrOut.uiPort, (*itrRsp).strBuddyHash, RECV_REQ);
 
 			itrRsp = g_tP2pManagerStatus.listCurBuddyRsp.erase(itrRsp);
 		}
@@ -2730,12 +2730,12 @@ void CHChainP2PManager::ProcessOnChainConfirmFinMsg(char* pszIP, unsigned short 
 		}
 		else
 		{
-			char pszPeerIP[64] = { 0 };
+			char pszPeerIP[MAX_IP_LEN] = { 0 };
 			struct in_addr addPeerIP;
 			addPeerIP.s_addr = (*itr).tPeerAddrOut.uiIP;
 			strcpy(pszPeerIP, inet_ntoa(addPeerIP));
 
-			SendRefuseReq(pszPeerIP, (*itr).tPeerAddrOut.uiPort, (*itr).strBuddyHash, 1);
+			SendRefuseReq(pszPeerIP, (*itr).tPeerAddrOut.uiPort, (*itr).strBuddyHash, RECV_RSP);
 
 			itr = g_tP2pManagerStatus.listCurBuddyReq.erase(itr);
 
@@ -2907,7 +2907,7 @@ void CHChainP2PManager::ProcessOnChainRspMsg(char* pszIP, unsigned short usPort,
 
 	bool index = false;
 
-	if (nodeSize == 1 || pP2pProtocolOnChainRspRecv->uiBlockCount == 1)
+	if (nodeSize == ONE_LOCAL_BLOCK || pP2pProtocolOnChainRspRecv->uiBlockCount == ONE_LOCAL_BLOCK)
 	{
 		index = true;
 	}
@@ -2919,7 +2919,7 @@ void CHChainP2PManager::ProcessOnChainRspMsg(char* pszIP, unsigned short usPort,
 
 	if (pP2pProtocolOnChainRspRecv->uiHyperBlockNum != g_tP2pManagerStatus.uiMaxBlockNum + 1)
 	{
-		SendRefuseReq(pszIP, usPort, pP2pProtocolOnChainRspRecv->strHash, 2);
+		SendRefuseReq(pszIP, usPort, pP2pProtocolOnChainRspRecv->strHash, RECV_REQ);
 		return;
 	}
 
@@ -3008,7 +3008,7 @@ bool CHChainP2PManager::JudgExistAtGlobalBuddy(LIST_T_LOCALCONSENSUS listLocalBu
 
 	if (!index)
 	{
-		if (listLocalBuddyChainInfo.size() >= 2)
+		if (listLocalBuddyChainInfo.size() >= LEAST_START_GLOBAL_BUDDY_NUM)
 		{
 			g_tP2pManagerStatus.listGlobalBuddyChainInfo.push_back(listLocalBuddyChainInfo);
 			g_tP2pManagerStatus.tBuddyInfo.usChainNum = g_tP2pManagerStatus.listGlobalBuddyChainInfo.size();
@@ -3133,7 +3133,7 @@ void CHChainP2PManager::SendGlobalBuddyReq()
 void CHChainP2PManager::SaveHyperBlockToLocal(T_HYPERBLOCK tHyperBlock)
 {
 	T_HYPERBLOCKDBINFO hyperBlockInfo;
-	hyperBlockInfo.ucBlockType = 1;
+	hyperBlockInfo.ucBlockType = HYPER_BLOCK;
 	hyperBlockInfo.uiBlockId = tHyperBlock.tBlockBaseInfo.uiID;
 	hyperBlockInfo.strAuth = tHyperBlock.tBlockBaseInfo.strAuth;
 
@@ -3164,7 +3164,7 @@ void CHChainP2PManager::SaveLocalBlockToLocal(T_HYPERBLOCK tHyperBlock)
 		{
 			blockNum += 1;
 			T_HYPERBLOCKDBINFO hyperBlockInfo;
-			hyperBlockInfo.ucBlockType = 2;
+			hyperBlockInfo.ucBlockType = LOCAL_BLOCK;
 			hyperBlockInfo.uiBlockId = blockNum;
 			hyperBlockInfo.strAuth = (*ssubItr).tBlockBaseInfo.strAuth;
 			memset(hyperBlockInfo.strHashAll, 0, DEF_SHA256_LEN);
@@ -3268,7 +3268,7 @@ bool CHChainP2PManager::CreatHyperBlock()
 		CAutoMutexLock muxAuto1(m_MuxHchainBlockList);
 		m_HchainBlockList.push_back(tHyperChainBlock);
 		m_HchainBlockListNew.push_back(T_HYPERBLOCKNEW(tHyperChainBlock));
-		char pszPeerIP1[32] = { 0 };
+		char pszPeerIP1[MAX_IP_LEN] = { 0 };
 		struct in_addr addPeerIP1;
 		addPeerIP1.s_addr = m_MyPeerInfo.tPeerInfoByMyself.uiIP;
 		strcpy(pszPeerIP1, inet_ntoa(addPeerIP1));
@@ -3511,7 +3511,7 @@ void CHChainP2PManager::ProcessGlobalBuddyReqMsg(char* pszIP, unsigned short usP
 				CCommonStruct::Hash256ToStr(localHash, &(*subItr).tLocalBlock.tBlockBaseInfo.tHashSelf);
 			}
 		}
-		char pszPeerIP[64] = { 0 };
+		char pszPeerIP[MAX_IP_LEN] = { 0 };
 		struct in_addr addPeerIP;
 		addPeerIP.s_addr = pP2pProtocolGlobalBuddyReqRecv->tPeerAddr.uiIP;
 		strcpy(pszPeerIP, inet_ntoa(addPeerIP));
@@ -3529,8 +3529,8 @@ void CHChainP2PManager::ProcessGlobalBuddyReqMsg(char* pszIP, unsigned short usP
 		ITR_LIST_T_LOCALCONSENSUS endItr = g_tP2pManagerStatus.listLocalBuddyChainInfo.end();
 		endItr--;
 
-		char pszPeerIP[64] = { 0 };
-		char pszPeerIPOut[64] = { 0 };
+		char pszPeerIP[MAX_IP_LEN] = { 0 };
+		char pszPeerIPOut[MAX_IP_LEN] = { 0 };
 		struct in_addr addPeerIP;
 		addPeerIP.s_addr = endItr->tPeer.tPeerAddr.uiIP;
 		strcpy(pszPeerIP, inet_ntoa(addPeerIP));
@@ -3594,7 +3594,7 @@ void CHChainP2PManager::ProcessGlobalBuddyRspMsg(char* pszIP, unsigned short usP
 }
 uint16 CHChainP2PManager::HyperBlockInListOrNot(uint64 blockNum, uint64 blockCount, T_SHA256 tHashSelf)
 {
-	uint16 retNum = 0;
+	uint16 retNum = DEFAULT_ERROR_NO;
 	CAutoMutexLock muxAuto(m_MuxHchainBlockList);
 	CAutoMutexLock muxAutoMap(m_MuxBlockStateMap);
 	ITR_LIST_T_HYPERBLOCK itrList = m_HchainBlockList.begin();
@@ -3617,13 +3617,13 @@ uint16 CHChainP2PManager::HyperBlockInListOrNot(uint64 blockNum, uint64 blockCou
 				if (blockCount > oldHyperLocalBlockNum)
 				{
 					itrList = m_HchainBlockList.erase(itrList);
-					retNum = 1;
+					retNum = ERROR_NOT_NEWEST;
 					break;
 				}
 
 				else
 				{
-					retNum = 2;
+					retNum = ERROR_EXIST;
 					break;
 				}
 			}
@@ -3649,7 +3649,7 @@ void CHChainP2PManager::ProcessCopyHyperBlockReqMsg(char* pszIP, unsigned short 
 
 	uint16 uiRetNum = 0;
 	uiRetNum = HyperBlockInListOrNot(pP2pProtocolCopyHyperBlockReqRecv->uiBlockNum, pP2pProtocolCopyHyperBlockReqRecv->uiBlockCount, blockInfos.tBlockBaseInfo.tHashSelf);
-	if (uiRetNum == 2)
+	if (uiRetNum == ERROR_EXIST)
 	{
 		return;
 	}
@@ -3687,7 +3687,7 @@ void CHChainP2PManager::ProcessCopyHyperBlockReqMsg(char* pszIP, unsigned short 
 	m_HchainBlockList.push_back(blockInfos);
 	m_HchainBlockListNew.push_back(T_HYPERBLOCKNEW(blockInfos));
 
-	char pszPeerIP1[32] = { 0 };
+	char pszPeerIP1[MAX_IP_LEN] = { 0 };
 	struct in_addr addPeerIP1;
 	addPeerIP1.s_addr = m_MyPeerInfo.tPeerInfoByMyself.uiIP;
 	strcpy(pszPeerIP1, inet_ntoa(addPeerIP1));
@@ -4821,9 +4821,6 @@ int64 CHChainP2PManager::GetOnChainState(string queueId)
 	}
 
 	return retNum;
-
-	return retNum;
-
 }
 
 VEC_T_BROWSERSHOWINFO CHChainP2PManager::GetBlockInfoByHash(string &hash)
@@ -5057,7 +5054,7 @@ VEC_T_HYPERBLOCKDBINFO CHChainP2PManager::ChainDataPersist()
 	for (; itr != m_HchainBlockList.end(); itr++)
 	{
 		T_HYPERBLOCKDBINFO tempHyperBlockDbInfo;
-		tempHyperBlockDbInfo.ucBlockType = 1;
+		tempHyperBlockDbInfo.ucBlockType = HYPER_BLOCK;
 		tempHyperBlockDbInfo.uiBlockId = itr->tBlockBaseInfo.uiID;
 		if (itr->tBlockBaseInfo.uiID == 1)
 			tempHyperBlockDbInfo.uiReferHyperBlockId = 0;
@@ -5088,7 +5085,7 @@ VEC_T_HYPERBLOCKDBINFO CHChainP2PManager::ChainDataPersist()
 				T_PFILEINFO fileInfo = &((privateBlock->tPayLoad));
 
 				T_HYPERBLOCKDBINFO tempHyperBlockDbInfoLocal;
-				tempHyperBlockDbInfoLocal.ucBlockType = 2;
+				tempHyperBlockDbInfoLocal.ucBlockType = LOCAL_BLOCK;
 				tempHyperBlockDbInfoLocal.uiBlockId = localBlock->tBlockBaseInfo.uiID;
 				tempHyperBlockDbInfoLocal.uiReferHyperBlockId = itr->tBlockBaseInfo.uiID;
 				tempHyperBlockDbInfoLocal.uiBlockTimeStamp = localBlock->tBlockBaseInfo.uiTime;
