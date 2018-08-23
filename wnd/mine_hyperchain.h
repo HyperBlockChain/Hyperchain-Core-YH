@@ -1,24 +1,25 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
+
 #ifndef MINE_HYPERCHAIN_H
 #define MINE_HYPERCHAIN_H
 
@@ -44,12 +45,13 @@ public:
     explicit mine_hyperchain(QWidget *parent = 0);
     ~mine_hyperchain();
 
+	
 public:
     void retranslateUi();
 	void hideblockinfo();
 
 private:
-	void InitDate();
+	void InitDate();	
 	void InitBuddyTime();
 	void StartBuddyTime();
 	void StopBuddyTime();
@@ -63,7 +65,7 @@ signals:
 
 public slots:
 	void onSigShowBrowserInfo(string blocknum);
-	void onSigShowNodeDlgInfo(QPoint gpos, uint64 blocknum);
+	void onSigShowNodeDlgInfo(QPoint gpos, uint64 blocknum);	
 	void onSigShowStatusMes(QString msg);
 	void updateTime();
 
@@ -74,7 +76,7 @@ public slots:
 	void Update_GlobleBuddyChainNum(uint16 number);
 	void Update_ConnectNodeUpdate(uint32 betternum, uint32 normalnum, uint32 badnum, uint32 downnum);
 	void Update_SendPoeNum(uint32 number);
-	void Update_ReceivePoeNum(uint32 number);
+	void Update_ReceivePoeNum(uint32 number);	
 	void Update_BuddyStop();
 	void Update_HyperBlockNumFromLocal(list<uint64> HyperBlockNum);
 	void Update_StatusMes(string msg);
@@ -100,13 +102,12 @@ private:
 	uint64	m_currentblocknumber;
 	uint64	m_nextblocknumber;
 
-	QTimer  *m_timer;
-	QTime	*m_timerecord;
-	bool	m_bstart;
+	QTimer  *m_timer;      
+	QTime	*m_timerecord;  
+	bool	m_bstart;  
 
 	QList<QSharedPointer<THBLOCKDLGINFO> > li;
 	list<uint64> list_ChainData;
-
 };
 
-#endif
+#endif // MINE_HYPERCHAIN_H

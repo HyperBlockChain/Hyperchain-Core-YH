@@ -1,30 +1,30 @@
-﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 #ifdef WIN32
-//#include "stdafx.h"
 #endif
 
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -37,7 +37,6 @@
 #endif
 
 #include "sock.h"
-//#include "../log.h"
 
 #define WriteLog() MangerLog::Instance()
 
@@ -78,7 +77,6 @@ void BaseSock::Close()
 #ifdef WIN32
 			shutdown(m_sock,SD_BOTH);
 			closesocket(m_sock);
-	//		WSACleanup();
 #else
 			shutdown(m_sock, SHUT_RDWR);
             close(m_sock);
@@ -101,10 +99,9 @@ bool BaseSock::Create(bool bUDP)
 
 	int bufsize = 102400;
 	setsockopt(m_sock, SOL_SOCKET, SO_RCVBUF, (char*)&bufsize, sizeof(bufsize));
-
+	
 	return (m_sock!=-1);
 }
-
 
 int BaseSock::isIp(const char *ip) 
 { 
@@ -159,10 +156,9 @@ bool BaseSock::Connect(const string& host,unsigned short port)
 			return false;
 		}
 	}	 		
-
-    struct sockaddr_in sin;
+        struct sockaddr_in sin;
 	memset(&sin, 0, sizeof(sin));
-    sin.sin_family=AF_INET;
+        sin.sin_family=AF_INET;
 	if(bflag)
 	{
         	sin.sin_addr=*((struct   in_addr*)he->h_addr);
@@ -171,14 +167,13 @@ bool BaseSock::Connect(const string& host,unsigned short port)
 	{
 		sin.sin_addr.s_addr = inet_addr(m_strHost.c_str());
 	}
-
+        //memset(sin.sin_zero,0,8);
         sin.sin_port=htons(port);
         if(connect(m_sock ,(struct sockaddr *)&sin,sizeof(sin)))
         {
                 Close();
                 return false;
         }
-
 
 		m_bConnected =  true;
         return true;
@@ -199,6 +194,7 @@ long BaseSock::Send(const char* buf,long buflen)
 			int len =send(m_sock,buf+sended,buflen-sended,0);
 			if(len<0)
 			{
+
 				break;
 			}
 			sended+=len;
@@ -301,7 +297,7 @@ bool BaseSock::GetPeerName(string& strIP,unsigned short &nPort)
 	sprintf(szIP,"%u.%u.%u.%u",addr.sin_addr.S_un.S_addr&0xFF,(addr.sin_addr.S_un.S_addr>>8)&0xFF,(addr.sin_addr.S_un.S_addr>>16)&0xFF,(addr.sin_addr.S_un.S_addr>>24)&0xFF);
 #else
 	sprintf(szIP,"%u.%u.%u.%u",addr.sin_addr.s_addr&0xFF,(addr.sin_addr.s_addr>>8)&0xFF,(addr.sin_addr.s_addr>>16)&0xFF,(addr.sin_addr.s_addr>>24)&0xFF);
-#endif  
+#endif 
 
 	strIP=szIP;
 	nPort=ntohs(addr.sin_port);
@@ -369,6 +365,7 @@ bool BaseSock::Bind(unsigned short nPort)
     }
 
     char* localIP = const_cast<char*>("0.0.0.0");
+
     struct sockaddr_in sin;
     sin.sin_family=AF_INET;
 #ifdef WIN32

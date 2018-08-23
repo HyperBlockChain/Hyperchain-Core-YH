@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf - 8"?>
 <peerinfo>
    <nodeinfo>
-      <serverip>192.168.0.208</serverip>
-      <serverport>8112</serverport>
-      <outserverip>192.168.0.208</outserverip>
-      <outserverport>8112</outserverport>
+      <serverip>0.0.0.0</serverip>
+      <serverport>0</serverport>
+      <outserverip>0.0.0.0</outserverip>
+      <outserverport>0</outserverport>
       <nodestate>1</nodestate>
-      <nodename>node192.168.0.208</nodename>
+      <nodename>node0.0.0.0</nodename>
    </nodeinfo>
 </peerinfo>

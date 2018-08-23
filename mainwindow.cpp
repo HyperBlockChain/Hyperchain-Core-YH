@@ -1,45 +1,51 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include "ui_tab_bar_wnd.h"
 #include "ui_attestation_reg.h"
 
 #include "wnd/mine_hyperchain.h"
 #include "wnd/attestation_reg.h"
+#include "wnd/attestation_record.h"
+#include "wnd/attestation_history.h"
 #include "wnd/record.h"
+
 
 #include "wnd/browser.h"
 #include "wnd/settings.h"
 #include "wnd/token.h"
 #include "wnd/history.h"
-#include "wnd/Cabout.h"
+#include "wnd/cabout.h"
 
 #include "wnd/dev_mode.h"
 #include "wnd/reg_verification_frameless.h"
+#include "wnd/about_dlg.h"
 
 #include "util/commonutil.h"
 #include "db/dbmgr.h"
+#include "db/RestApi.h"
 #include "HChainP2PManager/interface/QtNotify.h"
 
 #include <QResizeEvent>
@@ -89,22 +95,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _hyperChainWnd			= new mine_hyperchain(this);
     _attestationRegWnd      = new attestation_reg(this);
-
 	_recordWnd				 = new record(this);
 	_historyWnd				= new history(this);
 	_devModeWnd				= new dev_mode(this);
 
 	_settingsWnd			= new settings(this);
 	_browserWnd			    = new browser(this);
-	_tokenWnd				= new token(this);
+	_tokenWnd				= new token(this);    
 	_notify					= new QtNotify();
 	_AboutWnd				= new Cabout(this);
 
-    ui->verticalLayout->addWidget(_hyperChainWnd);
 
+    ui->verticalLayout->addWidget(_hyperChainWnd);
 	ui->verticalLayout->addWidget(_browserWnd);
     ui->verticalLayout->addWidget(_attestationRegWnd);
-
 	ui->verticalLayout->addWidget(_recordWnd);
 	ui->verticalLayout->addWidget(_historyWnd);
 	ui->verticalLayout->addWidget(_settingsWnd);
@@ -112,6 +116,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->verticalLayout->addWidget(_tokenWnd);
 	ui->verticalLayout->addWidget(_AboutWnd);
 
+		
     connectCtrlSignal();
 
 	qRegisterMetaType<uint16>("uint16");
@@ -123,6 +128,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	qRegisterMetaType<T_PEERCONF>("T_PEERCONF");
 	qRegisterMetaType<TEVIDENCEINFO>("TEVIDENCEINFO");
 	qRegisterMetaType<list<uint64>>("list<uint64>");
+	
+	
 
 	connect(_notify, &QtNotify::SIG_BuddyStartTime,	_hyperChainWnd, &mine_hyperchain::Update_BuddyStartTime);
 	connect(_notify, &QtNotify::SIG_LocalBuddyChainInfo,_hyperChainWnd, &mine_hyperchain::Update_LocalBuddyChainInfo);
@@ -142,7 +149,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_notify, &QtNotify::SIG_BuddyFailed, this, &MainWindow::Update_BuddyFailed);
 
     tabClick(MINE_HYPER_CHAIN);
-
 }
 
 MainWindow::~MainWindow()
@@ -224,7 +230,6 @@ void MainWindow::tabClick(E_TAB_TYPE type)
 
 void MainWindow::GoBack()
 {
-
 	tabClick(_oldTab);
 }
 
@@ -269,10 +274,9 @@ void MainWindow::onAttestationHistory()
 
 void MainWindow::onAttestationRecord(QSharedPointer<TEVIDENCEINFO> evidence)
 {
-
 	_recordWnd->setEvidence(evidence);
 	tabClick(HYPER_CHAIN_ATTESTATION_REG);
-
+    
 }
 
 void MainWindow::trayIconClicked(QSystemTrayIcon::ActivationReason reason)
@@ -289,15 +293,16 @@ void MainWindow::trayIconClicked(QSystemTrayIcon::ActivationReason reason)
 }
 
 void MainWindow::hcQuit()
-{
+{	
 	TEVIDENCEINFO evi;
-	DBmgr::instance()->updateEvidence(evi, 3);
+	DBmgr::instance()->updateEvidence(evi, 3); 
 
 	if (DBmgr::instance()->isOpen())
 	{
 		DBmgr::instance()->close();
 	}
 
+	RestApi::stopRest();
     trayIcon->hide();
     hide();
     qApp->quit();
@@ -322,6 +327,7 @@ void MainWindow::changeLanguage()
     _attestationRegWnd->ui->retranslateUi(_attestationRegWnd);
     _hyperChainWnd->retranslateUi();
 
+
 	_browserWnd->retranslateUi();
 	_recordWnd->retranslateUi();
 	_historyWnd->retranslateUi();
@@ -339,7 +345,6 @@ void MainWindow::changeLanguage()
 
 void MainWindow::about()
 {
-
 }
 
 void MainWindow::showHyperChain()
@@ -358,7 +363,6 @@ void MainWindow::showChainBrower()
     resetTabTextColor();
 
     _tabBar->ui->labelChainBrowser->resetFont(tab_label::SELECTED_COLOR);
-
 	_browserWnd->show();
 }
 
@@ -377,7 +381,6 @@ void MainWindow::showAttestationHistory()
     resetTabTextColor();
 
     _tabBar->ui->labelChainAttestation->resetFont(tab_label::SELECTED_COLOR);
-
 	_historyWnd->show();
 }
 
@@ -387,7 +390,6 @@ void MainWindow::showAttestationRecord()
     resetTabTextColor();
 
     _tabBar->ui->labelChainAttestation->resetFont(tab_label::SELECTED_COLOR);
-
 	_recordWnd->show();
 
 }
@@ -398,7 +400,6 @@ void MainWindow::showNodeSet()
     resetTabTextColor();
 
     _tabBar->ui->labelNodeSet->resetFont(tab_label::SELECTED_COLOR);
-
 	_settingsWnd->show();
 }
 
@@ -413,7 +414,7 @@ void MainWindow::showDevMode()
 
 void MainWindow::showToken()
 {
-	hideContentWnd();
+	hideContentWnd();	
 	resetTabTextColor();
 
 	_tabBar->ui->labelToken->resetFont(tab_label::SELECTED_COLOR);
@@ -443,7 +444,6 @@ void MainWindow::connectCtrlSignal()
 
 void MainWindow::createActions()
 {
-
     quitAction = new QAction(tr("quit"), this);
     connect(quitAction, &QAction::triggered, this, &MainWindow::hcQuit);
 }
@@ -473,16 +473,14 @@ void MainWindow::retranslateUi()
    quitAction->setText(QApplication::translate("MainWindow", ("quit"), Q_NULLPTR));
 }
 
+
 void MainWindow::hideContentWnd(){
     _hyperChainWnd->hide();
 	_hyperChainWnd->hideblockinfo();
-
 	_browserWnd->hide();
     _attestationRegWnd->hide();
-
 	_recordWnd->hide();
 	_historyWnd->hide();
-
 	_settingsWnd->hide();
     _devModeWnd->hide();
 	_tokenWnd->hide();
@@ -544,17 +542,15 @@ void MainWindow::addEvidence(QSharedPointer<TEVIDENCEINFO> evi, int index)
 {
     listEvi_.append(evi);
     DBmgr::instance()->insertEvidence(*evi.data());
-
+	
 	_historyWnd->insertDatetoList(*evi, index);
 }
 
 void MainWindow::updateEvidence()
 {
-
     for(auto evi: listEvi_){
         if(evi->iFileState == CONFIRMING){
             evi->iFileState = CONFIRMED;
-
 			_historyWnd->updateEvidence(evi->cFileHash, evi, 1);
 
             DBmgr::instance()->updateEvidence(*evi, 1);
@@ -573,11 +569,12 @@ void MainWindow::updateEvidenceByHash(string hash, time_t time, uint64 blocknumb
 			evi->iBlocknum = blocknumber;
 			evi->iFileState = CONFIRMED;
 			_historyWnd->updateEvidence(evi->cFileHash, evi, 1);
-			DBmgr::instance()->updateEvidence(*evi, 4);
+			DBmgr::instance()->updateEvidence(*evi, 4); //hash and time
 			break;
 		}
 	}
 }
+
 
 QList<QSharedPointer<TEVIDENCEINFO> > &MainWindow::getEvidence()
 {
@@ -617,7 +614,7 @@ void MainWindow::Update_BuddyFailed(string hash, time_t time)
 }
 
 void MainWindow::onDeleteHistoryItem(TEVIDENCEINFO * evi)
-{
+{	
 	for (int i = 0; i < listEvi_.size(); i++)
 	{
 		if ((evi->cFileHash.compare(listEvi_.at(i)->cFileHash) == 0) && (evi->tRegisTime == listEvi_.at(i)->tRegisTime))
@@ -628,7 +625,7 @@ void MainWindow::onDeleteHistoryItem(TEVIDENCEINFO * evi)
 	}
 	DBmgr::instance()->delEvidence(*evi);
 	_historyWnd->DeleteItem(evi);
-
+	
 }
 
 void MainWindow::BuddyRetry(QSharedPointer<TEVIDENCEINFO> evi)
@@ -640,7 +637,7 @@ void MainWindow::BuddyRetry(QSharedPointer<TEVIDENCEINFO> evi)
 	{
 		if ((levi->cFileHash.compare(evi->cFileHash) == 0) && (levi->tRegisTime == evi->tRegisTime))
 		{
-			levi->iFileState = evi->iFileState;
+			levi->iFileState = evi->iFileState;		
 			bfind = true;
 			break;
 		}
@@ -653,6 +650,8 @@ void MainWindow::BuddyRetry(QSharedPointer<TEVIDENCEINFO> evi)
 	DBmgr::instance()->updateEvidence(*evi, 2);
 
 }
+
+
 
 void MainWindow::initNoConfiringList()
 {
@@ -673,4 +672,6 @@ void MainWindow::initNoConfiringList()
 		listEvi_.append(qevi);
 	}
 }
+
+
 

@@ -1,23 +1,23 @@
-/*Copyright 2017 hyperchain.net  (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or?https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this?
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,?
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 #include "browser.h"
 #include "ui_browser.h"
@@ -29,11 +29,17 @@
 #include <string>
 #include "mainwindow.h"
 #include "wnd/statusbar.h"
+#include "common.h"
 
-extern "C"
-{
-	string ws2s(const wstring& ws);
-}
+
+#ifdef WIN32
+#include <codecvt>
+#endif
+
+
+#include <string>
+#include <locale>
+using namespace std;
 
 extern MainWindow* g_mainWindow();
 
@@ -44,6 +50,7 @@ browser::browser(QWidget *parent)
 	ui->setupUi(this);
 	_statusBar = new statusbar(this);
 	ui->verticalLayout->addWidget(_statusBar);
+	
 
 	QRegExp rx("[0-9]+$");
 	QRegExpValidator *validator = new QRegExpValidator(rx, this);
@@ -57,7 +64,8 @@ browser::browser(QWidget *parent)
 				   color: white;\
 				   }\
 				   QPushButton:!enabled {\
-				   background: gray;\color: rgb(200, 200, 200);\
+				   background: gray;\
+				   color: rgb(200, 200, 200);\
 				   }\
 				   QPushButton:enabled:hover {\
 				   background: rgb(0, 180, 255);\
@@ -66,7 +74,7 @@ browser::browser(QWidget *parent)
 				   background: rgb(0, 140, 215);\
 				   }";
 	ui->pushButton_Search->setStyleSheet(qssbuttonblue);
-
+	
 	connect(ui->pushButton_Search, &QPushButton::clicked, this, &browser::search);
 	InitTableView();
 }
@@ -98,7 +106,8 @@ void browser::InitHead()
 
 		ui->tableViewBlock->setModel(block_model);
 	}
-	}
+}
+
 
 void browser::InitTableView()
 {
@@ -110,31 +119,22 @@ void browser::InitTableView()
 
 }
 
-string browser::w2s(const wstring& ws)
+const string& browser::tstringToUtf8(const utility::string_t &str)
 {
-	string curLocale = setlocale(LC_ALL, NULL);
-
-	setlocale(LC_ALL, "chs");
-
-	const wchar_t* _Source = ws.c_str();
-	size_t _Dsize = 2 * ws.size() + 1;
-	char *_Dest = new char[_Dsize];
-	memset(_Dest, 0, _Dsize);
-	wcstombs(_Dest, _Source, _Dsize);
-	string result = _Dest;
-	delete[]_Dest;
-
-	setlocale(LC_ALL, curLocale.c_str());
-
-	return result;
+#ifdef _UTF16_STRINGS
+	wstring_convert<codecvt_utf8<wchar_t> > strCnv;
+	return strCnv.to_bytes(str);
+#else
+	return str;
+#endif
 }
 
 void browser::search()
 {
 	stringstream ss;
-	wostringstream oss;
+	ostringstream_t oss;
 	uint64 blockNum;
-	wstring wsNum;
+	string_t tsNum;
 	string strnum = ui->lineEditBlockNumber->text().toStdString();
 	int num = 0;
 
@@ -142,15 +142,16 @@ void browser::search()
 	ss >> blockNum;
 
 	oss << blockNum;
-	wsNum = oss.str();
+	tsNum = oss.str();
 
 	json::value  root = QueryByWeb(blockNum);
-	num = root[wsNum].size();
+	num = root[tsNum].size();
 	block_model->clear();
 	InitHead();
 
+	
 	if (num > 0)
-	{
+	{				
 		string hash = "";
 		string id = "";
 		string type = "";
@@ -164,16 +165,16 @@ void browser::search()
 
 		for (int i = 0; i < num; i++)
 		{
-			hash = w2s(root[wsNum][i][L"hash"].to_string());
-			id = w2s(root[wsNum][i][L"id"].to_string());
-			type = w2s(root[wsNum][i][L"type"].to_string());
-			hid = w2s(root[wsNum][i][L"hid"].to_string());
-			hhash = w2s(root[wsNum][i][L"hhash"].to_string());
-			hash_prev = w2s(root[wsNum][i][L"hash_prev"].to_string());
-			payload = w2s(root[wsNum][i][L"payload"].to_string());
-			utime = root[wsNum][i][L"ctime"].as_number().to_uint64();
+			hash = t2s(root[tsNum][i][_XPLATSTR("hash")].serialize());
+			id = t2s(root[tsNum][i][_XPLATSTR("id")].serialize());
+			type = t2s(root[tsNum][i][_XPLATSTR("type")].serialize());
+			hid = t2s(root[tsNum][i][_XPLATSTR("hid")].serialize());
+			hhash = t2s(root[tsNum][i][_XPLATSTR("hhash")].serialize());
+			hash_prev = t2s(root[tsNum][i][_XPLATSTR("hash_prev")].serialize());
+			payload = t2s(root[tsNum][i][_XPLATSTR("payload")].serialize());
+			utime = root[tsNum][i][_XPLATSTR("ctime")].as_number().to_uint64();// as_integer();
 			qtime = QDateTime::fromTime_t(utime).toString("yyyy-MM-dd hh:mm:ss");
-			chain_num = w2s(root[wsNum][i][L"chain_num"].to_string());
+			chain_num = t2s(root[tsNum][i][_XPLATSTR("chain_num")].serialize());
 
 			block_model->setItem(i, 0, new QStandardItem(QString::fromLocal8Bit(id.c_str())));
 			block_model->setItem(i, 1, new QStandardItem(QString::fromLocal8Bit(hid.c_str())));
@@ -188,7 +189,7 @@ void browser::search()
 		_statusBar->OutPutString(tr("Data returned successfully"));
 	}
 	else
-	{
+	{		
 		_statusBar->OutPutString(tr("Can not retrieve block information from local, try synchronizing with other nodes, please wait..."), "color: rgb(220,20,60)");
 	}
 }

@@ -1,23 +1,23 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 
 #include "attestation_reg.h"
@@ -26,6 +26,7 @@
 #include "util/commonutil.h"
 #include "mainwindow.h"
 #include "HChainP2PManager/interface/QtInterface.h"
+
 
 #include <QMessageBox>
 #include <QTextCodec>
@@ -65,7 +66,7 @@ attestation_reg::~attestation_reg()
 }
 
 void attestation_reg::dragEnterEvent(QDragEnterEvent *event){
-
+	//http://blog.csdn.net/a3631568/article/details/53819972
 	event->acceptProposedAction();
 }
 
@@ -81,9 +82,9 @@ void attestation_reg::dropEvent(QDropEvent *event){
 
 	if (areag.contains(gpoint)){
         ui->digitalFingerprintLabel->setText(tr("DigitalFingerprint"));
-
 		ui->labelFileName->setText(QStringLiteral(""));
 		ui->labelFileName->hide();
+		
 
 		const QMimeData*qm = event->mimeData();
 		QString path = qm->urls()[0].toLocalFile();
@@ -91,7 +92,6 @@ void attestation_reg::dropEvent(QDropEvent *event){
         QFile f(path);
 
         if(f.open(QIODevice::ReadOnly)){
-
             fpath_ = path;
 
             QCryptographicHash h(QCryptographicHash::Sha512);
@@ -112,7 +112,7 @@ void attestation_reg::dropEvent(QDropEvent *event){
 			ui->labelFileName->show();
 
 			f.close();
-
+		
 		}
     }
 }
@@ -127,11 +127,9 @@ void attestation_reg::onReset()
     sha512_.clear();
     fpath_.clear();
 
-	ui->labelFileName->clear();
+	ui->labelFileName->clear(); 
 	ui->labelFileName->hide();
-
 	ui->editRightOwner->clear();
-
 }
 
 void attestation_reg::onPublicAdd()
@@ -163,21 +161,18 @@ void attestation_reg::onPublicAdd()
 
 void attestation_reg::onPublicClear()
 {
-
-	if (publicInfo_.size() > 0)
-	{
+	if (publicInfo_.size() > 0) {
 		publicInfo_.pop_back();
 	}
 
-	if (publicInfo_.size() > 0)
-	{
+	if (publicInfo_.size() > 0) {
 		QString txt = formatPublicInfo();
 		ui->textEdit->setText(txt);
 	}
-	else
-	{
+	else {
 		ui->textEdit->clear();
 	}
+
 
 }
 
@@ -230,13 +225,12 @@ QString attestation_reg::convertPublicInfo2Json()
     }
 
 	QString json= nullptr;
-	if (size > 0)
-	{
+	if (size > 0) {
 		QJsonDocument doc(arr);
 		QByteArray ba = doc.toJson(QJsonDocument::Compact);
 		QString json(ba);
 		return json;
-	}
+	}   
 
     return json;
 }
@@ -251,7 +245,8 @@ void attestation_reg::setConnection()
 				   color: white;\
 				   }\
 				   QPushButton:!enabled {\
-				   background: gray;\color: rgb(200, 200, 200);\
+				   background: gray;\
+				   color: rgb(200, 200, 200);\
 				   }\
 				   QPushButton:enabled:hover {\
 				   background: rgb(0, 180, 255);\
@@ -282,23 +277,20 @@ void attestation_reg::onCommit()
     }
 
     QSharedPointer<TEVIDENCEINFO> evi = QSharedPointer<TEVIDENCEINFO>(new TEVIDENCEINFO);
-
 	evi->cFileName = ui->labelFileName->text().toStdString();
     evi->cCustomInfo = convertPublicInfo2Json().toStdString();
-	evi->cRightOwner = ui->editRightOwner->toPlainText().toStdString();
-    evi->cFileHash = sha512_.toStdString();
-    evi->iFileState = CONFIRMING;
-
+	evi->cRightOwner = ui->editRightOwner->toPlainText().toStdString();	
+    evi->cFileHash = sha512_.toStdString();     
+    evi->iFileState = CONFIRMING;               
 	evi->tRegisTime = QDateTime::currentDateTime().toTime_t();
 
     QFileInfo finfo(fpath_);
     evi->iFileSize = finfo.size();
 
 	SetFilePoeRecord(evi.data());
-
+    
     ui->digitalFingerprintLabel->setText(tr("DigitalFingerprint"));
-
-	ui->labelFileName->clear();
+	ui->labelFileName->clear(); 
 	ui->labelFileName->hide();
     ui->textEdit->clear();
 
@@ -310,13 +302,13 @@ void attestation_reg::onCommit()
     g_mainWindow()->onAttestationRecord(evi);
 }
 
+
 void attestation_reg::onOpenFile()
 {
 	QFile f;
 	QString path = QFileDialog::getOpenFileName(this, QString("Select File"), QString("/"), QString("(*.*)"));
 	f.setFileName(path);
-	if (f.open(QIODevice::ReadOnly ))
-	{
+	if (f.open(QIODevice::ReadOnly )) {
 		fpath_ = path;
 
 		QCryptographicHash h(QCryptographicHash::Sha512);

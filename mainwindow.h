@@ -1,23 +1,23 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 
 #ifndef MAINWINDOW_H
@@ -41,7 +41,6 @@ class chain_browser;
 class attestation_reg;
 class attestation_record;
 class attestation_history;
-
 class dev_mode;
 class QMenu;
 class reg_verification_frameless;
@@ -91,14 +90,14 @@ public:
     int getLanguage(){
         return langIndex_;
     }
-
+    
     void addLog(QString log);
 	QtNotify* GetQtNotify();
 
 public:
     void addEvidence(QSharedPointer<TEVIDENCEINFO> evi, int index = 0);
-
     void updateEvidence();
+
 
 	void updateEvidenceByHash(string hash, time_t time, uint64 blocknumber);
 
@@ -112,6 +111,7 @@ public slots:
     void onDevModeClick();
 	void onTokenClick();
 	void onAboutClick();
+
 
     void onAttestationHistory();
     void onAttestationRecord(QSharedPointer<TEVIDENCEINFO> evidence);
@@ -156,14 +156,12 @@ private:
     void retranslateUi();
 
 private:
-
     bool runningUpdate_ = false;
 
     E_TAB_TYPE _curTab;
 	E_TAB_TYPE _oldTab;
-    mine_hyperchain*     _hyperChainWnd = nullptr;
+    mine_hyperchain*     _hyperChainWnd = nullptr;    
     attestation_reg*     _attestationRegWnd = nullptr;
-
 	settings*			_settingsWnd = nullptr;
 	browser*			_browserWnd = nullptr;
 	token*				_tokenWnd = nullptr;
@@ -174,7 +172,7 @@ private:
     dev_mode*            _devModeWnd = nullptr;
     reg_verification_frameless* _verificationWnd = nullptr;
 
-    tab_bar_wnd*         _tabBar;
+    tab_bar_wnd*         _tabBar;	
 	QtNotify*			_notify = nullptr;
 
 private:
@@ -190,10 +188,9 @@ private:
     QTranslator appTranslatorEn_;
 
 private:
-
     QList<QSharedPointer<TEVIDENCEINFO> > listEvi_;
 
     bool _verificationWndShow = false;
 };
 
-#endif
+#endif // MAINWINDOW_H

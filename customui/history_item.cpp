@@ -1,39 +1,41 @@
 ﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 
-#include <QDateTime>
-#include <QTextCodec>
 #include "history_item.h"
 #include "util/commonutil.h"
 #include "mainwindow.h"
+#include <QDateTime>
+#include <QTextCodec>
+
 extern MainWindow* g_mainWindow();
 
 history_item::history_item(QWidget *parent, TEVIDENCEINFO evis,  bool insert, bool update) : QWidget(parent)
 {
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf-8"));
 	m_evis = evis;
-	InitTitle(insert, update);
-
+	InitTitle(insert, update);	
+	
 }
+
 
 void history_item::retranslateUi()
 {
@@ -41,7 +43,7 @@ void history_item::retranslateUi()
 }
 
 void history_item::InitTitle(bool insert, bool update)
-{
+{		
 	q_time = tr("Submit At:");
 	q_filename = tr("File Name:");
 	q_filesize = tr("Size:");
@@ -53,11 +55,12 @@ void history_item::InitTitle(bool insert, bool update)
 	q_delete = tr("Delete");
 	q_retry = tr("Retry");
 
+
 	int ntile = 4;
 	int nwspace = 30;
-	QVariantMap v;
+	QVariantMap v;	
 	int ntop = 6;
-	int nleft = 0;
+	int nleft = 0;	
 	convertEvidenceStruct2VariantMap(v, &m_evis);
 
 	if (!update)
@@ -67,7 +70,8 @@ void history_item::InitTitle(bool insert, bool update)
 	t_time->move(nleft, ntop);
 	t_time->setText(q_time);
 	t_time->setStyleSheet("background-color: transparent;font-size:15px;color:#0f69b5");
-	t_time->adjustSize();
+	t_time->adjustSize();	
+	
 
 	nleft += t_time->width() + ntile;
 	QString qz = QDateTime::fromTime_t(v["tRegisTime"].toULongLong()).toString("yyyy-MM-dd hh:mm:ss");
@@ -80,7 +84,10 @@ void history_item::InitTitle(bool insert, bool update)
 	m_time->setStyleSheet("background-color: transparent;font-size:14px;color:#656565");
 	m_time->adjustSize();
 
-	nleft = 0;
+
+
+	
+	nleft = 0;	
 	ntop += 20;
 	if (!update)
 	{
@@ -90,6 +97,7 @@ void history_item::InitTitle(bool insert, bool update)
 	t_filename->setText(q_filename);
 	t_filename->setStyleSheet("background-color: transparent;font-size:15px;color:#0f69b5");
 	t_filename->adjustSize();
+
 
 	nleft += t_filename->width() + ntile;
 	if (!update)
@@ -105,13 +113,15 @@ void history_item::InitTitle(bool insert, bool update)
 		m_filename->resize(m_filename->width() + 20, m_filename->height());
 	}
 
+
+	
 	nleft += m_filename->width() + nwspace;
 	if (!update)
 	{
 		t_filesize = new QLabel(this);
 	}
 	t_filesize->move(nleft, ntop);
-	t_filesize->setText(q_filesize);
+	t_filesize->setText(q_filesize);	
 	t_filesize->setStyleSheet("background-color: transparent;font-size:15px;color:#0f69b5");
 	t_filesize->adjustSize();
 
@@ -119,6 +129,7 @@ void history_item::InitTitle(bool insert, bool update)
 	{
 		t_filesize->resize(t_filesize->width() + 26, t_filesize->height());
 	}
+	
 
 	nleft += t_filesize->width() + ntile;
 	QString qfilesize = getfilesize(v["iFileSize"].toULongLong());
@@ -126,10 +137,12 @@ void history_item::InitTitle(bool insert, bool update)
 	{
 		m_filesize = new QLabel(this);
 	}
-	m_filesize->move(nleft, ntop);
+	m_filesize->move(nleft, ntop);	
 	m_filesize->setText(qfilesize);
 	m_filesize->setStyleSheet("background-color: transparent;font-size:14px;color:#656565");
 	m_filesize->adjustSize();
+
+
 
 	nleft += m_filesize->width() + nwspace;
 	if (!update)
@@ -145,10 +158,12 @@ void history_item::InitTitle(bool insert, bool update)
 		t_blocknumber->resize(t_blocknumber->width() + 20, t_blocknumber->height());
 	}
 
+
+	
 	nleft += t_blocknumber->width() + ntile;
 	if (!update)
 	{
-		m_blocknumber = new QLabel(this);
+		m_blocknumber = new QLabel(this);		
 	}
 
 	uint64 ublocknum = v["iBlocknum"].toULongLong();
@@ -161,6 +176,7 @@ void history_item::InitTitle(bool insert, bool update)
 		QString blocknum = QString::number(ublocknum, 10);
 		m_blocknumber->setText(blocknum);
 	}
+	
 
 	m_blocknumber->move(nleft, ntop);
 	m_blocknumber->setStyleSheet("background-color: transparent;font-size:14px;color:#656565");
@@ -171,7 +187,7 @@ void history_item::InitTitle(bool insert, bool update)
 	{
 		m_width += 120;
 	}
-
+	
 	nleft =0;
 	ntop += 20;
 	if (!update)
@@ -180,8 +196,9 @@ void history_item::InitTitle(bool insert, bool update)
 	}
 	t_ower->move(nleft, ntop);
 	t_ower->setStyleSheet("background-color: transparent;font-size:15px;color:#0f69b5");
-	t_ower->setText(q_ower);
+	t_ower->setText(q_ower);	
 	t_ower->adjustSize();
+
 
 	nleft += t_ower->width() + ntile;
 	if (!update)
@@ -192,6 +209,8 @@ void history_item::InitTitle(bool insert, bool update)
 	m_ower->setStyleSheet("background-color: transparent;font-size:14px;color:#656565");
 	m_ower->setText(v["cRightOwner"].toString());
 	m_ower->adjustSize();
+
+
 
 	nleft += m_ower->width() + nwspace;
 	if (!update)
@@ -207,6 +226,7 @@ void history_item::InitTitle(bool insert, bool update)
 		t_status->resize(t_status->width() + 20, t_status->height());
 	}
 
+
 	nleft += t_status->width() + ntile;
 	int istatus = v["iFileState"].toInt();
 	QString qs = getstatus(istatus);
@@ -218,6 +238,7 @@ void history_item::InitTitle(bool insert, bool update)
 	m_status->setStyleSheet("background-color: transparent;font-size:14px;color:#656565");
 	m_status->setText(qs);
 	m_status->adjustSize();
+		
 
 	nleft += m_status->width() + nwspace;
 	if (!update)
@@ -233,7 +254,8 @@ void history_item::InitTitle(bool insert, bool update)
 				   color: white;\
 				   }\
 				   QPushButton:!enabled {\
-				   background: gray;\color: rgb(200, 200, 200);\
+				   background: gray;\
+				   color: rgb(200, 200, 200);\
 				   }\
 				   QPushButton:enabled:hover {\
 				   background: rgb(0, 180, 255);\
@@ -243,7 +265,7 @@ void history_item::InitTitle(bool insert, bool update)
 				   }";
 	m_verification->setStyleSheet(qssbuttonblue);
 	m_verification->setText(q_verification);
-
+	
 	m_verification->adjustSize();
 	if (istatus == CONFIRMED)
 	{
@@ -253,6 +275,8 @@ void history_item::InitTitle(bool insert, bool update)
 	{
 		m_verification->setEnabled(false);
 	}
+
+
 
 	if (!update)
 	{
@@ -267,7 +291,8 @@ void history_item::InitTitle(bool insert, bool update)
 				   color: white;\
 				   }\
 				   QPushButton:!enabled {\
-				   background: gray;\color: rgb(200, 200, 200);\
+				   background: gray;\
+				   color: rgb(200, 200, 200);\
 				   }\
 				   QPushButton:enabled:hover {\
 				   background: rgb(	255,192,203);\
@@ -279,6 +304,8 @@ void history_item::InitTitle(bool insert, bool update)
 	m_delete->setText(q_delete);
 	m_delete->adjustSize();
 
+
+	
 	nleft += m_verification->width() + nwspace;
 	if (!update)
 	{
@@ -293,7 +320,8 @@ void history_item::InitTitle(bool insert, bool update)
 				   color: white;\
 				   }\
 				   QPushButton:!enabled {\
-				   background: gray;\color: rgb(200, 200, 200);\
+				   background: gray;\
+				   color: rgb(200, 200, 200);\
 				   }\
 				   QPushButton:enabled:hover {\
 				   background: rgb(	0,255,0);\
@@ -304,6 +332,7 @@ void history_item::InitTitle(bool insert, bool update)
 	m_details->setStyleSheet(qssbuttongreen);
 	m_details->setText(q_details);
 	m_details->adjustSize();
+	
 
 	if (!update)
 	{
@@ -314,8 +343,9 @@ void history_item::InitTitle(bool insert, bool update)
 	m_retry->setText(q_retry);
 	m_retry->adjustSize();
 
+
 	if (istatus == REJECTED)
-	{
+	{	
 		m_delete->setEnabled(true);
 		m_retry->setEnabled(true);
 	}
@@ -324,6 +354,7 @@ void history_item::InitTitle(bool insert, bool update)
 		m_delete->setEnabled(false);
 		m_retry->setEnabled(false);
 	}
+
 
 	connect(m_verification, &QPushButton::clicked, this, &history_item::onVerification);
 	connect(m_details, &QPushButton::clicked, this, &history_item::onDetails);
@@ -334,8 +365,9 @@ void history_item::InitTitle(bool insert, bool update)
 	{
 		m_width = nleft + m_details->width();
 	}
-
+	
 }
+
 
 QString history_item::getstatus(int status)
 {
@@ -375,7 +407,7 @@ QString history_item::getstatus(int status)
 }
 
 QString history_item::getfilesize(uint64 nsize)
-{
+{	
 	double dsize = nsize;
 	QString unit = " B";
 	if (dsize > 1024)
@@ -421,6 +453,7 @@ void history_item::onDetails()
 	g_mainWindow()->onAttestationRecord(evi);
 }
 
+
 void history_item::onDelete()
 {
 	g_mainWindow()->onDeleteHistoryItem(&m_evis);
@@ -445,5 +478,4 @@ void history_item::update(QSharedPointer<TEVIDENCEINFO> evi)
 {
 	m_evis = *evi;
 	InitTitle(false, true);
-
 }

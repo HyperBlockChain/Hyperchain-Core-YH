@@ -1,36 +1,38 @@
-﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
+
 #ifdef WIN32
 #include <windows.h>
-#include <psapi.h>
+#include <psapi.h>    
 #pragma comment(lib,"psapi.lib")
 #else
-#include <stdio.h>
-#include <unistd.h>
-#include <linux/kernel.h>
+#include <sys/sysinfo.h>
+#include <stdio.h>  
+#include <unistd.h>  
+#include <linux/kernel.h>  
 #include <stdlib.h>
 
-#define VMRSS_LINE 17
-#define VMSIZE_LINE 13
+#define VMRSS_LINE 17  
+#define VMSIZE_LINE 13  
 #define PROCESS_ITEM 14
 
 #endif
@@ -48,12 +50,12 @@ int OSFunctions::GetCurrentFreeMemoryOS()
 
 	return mems;
 #else
-	struct sysinfo sys;
-	int err = sysinfo(&sys);
+	struct sysinfo sys;  
+	int err = sysinfo(&sys); 
 	int mems = sys.freeram/MB;
 
 	return mems;
-#endif
+#endif	
 }
 
 int OSFunctions::GetTotalMemoryOS()
@@ -65,7 +67,7 @@ int OSFunctions::GetTotalMemoryOS()
 
 	return mems;
 #else
-	struct sysinfo sys;
+	struct sysinfo sys;  
 	int err = sysinfo(&sys);
 	int mems = sys.totalram / MB;
 
@@ -73,15 +75,16 @@ int OSFunctions::GetTotalMemoryOS()
 #endif
 }
 
+
 int OSFunctions::GetUsedMemoryHC()
 {
 #ifdef WIN32
 	HANDLE handle = GetCurrentProcess();
 	PROCESS_MEMORY_COUNTERS pmc;
-	GetProcessMemoryInfo(handle,&pmc,sizeof(pmc));
+	GetProcessMemoryInfo(handle,&pmc,sizeof(pmc)); 
 
 	return pmc.WorkingSetSize / MB;
-#else
+#else	
 	pid_t pid = getpid();
 	char file_name[64] = { 0 };
 	FILE *fd;
@@ -131,12 +134,22 @@ int OSFunctions::GetCurrentCPUIdlePercentageOS()
 #else
 	FILE*fd;
 	char buffer[1024] = { 0 };
+
+	typedef struct {
+		unsigned int user;
+		unsigned int nice; 
+		unsigned int system;
+		unsigned int idle;
+	}total_cpu_occupy_t;
+
 	total_cpu_occupy_t t;
 	fd = fopen("/proc/stat", "r");
 	fgets(buffer, sizeof(buffer), fd);
-	char name[16];
+
+	char name[16];	
+	sscanf(buffer, "%s %u %u %u %u", name, &t.user, &t.nice, &t.system, &t.idle);
 	fclose(fd);
 
 	return t.user + t.nice + t.system + t.idle;
-#endif
+#endif	
 }

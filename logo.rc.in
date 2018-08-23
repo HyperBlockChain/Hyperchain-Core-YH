@@ -1,0 +1,45 @@
+﻿IDI_ICON1               ICON     DISCARDABLE     "@CMAKE_SOURCE_DIR@/logo.ico"
+
+#if defined(UNDER_CE)
+    #include <winbase.h>
+#else
+    #include <winver.h>
+#endif
+
+VS_VERSION_INFO VERSIONINFO
+
+    FILEVERSION @MIRALL_VERSION_MAJOR@,@MIRALL_VERSION_MINOR@,@MIRALL_VERSION_PATCH@,@MIRALL_VERSION_BUILD@
+    PRODUCTVERSION @MIRALL_VERSION_MAJOR@,@MIRALL_VERSION_MINOR@,@MIRALL_VERSION_PATCH@,@MIRALL_VERSION_BUILD@
+    FILEFLAGSMASK 0x3fL
+
+    #ifdef _DEBUG
+        FILEFLAGS VS_FF_DEBUG
+    #else
+        FILEFLAGS 0x0L
+    #endif
+
+    FILEOS VOS__WINDOWS32
+    FILETYPE VFT_DLL
+    FILESUBTYPE 0x0L
+
+    BEGIN
+        BLOCK "StringFileInfo"
+        BEGIN
+            BLOCK "040904B0"
+            BEGIN
+            VALUE "CompanyName","Hyperchain Co., Ltd."
+            VALUE "FileDescription", "Hyperchain"
+            VALUE "FileVersion", "@MIRALL_VERSION_MAJOR@.@MIRALL_VERSION_MINOR@.@MIRALL_VERSION_PATCH@.@MIRALL_VERSION_BUILD@"
+            VALUE "InternalName", "hc.exe"
+            VALUE "LegalCopyright", "Copyright (C)2018 Hyperchain Co.Ltd."
+            VALUE "OriginalFilename", "hc.exe"
+            VALUE "ProductName", "hc"
+            VALUE "ProductVersion", "@MIRALL_VERSION_MAJOR@.@MIRALL_VERSION_MINOR@.@MIRALL_VERSION_PATCH@.@MIRALL_VERSION_BUILD@"
+            END
+        END
+
+        BLOCK "VarFileInfo"
+        BEGIN
+        VALUE "Translation", 0x804, 1200
+        END
+    END

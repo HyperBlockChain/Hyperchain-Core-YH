@@ -1,30 +1,32 @@
-﻿/*Copyright 2017 hyperchain.net  (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT.
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
+
 #include "mine_hyperchain.h"
 #include "ui_mine_hyperchain.h"
 
 #include "blockinfo.h"
 #include "HChainP2PManager/interface/QtInterface.h"
 #include "util/commonutil.h"
+#include "common.h"
 #include "mainwindow.h"
 
 #include <QDebug>
@@ -32,12 +34,13 @@
 #include <QPixmap>
 #include "statusbar.h"
 
+
 extern MainWindow* g_mainWindow();
 
 mine_hyperchain::mine_hyperchain(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::mine_hyperchain)
-{
+{	
     ui->setupUi(this);
 
 	_minehy_statusBar = new statusbar(this);
@@ -53,11 +56,12 @@ mine_hyperchain::mine_hyperchain(QWidget *parent) :
 	ui->chainConectStatusOccasionallyNoResponse->SetMes("How many Hyperchain nodes in good connection state");
 	ui->chainConectStatusOccasionallyResponse->SetMes("How many Hyperchain nodes in average connection state");
 	ui->chainConectStatusNoResponse->SetMes("How many Hyperchain nodes in bad connection state");
-
+	
 	ui->labelBuddyChainCount->SetMes("How many Local Chains found in this round of consensus");
 	ui->labelBuddyStatus->SetMes("Consensus Phase should be Local or Global");
 	ui->labelCurrentBlockNumber->SetMes("The Hyperblock which now consensus is based");
 	ui->labelNextBlockNumber->SetMes("The HyperBlock which now consensus will produce");
+
 
 	ShowPng();
 	li.clear();
@@ -88,6 +92,7 @@ mine_hyperchain::~mine_hyperchain()
     delete ui;
 }
 
+
 void mine_hyperchain::InitDate()
 {
 	m_gbuddychainnum = 0;
@@ -112,12 +117,10 @@ void mine_hyperchain::InitDate()
 void mine_hyperchain::retranslateUi()
 {
     ui->retranslateUi(this);
-
 }
 
 void mine_hyperchain::onSigShowNodeDlgInfo(QPoint gpos, uint64 blocknum)
 {
-
 	static uint64 sblocknum;
 
 	bool bChanged = false;
@@ -129,7 +132,7 @@ void mine_hyperchain::onSigShowNodeDlgInfo(QPoint gpos, uint64 blocknum)
 
 	if (bChanged)
 	{
-
+	
 		binfo->refreshNodeDlgInfo(blocknum);
 	}
 
@@ -146,76 +149,59 @@ void mine_hyperchain::onSigShowBrowserInfo(string blocknum)
 	emit SIG_BrowserInfo(blocknum);
 }
 
+
 void mine_hyperchain::clearDate_Buddy()
 {
-	StopBuddyTime();
+	StopBuddyTime();	
 	Update_GlobleBuddyChainNum(0);
 	Update_NodeStatus(IDLE);
 	ui->myPartenerFrame->clearNodes();
 }
 
+
 void mine_hyperchain::Update_HyperBlock(string hash, time_t time, uint64 blocknumber)
-{
+{	
 	if (!hash.empty() && time > 0)
 	{
-
 		g_mainWindow()->updateEvidenceByHash(hash, time, blocknumber);
-	}
+	}	
 
 	if (m_currentblocknumber != blocknumber)
 	{
 		m_currentblocknumber = blocknumber;
 		m_nextblocknumber = m_currentblocknumber + 1;
 		ui->labelCurrentBlockNumber->setText(QString("%1").arg(m_currentblocknumber));
-		ui->labelNextBlockNumber->setText(QString("%1").arg(m_nextblocknumber));
+		ui->labelNextBlockNumber->setText(QString("%1").arg(m_nextblocknumber));			
 		ui->labelChainDataStatus->setBlockNum(m_currentblocknumber, m_currentblocknumber);
-
+		
 		list_ChainData.push_back(m_currentblocknumber);
 		ui->labelChainDataStatus->setBlocksNum(list_ChainData);
 		ui->labelChainDataStatus->update();
-
 	}
 }
 
-string mine_hyperchain::w2s(const wstring& ws)
-{
-	string curLocale = setlocale(LC_ALL, NULL);
 
-	setlocale(LC_ALL, "chs");
-
-	const wchar_t* _Source = ws.c_str();
-	size_t _Dsize = 2 * ws.size() + 1;
-	char *_Dest = new char[_Dsize];
-	memset(_Dest, 0, _Dsize);
-	wcstombs(_Dest, _Source, _Dsize);
-	string result = _Dest;
-	delete[]_Dest;
-
-	setlocale(LC_ALL, curLocale.c_str());
-
-	return result;
-}
 
 bool mine_hyperchain::GetHBlockDlgInfo(uint64 blocknum, THBLOCKDLGINFO & hinfo)
 {
 	bool bret = false;
-	wostringstream oss;
-	wstring wsNum;
+	ostringstream_t oss;
+	string_t tsNum;
 	uint64 num = 0;
 
 	oss << blocknum;
-	wsNum = oss.str();
+	tsNum = oss.str();
 
 	json::value  root = QueryByWeb(blocknum);
-	num = root[wsNum].size();
+	num = root[tsNum].size();
 	if (num > 0)
 	{
 		bret = true;
 
 		hinfo.iBlockNo = blocknum;
-		hinfo.iCreatTime = root[wsNum][0][L"ctime"].as_number().to_uint64();
+		hinfo.iCreatTime = root[tsNum][0][_XPLATSTR("ctime")].as_number().to_uint64();
 		hinfo.iLocalBlockNum = num - 1;
-		hinfo.strHHash = w2s(root[wsNum][0][L"hhash"].to_string());
+		hinfo.strHHash = t2s(root[tsNum][0][_XPLATSTR("hhash")].serialize());
 	}
 
 	return bret;
@@ -230,39 +216,33 @@ void mine_hyperchain::Update_NodeStatus(uint16 status)
 		switch (m_buddystatus)
 		{
 		case IDLE:
-
 			ui->labelBuddyStatus->setText("IDLE");
 			break;
 
 		case LOCAL_BUDDY:
-
 			ui->labelBuddyStatus->setText("LOCAL_BUDDY");
 			break;
 
 		case GLOBAL_BUDDY:
-
 			ui->labelBuddyStatus->setText("GLOBAL_BUDDY");
 			break;
 
 		default:
-
 			ui->labelBuddyStatus->setText("IDLE");
 			break;
 		}
-
+		 
 	}
 
 }
 
 void mine_hyperchain::Update_BuddyStartTime(time_t stime, uint64 blocknumber)
-{
-
+{		
 	StartBuddyTime();
 }
 
 void mine_hyperchain::Update_BuddyStop()
 {
-
 	clearDate_Buddy();
 }
 
@@ -272,13 +252,12 @@ void mine_hyperchain::Update_GlobleBuddyChainNum(uint16 number)
 	{
 		m_gbuddychainnum = number;
 		ui->labelBuddyChainCount->setText(tr("%1 rds").arg(m_gbuddychainnum));
-
 	}
 
 }
 
 void mine_hyperchain::Update_LocalBuddyChainInfo(LIST_T_LOCALCONSENSUS chaininfo)
-{
+{	
 	VEC_T_NODEINFO vecnode;
 	for (auto item : chaininfo)
 	{
@@ -290,8 +269,8 @@ void mine_hyperchain::Update_LocalBuddyChainInfo(LIST_T_LOCALCONSENSUS chaininfo
 	}
 	if (!vecnode.empty())
 	{
-		ui->myPartenerFrame->setNodeInfo(vecnode);
-		ui->myPartenerFrame->showNodes();
+		ui->myPartenerFrame->setNodeInfo(vecnode);		
+		ui->myPartenerFrame->showNodes();		
 	}
 }
 
@@ -301,28 +280,24 @@ void mine_hyperchain::Update_ConnectNodeUpdate(uint32 betternum, uint32 normalnu
 	{
 		m_betternum = betternum;
 		ui->chainConectStatusWell->setText(QString("%1").arg(m_betternum));
-
 	}
 
 	if (m_normalnum != normalnum)
 	{
 		m_normalnum = normalnum;
 		ui->chainConectStatusOccasionallyNoResponse->setText(QString("%1").arg(m_normalnum));
-
 	}
 
 	if (m_badnum != badnum)
 	{
 		m_badnum = badnum;
 		ui->chainConectStatusOccasionallyResponse->setText(QString("%1").arg(m_badnum));
-
 	}
 
 	if (m_downnum != downnum)
 	{
 		m_downnum = downnum;
 		ui->chainConectStatusNoResponse->setText(QString("%1").arg(m_downnum));
-
 	}
 
 }
@@ -333,7 +308,6 @@ void mine_hyperchain::Update_SendPoeNum(uint32 number)
 	{
 		m_sendpoenum = number;
 		ui->labelMyRegSended->setText(QString("%1").arg(m_sendpoenum));
-
 	}
 
 }
@@ -344,14 +318,13 @@ void mine_hyperchain::Update_ReceivePoeNum(uint32 number)
 	{
 		m_recvepoenum = number;
 		ui->labelRecvRegSended->setText(QString("%1").arg(m_recvepoenum));
-
 	}
 }
 
 void mine_hyperchain::InitBuddyTime()
 {
 	m_timer = new QTimer;
-	m_timerecord = new QTime(0, 0, 0);
+	m_timerecord = new QTime(0, 0, 0);		
 
 	ui->lcdBuddyTime->display(m_timerecord->toString("hh:mm:ss"));
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(updateTime()));
@@ -367,9 +340,9 @@ void mine_hyperchain::StartBuddyTime()
 void mine_hyperchain::StopBuddyTime()
 {
 	m_bstart = false;
-	m_timer->stop();
-	m_timerecord->setHMS(0, 0, 0);
-	ui->lcdBuddyTime->display(m_timerecord->toString("hh:mm:ss"));
+	m_timer->stop();    
+	m_timerecord->setHMS(0, 0, 0); 
+	ui->lcdBuddyTime->display(m_timerecord->toString("hh:mm:ss")); 
 
 }
 
@@ -387,6 +360,7 @@ void mine_hyperchain::ShowPng()
 	QString strNodeConnectStatusPath = NodeConnectStatusPath();
 	QString strPoePath = PoePath();
 
+	
 	pix.load(strChainStatusPath);
 	ui->png_ChainStatus->setPixmap(pix);
 
@@ -409,11 +383,11 @@ void mine_hyperchain::hideblockinfo()
 	}
 }
 
+
 void mine_hyperchain::Update_HyperBlockNumFromLocal(list<uint64> HyperBlockNum)
 {
-
 	for (list<uint64>::iterator it = HyperBlockNum.begin(); it != HyperBlockNum.end(); it++)
-	{
+	{	
 		list_ChainData.push_back(*it);
 	}
 
@@ -423,6 +397,7 @@ void mine_hyperchain::Update_HyperBlockNumFromLocal(list<uint64> HyperBlockNum)
 		ui->labelChainDataStatus->update();
 	}
 }
+
 
 void mine_hyperchain::onSigShowStatusMes(QString msg)
 {
@@ -436,6 +411,7 @@ void mine_hyperchain::mousePressEvent(QMouseEvent *event)
 		binfo->hide();
 	}
 }
+
 
 void mine_hyperchain::Update_StatusMes(string msg)
 {

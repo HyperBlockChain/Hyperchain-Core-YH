@@ -1,23 +1,23 @@
-﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 #ifndef _SRC_PLATFORM_H_
 #define _SRC_PLATFORM_H_
@@ -25,17 +25,15 @@
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
 #else
-#include <sys/stat.h>
-#include <sys/types.h>
-
+#include <sys/stat.h> 
+#include <sys/types.h> 
 #endif
 
 #ifdef _WIN32
 #include <process.h>
 #define THREAD_EXIT								              return
-#define THREAD_API
+#define THREAD_API                          
 #define THREAD_TYPE							               void*
 #define DEFINE_THREAD(_thread)			               void* _thread
 #define BEGIN_THREAD(_thread, _pfn, _pArg)	    _thread = (HANDLE)_beginthread(_pfn, 0, _pArg)
@@ -46,7 +44,7 @@
 #else
 #include <pthread.h>
 #include <semaphore.h>
-#define THREAD_EXIT								              pthread_exit(NULL); return
+#define THREAD_EXIT								              pthread_exit(NULL); return 
 #define THREAD_API								              *
 #define THREAD_TYPE							              pthread_t
 #define DEFINE_THREAD(_thread)		    	           pthread_t _thread
@@ -76,8 +74,8 @@
 
 #ifdef _WIN32
 #define	    MUTEXTYPE                      HANDLE
-#define		MUTEXDEFX(x)		          HANDLE x
-#define		MUTEXINITX(x)		          x = CreateMutex (NULL, FALSE, NULL)
+#define		MUTEXDEFX(x)		          HANDLE x 
+#define		MUTEXINITX(x)		          x = CreateMutex (NULL, FALSE, NULL)  
 #define		MUTEXLOCKX(x)		          WaitForSingleObject(x , INFINITE)
 #define		MUTEXUNLOCKX(x)		  ReleaseMutex(x)
 #define       MUTEXDESDROYX(x)        CloseHandle(x)
@@ -126,5 +124,6 @@ public:
 private:
 	T& m_lock;
 };
+
 
 #endif

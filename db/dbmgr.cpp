@@ -1,23 +1,23 @@
-﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 #include "db/dbmgr.h"
 #include "util/cppsqlite3.h"
@@ -65,15 +65,21 @@ namespace DBSQL {
 
 }
 
+
+
+
+////////////////////////////////////////////////////
 static const std::string scEvidenceInsert = "INSERT OR REPLACE INTO evidence_tbl(hash,blocknum,filename,custominfo,owner,filestate,regtime,filesize,extra) "
                                          "VALUES(?,?,?,?,?,?,?,?,?);";
-
+////////////////////////////////////////////////////
 static const std::string scHyperblockInsert = "INSERT OR REPLACE INTO hyperblock(hash,id,type,hid,hhash,hash_prev,payload,ctime,queue_id,chain_num)  "
 "VALUES(?,?,?,?,?,?,?,?,?,?);";
-
+////////////////////////////////////////////////////
 static const std::string scUpqueueInsert = "INSERT OR REPLACE INTO upqueue(hash,ctime) "
 "VALUES(?,?);";
-
+////////////////////////////////////////////////////
+static const std::string scGetOnChainStateSelect = "SELECT * FROM hyperblock WHERE ctime= ? AND hash = ?";
+////////////////////////////////////////////////////
 DBmgr *DBmgr::instance()
 {
     static DBmgr s;
@@ -111,9 +117,6 @@ int DBmgr::open(const char *dbpath)
 
         _db->open(dbpath);
 
-#ifndef _DEBUG
-
-#endif
 
         int threadSafe = sqlite3_threadsafe();
 
@@ -205,17 +208,15 @@ int DBmgr::insertEvidence(const TEVIDENCEINFO &evidence)
 {
     try
     {
-
         CppSQLite3Statement stmt = _db->compileStatement(scEvidenceInsert.c_str());
         stmt.bind(1, evidence.cFileHash.c_str());
-
-		stmt.bind(2, (int64)evidence.iBlocknum);
+		stmt.bind(2, (sqlite_int64)evidence.iBlocknum);
         stmt.bind(3, evidence.cFileName.c_str());
         stmt.bind(4, evidence.cCustomInfo.c_str());
         stmt.bind(5, evidence.cRightOwner.c_str());
         stmt.bind(6, evidence.iFileState);
-        stmt.bind(7, (int64)evidence.tRegisTime);
-        stmt.bind(8, (int64)evidence.iFileSize);
+		stmt.bind(7, (sqlite_int64)evidence.tRegisTime);
+		stmt.bind(8, (sqlite_int64)evidence.iFileSize);
         stmt.bind(9, "");
 
         stmt.execDML();
@@ -253,7 +254,6 @@ int DBmgr::getEvidences(QList<TEVIDENCEINFO> &evidences, int page, int size)
         CppSQLite3Query query = stmt.execQuery();
         while (!query.eof())
         {
-
             TEVIDENCEINFO evi;
             evi.cFileHash = query.getStringField("hash");
             evi.cFileName = query.getStringField("filename");
@@ -262,7 +262,7 @@ int DBmgr::getEvidences(QList<TEVIDENCEINFO> &evidences, int page, int size)
             evi.iFileState = query.getIntField("filestate");
             evi.tRegisTime = query.getInt64Field("regtime");
             evi.iFileSize = query.getInt64Field("filesize");
-			evi.iBlocknum = query.getInt64Field("blocknum");
+			evi.iBlocknum = query.getInt64Field("blocknum"); 
 
             evidences.append(evi);
 
@@ -285,16 +285,17 @@ int DBmgr::getNoConfiringList(QList<TEVIDENCEINFO>& evidences)
 	{
 		CppSQLite3Statement stmt;
 		std::string sql;
-
+	
 		sql = "SELECT * FROM evidence_tbl WHERE filestate!=? ORDER BY regtime DESC;";
 
-		stmt = _db->compileStatement(sql.c_str());
+		stmt = _db->compileStatement(sql.c_str());		
 		stmt.bind(1, CONFIRMED);
+
+	
 
 		CppSQLite3Query query = stmt.execQuery();
 		while (!query.eof())
 		{
-
 			TEVIDENCEINFO evi;
 			evi.cFileHash = query.getStringField("hash");
 			evi.cFileName = query.getStringField("filename");
@@ -322,7 +323,6 @@ int DBmgr::updateEvidence(const TEVIDENCEINFO &evidence, int type)
 {
     try
     {
-
         std::string sql;
         if (1 == type){
             sql = "UPDATE evidence_tbl SET filestate=?"
@@ -351,21 +351,21 @@ int DBmgr::updateEvidence(const TEVIDENCEINFO &evidence, int type)
         }
 		else if (2 == type)
 		{
-			stmt.bind(1, evidence.iFileState);
+			stmt.bind(1, evidence.iFileState);			
 			stmt.bind(2, evidence.cFileHash.c_str());
-			stmt.bind(3, (int64)evidence.tRegisTime);
+			stmt.bind(3, (sqlite_int64)evidence.tRegisTime);
 		}
 		else if (3 == type)
 		{
-			stmt.bind(1, REJECTED);
+			stmt.bind(1, REJECTED);	
 			stmt.bind(2, CONFIRMING);
 		}
 		else if (4 == type)
 		{
 			stmt.bind(1, evidence.iFileState);
-			stmt.bind(2, (int64)evidence.iBlocknum);
+			stmt.bind(2, (sqlite_int64)evidence.iBlocknum);
 			stmt.bind(3, evidence.cFileHash.c_str());
-			stmt.bind(4, (int64)evidence.tRegisTime);
+			stmt.bind(4, (sqlite_int64)evidence.tRegisTime);
 		}
 
         stmt.execDML();
@@ -400,7 +400,7 @@ int DBmgr::delEvidence(const TEVIDENCEINFO &evidence)
 	{
 		CppSQLite3Statement stmt = _db->compileStatement("DELETE FROM evidence_tbl WHERE hash=? And regtime=?;");
 		stmt.bind(1, evidence.cFileHash.c_str());
-		stmt.bind(2, (int64)evidence.tRegisTime);
+		stmt.bind(2, (sqlite_int64)evidence.tRegisTime);
 		stmt.execDML();
 	}
 	catch (CppSQLite3Exception& ex)
@@ -424,6 +424,7 @@ int DBmgr::updateDB()
     return 0;
 }
 
+
 string DBmgr::hash256tostring(const unsigned char* hash)
 {
 	char szHash[512] = "";
@@ -434,7 +435,7 @@ string DBmgr::hash256tostring(const unsigned char* hash)
 	{
 		memset(ucBuf, 0, 10);
 		sprintf(ucBuf, "%02x", hash[uiNum]);
-		strcat(szHash, ucBuf);
+		strcat(szHash, ucBuf);	
 	}
 	string sHash = szHash;
 	return sHash;
@@ -450,15 +451,12 @@ void DBmgr::strtohash256(unsigned char* out, const char* szHash)
     memset(str, 0, len);
     memcpy(str, szHash, len);
     for (int i = 0; i < len; i+=2) {
-
         if(str[i] >= 'a' && str[i] <= 'f') str[i] = str[i] & ~0x20;
         if(str[i+1] >= 'a' && str[i] <= 'f') str[i+1] = str[i+1] & ~0x20;
-
         if(str[i] >= 'A' && str[i] <= 'F')
             out[i/2] = (str[i]-'A'+10)<<4;
         else
             out[i/2] = (str[i] & ~0x30)<<4;
-
         if(str[i+1] >= 'A' && str[i+1] <= 'F')
             out[i/2] |= (str[i+1]-'A'+10);
         else
@@ -476,16 +474,18 @@ int DBmgr::insertHyperblock(const T_HYPERBLOCKDBINFO &hyperblock)
 
 		CppSQLite3Statement stmt = _db->compileStatement(scHyperblockInsert.c_str());
 
+
+
 		stmt.bind(1, hash256tostring(hyperblock.strHashSelf).c_str());
-		stmt.bind(2, (int64)hyperblock.uiBlockId);
-		stmt.bind(3, (int64)hyperblock.ucBlockType);
-		stmt.bind(4, (int64)hyperblock.uiReferHyperBlockId);
+		stmt.bind(2, (sqlite_int64)hyperblock.uiBlockId);
+		stmt.bind(3, (sqlite_int64)hyperblock.ucBlockType);
+		stmt.bind(4, (sqlite_int64)hyperblock.uiReferHyperBlockId);
 		stmt.bind(5, hash256tostring(hyperblock.strHyperBlockHash).c_str());
 		stmt.bind(6, hash256tostring(hyperblock.strPreHash).c_str());
 		stmt.bind(7, hyperblock.strPayload.c_str());
-		stmt.bind(8, (int64)hyperblock.uiBlockTimeStamp);
-		stmt.bind(9, (int64)hyperblock.uiQueueID);
-		stmt.bind(10, (int64)hyperblock.uiLocalChainId);
+		stmt.bind(8, (sqlite_int64)hyperblock.uiBlockTimeStamp);
+		stmt.bind(9, (sqlite_int64)hyperblock.uiQueueID);
+		stmt.bind(10, (sqlite_int64)hyperblock.uiLocalChainId);
 
 		stmt.execDML();
 	}
@@ -513,21 +513,20 @@ int DBmgr::updateHyperblock(const T_HYPERBLOCKDBINFO &hyperblock)
 		"queue_id=?,"
 		"chain_num=?"
 		" WHERE hid=? and type=? and id=?;";
-
 		CppSQLite3Statement stmt = _db->compileStatement(sqlUpdate.c_str());
 		stmt.bind(1, hash256tostring(hyperblock.strHashSelf).c_str());
-		stmt.bind(2, (int64)hyperblock.uiBlockId);
-		stmt.bind(3, (int64)hyperblock.ucBlockType);
-		stmt.bind(4, (int64)hyperblock.uiReferHyperBlockId);
+		stmt.bind(2, (sqlite_int64)hyperblock.uiBlockId);
+		stmt.bind(3, (sqlite_int64)hyperblock.ucBlockType);
+		stmt.bind(4, (sqlite_int64)hyperblock.uiReferHyperBlockId);
 		stmt.bind(5, hash256tostring(hyperblock.strHyperBlockHash).c_str());
 		stmt.bind(6, hash256tostring(hyperblock.strPreHash).c_str());
 		stmt.bind(7, hyperblock.strPayload.c_str());
-		stmt.bind(8, (int64)hyperblock.uiBlockTimeStamp);
-		stmt.bind(9, (int64)hyperblock.uiQueueID);
-		stmt.bind(10, (int64)hyperblock.uiLocalChainId);
-		stmt.bind(11, (int64)hyperblock.uiReferHyperBlockId);
-		stmt.bind(12, (int64)hyperblock.ucBlockType);
-		stmt.bind(13, (int64)hyperblock.uiBlockId);
+		stmt.bind(8, (sqlite_int64)hyperblock.uiBlockTimeStamp);
+		stmt.bind(9, (sqlite_int64)hyperblock.uiQueueID);
+		stmt.bind(10, (sqlite_int64)hyperblock.uiLocalChainId);
+		stmt.bind(11, (sqlite_int64)hyperblock.uiReferHyperBlockId);
+		stmt.bind(12, (sqlite_int64)hyperblock.ucBlockType);
+		stmt.bind(13, (sqlite_int64)hyperblock.uiBlockId);
 		stmt.execDML();
 	}
 	catch (CppSQLite3Exception& ex)
@@ -549,9 +548,9 @@ int DBmgr::existHyperblock(const T_HYPERBLOCKDBINFO &hyperblock)
 		std::string sql = "SELECT * FROM hyperblock where hid=? and type=? and id=?;";
 
 		stmt = _db->compileStatement(sql.c_str());
-		stmt.bind(1, (int64)hyperblock.uiReferHyperBlockId);
-		stmt.bind(2, (int64)hyperblock.ucBlockType);
-		stmt.bind(3, (int64)hyperblock.uiBlockId);
+		stmt.bind(1, (sqlite_int64)hyperblock.uiReferHyperBlockId);
+		stmt.bind(2, (sqlite_int64)hyperblock.ucBlockType);
+		stmt.bind(3, (sqlite_int64)hyperblock.uiBlockId);
 
 		CppSQLite3Query query = stmt.execQuery();
 		if (!query.eof())
@@ -620,6 +619,7 @@ int DBmgr::getHyperblock(QList<T_HYPERBLOCKDBINFO> &queue, int page, int size)
 	return ret;
 }
 
+
 int DBmgr::getHyperblocks(QList<T_HYPERBLOCKDBINFO> &queue, int nStartHyperID, int nEndHyperID)
 {
 	int ret = 0;
@@ -677,7 +677,6 @@ int DBmgr::getAllHyperblockNumInfo(std::list<uint64> &queue)
 		CppSQLite3Query query = stmt.execQuery();
 		while (!query.eof())
 		{
-
 			uint64 num = query.getIntField("id");
 			queue.push_back(num);
 			query.nextRow();
@@ -757,7 +756,7 @@ int DBmgr::addUpqueue(string sHash)
 		uint64_t uiTime = time(NULL);
 		CppSQLite3Statement stmt = _db->compileStatement(scUpqueueInsert.c_str());
 		stmt.bind(1, sHash.c_str());
-		stmt.bind(2, (int64)uiTime);
+		stmt.bind(2, (sqlite_int64)uiTime);
 		stmt.execDML();
 		return sqlite3_last_insert_rowid(_db->getDB());
 	}
@@ -767,6 +766,7 @@ int DBmgr::addUpqueue(string sHash)
 	}
 
 	return 0;
+
 
 }
 
@@ -795,7 +795,6 @@ int DBmgr::getUpqueue(QList<TUPQUEUE> &queue, int page, int size)
 		CppSQLite3Query query = stmt.execQuery();
 		while (!query.eof())
 		{
-
 			TUPQUEUE evi;
 			evi.uiID = query.getIntField("id");
 			evi.strHash = query.getStringField("hash");
@@ -834,7 +833,30 @@ int DBmgr::getLatestHyperBlockNo()
 	}
 	catch (CppSQLite3Exception& ex)
 	{
+	}
 
+	return ret;
+
+}
+
+
+int DBmgr::getOnChainStateFromHashTime(string strlocalhash, uint64 time)
+{	
+	int ret = -1;
+	try
+	{
+		CppSQLite3Statement stmt = _db->compileStatement(scGetOnChainStateSelect.c_str());
+
+		stmt.bind(1, (sqlite_int64)time);
+		stmt.bind(2, strlocalhash.c_str());
+		CppSQLite3Query query = stmt.execQuery();
+		if (!query.eof()){
+			return query.getIntField("hid");
+		}
+	}
+	catch (CppSQLite3Exception& ex)
+	{
+	
 	}
 
 	return ret;

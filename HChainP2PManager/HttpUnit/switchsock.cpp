@@ -1,40 +1,42 @@
-﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 #ifdef WIN32
-//#include "stdafx.h"
+
 #endif
 
+#include <string.h>
 #include "switchsock.h"
 #include <map>
 using namespace std;
 
-
 static BOOL s_bUseSwitch=false;
+
 static MMutex s_SocketListLock;
+
 static map<SOCKET,SwitchSock*> s_SocketList;
+
 static BOOL s_bUseProxy=false;
 static string s_szHttpProxy = "";
 static unsigned short s_nHttpProxyPort=0;
-
 
 static vector< pair<string, unsigned short> > g_vecHttpSwitchHost;
 const char c_strDefaultHttpSwitchHost[] = "114.30.47.10";//218.61.32.99
@@ -324,7 +326,7 @@ long SwitchSock::SendTo(const char* buf,int buflen,const struct sockaddr_in* toa
 	if(!m_bUseHttpSwitch)
 		return m_sock.SendTo(buf,buflen,toaddr,tolen);
 
-
+//	m_SendRecvLock.Lock();
 #ifdef WIN32
 	if(!_SendHttpPacket("Cmd=SendTo&IP="+IntToStr(toaddr->sin_addr.S_un.S_addr)+"&Port="+IntToStr(toaddr->sin_port),string(buf,buflen)))
 #else
@@ -541,6 +543,7 @@ bool SwitchSock::_RecvHttpPacket(string& param,string& data)
 	}
 
 	data.resize(nCntLen);
+
 	if(m_nHttpRecvLen-(pContent-m_pHttpRecvBuffer)<nCntLen)
 	{
 		int nRecved=0;
@@ -578,7 +581,7 @@ bool SwitchSock::_RecvHttpPacket(string& param,string& data)
 		m_nHttpRecvLen = m_nHttpRecvLen-(pContent-m_pHttpRecvBuffer)-nCntLen;
 		memcpy(m_pHttpRecvBuffer,pContent+nCntLen,m_nHttpRecvLen);
 	}
-	
+
 	return true;
 }
 

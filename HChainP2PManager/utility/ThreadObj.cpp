@@ -1,25 +1,26 @@
-﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 #include "ThreadObj.h"
+#include "CallbackFuncObj.cpp"
 
  int 	ERR_JTHREAD_CANINITMUTEX 		= -1;
  int 	ERR_JTHREAD_CANTSTARTTHREAD		= -2;
@@ -27,6 +28,7 @@
  int 	ERR_JTHREAD_NOTRUNNING 			= -4;
  int  	ERR_JTHREAD_ALREADYRUNNING		= -5;
  int    ERR_JTHREAD_NOT	 				= -6;
+
 
 CThreadObj::CThreadObj() : m_ThreadID(0)
 						, m_bIsRunning(false)
@@ -57,7 +59,7 @@ int CThreadObj::Start()
 		return ERR_JTHREAD_ALREADYRUNNING;
 	}
 	m_muxRunning.UnLock();
-
+	
 	m_muxContinue.Lock();
 
 #ifdef WIN32
@@ -66,7 +68,7 @@ int CThreadObj::Start()
 		int iRtn = (NULL == m_ThreadID) ? 1 : 0;
 #else
 		int iRtn = pthread_create(&m_ThreadID,NULL, ThreadEntry,this);
-#endif
+#endif 
 
 	if(0 != iRtn)
 	{
@@ -82,14 +84,14 @@ int CThreadObj::Start()
 		Sleep(1);
 #else
 		usleep(1000);
-#endif
-
+#endif 
+	
 		m_muxRunning.Lock();
 	}
 	m_muxRunning.UnLock();
 
 	m_muxContinue.UnLock();
-
+	
 	m_muxContinue2.Lock();
 	m_muxContinue2.UnLock();
 
@@ -100,7 +102,7 @@ int CThreadObj::Start(TCallbackFuncObj<pThreadCallbackFunc>* pCObj)
 {
 	if(NULL == pCObj && NULL == m_pCallbackFuncObj)
 		return ERR_JTHREAD_THREADFUNCNOTSET;
-
+	
 	if(NULL != pCObj)
 		m_pCallbackFuncObj = pCObj;
 
@@ -109,14 +111,14 @@ int CThreadObj::Start(TCallbackFuncObj<pThreadCallbackFunc>* pCObj)
 
 void CThreadObj::Join()
 {
-	if(!IsRunning())
+	if(!IsRunning())	
 		return;
 #ifdef WIN32
 	WaitForSingleObject(m_ThreadID, INFINITE);
 #else
-	pthread_join(m_ThreadID, NULL);
-#endif
-
+	pthread_join(m_ThreadID, NULL);	
+#endif 
+	
 }
 
 int CThreadObj::Kill()
@@ -133,7 +135,7 @@ int CThreadObj::Kill()
 #else
 	pthread_cancel(m_ThreadID);
 #endif
-
+	
 	m_ThreadID = 0;
 	m_bIsRunning = false;
 	m_muxRunning.UnLock();
@@ -160,7 +162,7 @@ void* CThreadObj::ThreadImp()
 {
 	return m_pCallbackFuncObj->GetCallbackFunc()(m_pCallbackFuncObj->GetCallbackParam());
 }
-
+	
 #ifdef WIN32
 DWORD CThreadObj::ThreadEntry( LPVOID param )
 #else
@@ -181,7 +183,7 @@ void* CThreadObj::ThreadEntry(void* param)
 	pThis->m_muxContinue.UnLock();
 
 	pRet = pThis->ThreadImp();
-
+		
 	pThis->m_muxRunning.Lock();
 	pThis->m_bIsRunning = false;
 	pThis->m_ThreadID = 0;
@@ -189,4 +191,11 @@ void* CThreadObj::ThreadEntry(void* param)
 
 	return 0;
 }
+
+
+
+
+
+
+	
 

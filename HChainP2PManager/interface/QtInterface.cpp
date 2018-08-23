@@ -1,23 +1,23 @@
-﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 
 #include "stdio.h"
@@ -38,7 +38,9 @@
 #include <string>
 #endif
 
+#include <QtCore>
 #include <QCryptographicHash>
+
 
 uint64 gStartTime = time(NULL);
 
@@ -49,18 +51,13 @@ uint16 g_csvfileNum;
 
 void analysisCsvTest(string ip)
 {
-
-	{
-
-	}
-
 	uint64 blockNum = 0;
 	while (1)
 	{
-		for (int i = 0; i <= 10; i++)
+		for (int i = 0; i <= 2; i++)
 		{
 			uint16 listNum = gP2PManager.GetPoeRecordListNum();
-			if (listNum > 10)
+			if (listNum > 2)
 			{
 				SLEEP(1.5 * 60 * 1000);
 				continue;
@@ -83,6 +80,7 @@ void analysisCsvTest(string ip)
 
 			QString str512 = QString("%1%2%3%4").arg(s1).arg(s2).arg(s3).arg(s4);
 			QByteArray ba = str512.toLatin1();
+
 			char *testBuf = ba.data();
 
 			char tempbuf[64] = { 0 };
@@ -134,21 +132,17 @@ void GetHyperBlockNumInfoFromLocal()
 	gP2PManager.GetHyperBlockNumInfoFromLocal();
 }
 
-string Upqueue(string hash)
+string Upqueue(string strfilename, string strfilehash, string strcustomInfo, string strrightowner)
 {
 
 	{
 		int randNum = rand() % 150;
 
-		{
-
-			{
-
 				TEVIDENCEINFO FileInfo;
-				FileInfo.cFileName = "uyoo";
-				FileInfo.cFileHash = hash.c_str();
-				FileInfo.cCustomInfo = "";
-				FileInfo.cRightOwner = "";
+				FileInfo.cFileName = strfilename;
+				FileInfo.cFileHash = strfilehash;
+				FileInfo.cCustomInfo = strcustomInfo;
+				FileInfo.cRightOwner = strrightowner;
 
 				FileInfo.tRegisTime = time(NULL);
 				FileInfo.iFileState = 0;
@@ -162,24 +156,57 @@ string Upqueue(string hash)
 
 				gP2PManager.AddNewBlock(FileInfo, line);
 				return line;
-
 			}
 		}
 
 	}
 
 }
+
+
+void UpqueueEx(string strfilename, string strfilehash, string strcustomInfo, string strrightowner, vector<string>& out_vc)
+{
+	int randNum = rand() % 150;
+
+	TEVIDENCEINFO FileInfo;
+	FileInfo.cFileName = strfilename;
+	FileInfo.cFileHash = strfilehash;
+	FileInfo.cCustomInfo = strcustomInfo;
+	FileInfo.cRightOwner = strrightowner;
+
+	FileInfo.tRegisTime = time(NULL);
+	FileInfo.iFileState = 0;
+	FileInfo.iFileSize = 1024;
+
+	string localhash;
+	string ctime;
+	char line[512] = { 0 };
+	time_t tempTime = time(NULL);
+	struct tm * t;
+	t = localtime(&tempTime);
+	sprintf(line, "%d-%d-%d-%d:%d:%d--%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, randNum);
+	
+
+	gP2PManager.AddNewBlockEx(FileInfo, line, localhash, ctime);
+
+	out_vc.push_back(line);
+	out_vc.push_back(localhash);
+	out_vc.push_back(ctime);
+}
+
 void runP2P(int argc, char *argv[])
 {
 	if (!CCommonStruct::ReadConfig())
-		return ;
+		return;
 
 	string strLogFile = g_confFile.strLogDir;
 	strLogFile += "hyperchain_p2p.log";
 	g_pLogHelper = open_logfile(strLogFile.c_str());
 
+	log_info(g_pLogHelper, "hyperBlock P2P start......");
 
 	string ipTemp = CCommonStruct::GetLocalIp();
+
 
 	gP2PManager.Init();
 	gP2PManager.Start();
@@ -192,7 +219,6 @@ uint64 GetLocalLatestBlockNo()
 }
 
 uint64 GetLatestHyperBlockNo()
-
 {
 	return gP2PManager.GetLatestHyperBlockNo();
 }
@@ -224,7 +250,6 @@ uint16 GetHaveConfirmChainNum()
 
 uint64 GetTimeOfConsensus()
 {
-
 	return gP2PManager.GetElaspedTimeOfCurrentConsensus();
 }
 uint64 GetStartTimeOfCurrentConsensus()
@@ -241,6 +266,8 @@ VEC_T_NODEINFO GetOtherLocalChain(uint16 chainNum)
 {
 	return gP2PManager.GetOtherLocalChain(chainNum);
 }
+
+
 
 uint32 GetBetterNodeNum()
 {
@@ -261,6 +288,7 @@ uint32 GetDownNodeNum()
 {
 	return gP2PManager.GetOfflineNodeNum();
 }
+
 
 uint32 GetSendRegisReqNum(uint16 regisReq)
 {
@@ -325,13 +353,14 @@ void SetFilePoeRecord(P_TEVIDENCEINFO pSetInfo)
 	t.detach();
 }
 
+
 bool VerifyPoeRecord(string &checkFileHash, P_TEVIDENCEINFO pCheckInfo)
 {
 	return gP2PManager.VerifyPoeRecord(checkFileHash, pCheckInfo);
 }
 
 uint64 GetConnNodesNum()
-{
+{//todo:
 	return GetAllConnectedNodes();
 }
 
@@ -429,7 +458,7 @@ json::value QueryByWeb(uint64 blockNum)
 
 void GetChainData(string &chainData)
 {
-    chainData = gP2PManager.GetChainData();
+	chainData = gP2PManager.GetChainData();
 }
 
 uint64 GetPoeReqTotalNum()
@@ -467,6 +496,7 @@ void setNotify(QtNotify * qnotify)
 	gP2PManager.SetQtNotify(qnotify);
 }
 
+
 uint16 GetPoeRecordListNum()
 {
 	return gP2PManager.GetPoeRecordListNum();
@@ -490,7 +520,7 @@ void GetNodeRunTimeEnv(string &version, string &netType, string &protocolVersion
 	protocolVersion = "V1.0";
 }
 
-uint16 GetStateOfCurrentConsensus(uint64 &blockNo,uint16 &blockNum, uint16 &chainNum)
+uint16 GetStateOfCurrentConsensus(uint64 &blockNo, uint16 &blockNum, uint16 &chainNum)
 {
 	return gP2PManager.GetStateOfCurrentConsensus(blockNo, blockNum, chainNum);
 }

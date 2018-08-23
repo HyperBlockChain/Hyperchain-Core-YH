@@ -1,23 +1,23 @@
-﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 
 #ifndef __UDP_SOCKET_H__
@@ -32,13 +32,13 @@
 #include <winsock2.h>
 #endif
 
-#define MAX_RECV_BUF_SIZE (1024*16)
+#define MAX_RECV_BUF_SIZE 1024*16
 #define MAX_BUF_LEN (1024 * 32)
-#define MAX_RECV_LIST_COUNT (20000)
-#define MAX_INTER_FACES (16)
-#define MAX_CRC_LEN (16)
-#define CURRENT_VERSION ('1')
-#define MAX_LIST_NUM (4294967295)
+#define MAX_RECV_LIST_COUNT 20000
+#define MAX_INTER_FACES 16
+#define MAX_CRC_LEN 16
+#define CURRENT_VERSION '1'
+#define MAX_LIST_NUM 4294967295
 #define UDP_INIT_FLAG (123456)
 #define UDP_INIT_PAKTYPE ('1')
 #define UDP_ACK_PAKTYPE  ('2')
@@ -67,7 +67,7 @@ typedef struct _ttestdata
 	unsigned int   usSendListCount;
 	unsigned short usFastTime;
 	unsigned short usSlowTime;
-	unsigned short usRecvListNum;
+	unsigned short usRecvListNum;	
 
 	_ttestdata()
 	{
@@ -113,7 +113,7 @@ typedef struct _tsendnode
 	 char 						*sendBuf;
 
 	 uint64						uiLastSendTime;
-	 unsigned short				usFlag;
+	 unsigned short				usFlag;	 
 }T_SENDNODE, *T_PSENDNODE;
 
 typedef struct _tuuseehead
@@ -123,7 +123,7 @@ typedef struct _tuuseehead
 	 unsigned int   uiSendBufCrc;
      unsigned int  	uiBufLen;
 	 char		  	PackType;
-	 char			Version;
+	 char			Version; 
 }T_UUSEEHEAD, *T_PUUSEEHEAD;
 
 #pragma pack()
@@ -140,7 +140,7 @@ typedef MAP_T_PSENDNODE::iterator    ITR_MAP_T_PSENDNODE;
 class CUdpSocket
 {
 public:
-
+	
 	CUdpSocket();
 	virtual ~CUdpSocket();
 
@@ -176,7 +176,7 @@ private:
 	void SendAgain();
 	static void THREAD_API RecvDataEntry(void* pParam);
 	static void THREAD_API SendAgainEntry(void* pParam);
-
+	
 	string			GetLocalIp(int fd, const string& eth);
 	void 			OupPutTestData();
 	string			SetNetNum(string netSize, uint64 recvNum);
@@ -191,11 +191,10 @@ private:
 	int						m_listenFd;
 #endif
 	LIST_T_SENDNODE			m_recvList;
-	LIST_T_PSENDNODE		m_sendList;
-	MAP_T_PSENDNODE			m_sendMap;
+	LIST_T_PSENDNODE		m_sendList;	
+	MAP_T_PSENDNODE			m_sendMap;  
 	CMutexObj				m_recvListLock;
 	CMutexObj				m_sendMapLock;
-
 	int						m_networkCardNum;
 	T_TESTDATA				m_testData;
 	T_TESTDATA				m_GetData;
@@ -209,4 +208,5 @@ private:
 	uint64					m_netRateSend;
 };
 
-#endif
+
+#endif 

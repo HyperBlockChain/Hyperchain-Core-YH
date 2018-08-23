@@ -1,41 +1,45 @@
-﻿/*copyright 2016-2018 hyperchain.net (Hyperchain)
-/*
-/*Distributed under the MIT software license, see the accompanying
-/*file COPYING or https://opensource.org/licenses/MIT。
-/*
-/*Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-/*software and associated documentation files (the "Software"), to deal in the Software
-/*without restriction, including without limitation the rights to use, copy, modify, merge,
-/*publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-/*to whom the Software is furnished to do so, subject to the following conditions:
-/*
-/*The above copyright notice and this permission notice shall be included in all copies or
-/*substantial portions of the Software.
-/*
-/*THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-/*INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-/*PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
-/*FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-/*OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-/*DEALINGS IN THE SOFTWARE.
+﻿/*Copyright 2016-2018 hyperchain.net (Hyperchain)
+
+Distributed under the MIT software license, see the accompanying
+file COPYING or https://opensource.org/licenses/MIT.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
 */
 #include "udpsocket.h"
 #define SEND_TIMES (5)
+
+
 CUdpSocket::CUdpSocket()
 {
 	m_packetNum = 0;
 	m_localIp = NULL;
-	m_localPort = 0;
+	m_localPort = 0;   
 	m_listenFd = -1;
 	m_bUsed = false;
 
+	//socket
 #ifdef WIN32
 	WSADATA wsaData;
-	WORD sockVersion = MAKEWORD(2, 2);
+	WORD sockVersion = MAKEWORD(2, 2);  
 
-	if (WSAStartup(sockVersion, &wsaData) != 0)
-
+	if (WSAStartup(sockVersion, &wsaData) != 0)  
+												 
 	{
+		log_info(g_pLogHelper, "CUdpSocket::load ws2_32.dll failed...");
 		END_THREAD();
 		THREAD_EXIT;
 	}
@@ -50,13 +54,16 @@ CUdpSocket::~CUdpSocket()
 	m_localPort = 0;
 	m_listenFd = -1;
 #ifdef WIN32
-	WSACleanup();
+	WSACleanup();  
 #endif
+
+
 
 }
 
 int CUdpSocket::Init(const char* localIp, unsigned int localPort)
 {
+	log_info(g_pLogHelper, "CUdpSocket::Init IN...");
 	m_localIp = localIp;
 	m_localPort = localPort;
 
@@ -64,17 +71,17 @@ int CUdpSocket::Init(const char* localIp, unsigned int localPort)
 	BEGIN_THREAD(thread1, SendAgainEntry, this);
 	SLEEP(1*1000);
 	BEGIN_THREAD(thread1, RecvDataEntry, this);
-
-	return 1;
+	
+	return 1;	
 }
 
 void THREAD_API CUdpSocket::RecvDataEntry(void* pParam)
-{
+{        
 	CUdpSocket* pThis = static_cast<CUdpSocket*>(pParam);
 	if(NULL != pThis)
 		pThis->RecvData();
 
-}
+} 
 
 void THREAD_API CUdpSocket::SendAgainEntry(void* pParam)
 {
@@ -116,18 +123,17 @@ void CUdpSocket::RecvData()
 		THREAD_EXIT;
 	}
 
-	this->m_listenFd = socket(AF_INET, SOCK_DGRAM, 0);
-
+	this->m_listenFd = socket(AF_INET, SOCK_DGRAM, 0);		
+	
 #ifdef WIN32
 	if (this->m_listenFd == SOCKET_ERROR || this->m_listenFd == INVALID_SOCKET)
 #else
 	if (this->m_listenFd == -1)
-#endif
+#endif 
 	{
 		log_err(g_pLogHelper, "(US::RecvData) recv socket create failed(%s)\n", strerror(errno));
 		delete [] recvBuf;
 		recvBuf = NULL;
-
 		END_THREAD();
 		THREAD_EXIT;
 	}
@@ -156,7 +162,6 @@ void CUdpSocket::RecvData()
 		this->m_listenFd = -1;
 		delete [] recvBuf;
 		recvBuf = NULL;
-
 		END_THREAD();
 		THREAD_EXIT;
 	}
@@ -165,7 +170,6 @@ void CUdpSocket::RecvData()
 	CCommonStruct::gettimeofday_update(&tvStart);
 	while (1)
 	{
-
 		fd_set fd;
 		FD_ZERO(&fd);
 		FD_SET(this->m_listenFd, &fd);
@@ -174,10 +178,8 @@ void CUdpSocket::RecvData()
 		timeOut.tv_usec = 0;
 
 		int sleret = select(this->m_listenFd + 1, &fd, NULL, NULL, &timeOut);
-
 		if (sleret == 0)
 		{
-
 			continue;
 		}
 		else if (sleret < 0)
@@ -185,7 +187,6 @@ void CUdpSocket::RecvData()
 			log_err(g_pLogHelper, "(US::RecvData) select error(%s)", strerror(errno));
 			delete[] recvBuf;
 			recvBuf = NULL;
-
 			END_THREAD();
 			THREAD_EXIT;
 		}
@@ -205,12 +206,10 @@ void CUdpSocket::RecvData()
 
 			if (recvNum == -1)
 			{
-
 				continue;
 			}
 			else if (recvNum == 0)
 			{
-
 				continue;
 			}
 
@@ -224,29 +223,24 @@ void CUdpSocket::RecvData()
 				m_netRateRecv = m_netRecvTemp / 60;
 				m_netRecvTemp = 0;
 			}
-
 			if (((T_PUUSEEHEAD)recvBuf)->uiUuseeFlag != UDP_INIT_FLAG)
 			{
-
 				continue;
 			}
 
 			if (((T_PUUSEEHEAD)recvBuf)->Version > CURRENT_VERSION)
 			{
-
 				continue;
 			}
 
 			if (((T_PUUSEEHEAD)recvBuf)->PackType == UDP_INIT_PAKTYPE)
 			{
-
 				this->m_testData.usRecvRspNum++;
 				this->m_recvListLock.Lock();
 				unsigned short usRecvNum = this->m_recvList.size();
 				this->m_testData.usRecvListNum = usRecvNum;
 				if (usRecvNum > MAX_RECV_LIST_COUNT)
 				{
-
 					this->m_recvListLock.UnLock();
 
 					continue;
@@ -267,11 +261,9 @@ void CUdpSocket::RecvData()
 					int sendNum = sendto(this->m_listenFd, ackBuf, acklen, 0, (struct sockaddr*)&fromAdd, fromLen);
 					if (sendNum == -1)
 					{
-
 					}
 					else if (sendNum > 0)
 					{
-
 						this->m_testData.usSendRspAckNum++;
 					}
 
@@ -291,25 +283,20 @@ void CUdpSocket::RecvData()
 				}
 				else
 				{
-
 				}
 			}
 			else if (((T_PUUSEEHEAD)recvBuf)->PackType == UDP_ACK_PAKTYPE)
 			{
-
 				this->m_sendMapLock.Lock();
 				this->m_testData.usRecvReqAckNum++;
 
 				ITR_MAP_T_PSENDNODE iter = this->m_sendMap.find(((T_PUUSEEHEAD)recvBuf)->usPackNum);
 				if (iter != this->m_sendMap.end())
 				{
-
 					(iter->second)->usFlag = ACK_FALG;
 
 					struct timeval tempTime;
-
 					uint64 lastTime = (iter->second)->uiLastSendTime;
-				//	gettimeofday(&tempTime, NULL);
 					CCommonStruct::gettimeofday_update(&tempTime);
 					unsigned int useTime = ((tempTime.tv_sec * 1000) + (tempTime.tv_usec / 1000)) - lastTime;
 					if (useTime < this->m_testData.usFastTime)
@@ -328,7 +315,7 @@ void CUdpSocket::RecvData()
 		}
 	}
 	delete []recvBuf;
-	recvBuf = NULL;
+	recvBuf = NULL;	
 }
 
 string CUdpSocket::SetNetNum(string netSize, uint64 recvNum)
@@ -339,7 +326,6 @@ string CUdpSocket::SetNetNum(string netSize, uint64 recvNum)
 
 	char buf[16];
 	memset(buf, 0, 16);
-
 	retNum = atof(strTemp.substr(0, len - 1).c_str());
 
 	if (strTemp[len] == 'B')
@@ -363,7 +349,7 @@ string CUdpSocket::SetNetNum(string netSize, uint64 recvNum)
 	}
 
 	retNum += recvNum;
-
+	
 	memset(buf, 0, 16);
 	if (strTemp[len] == 'B')
 	{
@@ -421,7 +407,6 @@ void CUdpSocket::SendAgain()
 		this->m_sendMapLock.Lock();
 		if(this->m_sendList.empty())
 		{
-
 			this->m_sendMapLock.UnLock();
 			SLEEP(5);
 			continue;
@@ -449,10 +434,9 @@ void CUdpSocket::SendAgain()
 				testIp.s_addr = (*iter)->uiIp;
 				unsigned int uiTempPack = ((T_PUUSEEHEAD)((*iter)->sendBuf))->usPackNum;
 
-				bool bFlag = false;
+				bool bFlag = false;	
 				if((*iter)->usFlag == ACK_FALG)
-				{
-
+				{			
 					bFlag = true;
 				}
 
@@ -461,10 +445,9 @@ void CUdpSocket::SendAgain()
 					if ((*iter)->uiRetryTimes >= SEND_TIMES)
 					{
 						this->m_testData.usSendFailed ++;
-
 					}
 				}
-
+				
 				ITR_MAP_T_PSENDNODE iter_map;
 				iter_map = this->m_sendMap.find(uiTempPack);
 				if(iter_map != this->m_sendMap.end())
@@ -478,13 +461,14 @@ void CUdpSocket::SendAgain()
 				}
 				else
 				{
+					log_info(g_pLogHelper, "ERROR:not find %d", uiTempPack);
 				}
-
+				
 				if((*iter)->sendBuf != NULL)
 				{
 					delete [](*iter)->sendBuf;
 					(*iter)->sendBuf = NULL;
-				}
+				}	
 				if((*iter) != NULL)
 				{
 					delete (*iter);
@@ -492,25 +476,22 @@ void CUdpSocket::SendAgain()
 				}
 				iter = this->m_sendList.erase(iter);
 
-				continue;
+
+				continue; 
 			}
 
 			CCommonStruct::gettimeofday_update(&tmNow);
-
 			unsigned int intervalTime = ((tmNow.tv_sec) * 1000 + (tmNow.tv_usec) / 1000) - (*iter)->uiLastSendTime;
 			if(((*iter)->uiRetryTimes == 0) || (intervalTime > 200))
-			{
+			{	
 				this->m_testData.usActualSendReqNum ++;
-
 				this->m_testData.usSendListCount = this->m_sendMap.size();
 				if((*iter)->uiRetryTimes == 0)
 				{
-
 				}
 				else if((*iter)->uiRetryTimes > 0)
 				{
 					this->m_testData.usRetryTimes ++;
-
 				}
 
 				struct sockaddr_in serverAdd;
@@ -521,16 +502,13 @@ void CUdpSocket::SendAgain()
 
 				if(this->m_listenFd == -1)
 				{
-
 					iter ++;
 					continue;
 				}
 
 				int sedNum = sendto(this->m_listenFd, (*iter)->sendBuf, (*iter)->uiSendLen, 0, (struct sockaddr*)&serverAdd, sizeof(serverAdd));
-
 				if(sedNum < 0)
 				{
-
 					iter ++;
 					continue;
 				}
@@ -545,13 +523,12 @@ void CUdpSocket::SendAgain()
 					m_netRateSend = m_netSendTemp / 60;
 					m_netSendTemp = 0;
 				}
-
+				
 				CCommonStruct::gettimeofday_update(&tmTemp);
-
 				(*iter)->uiLastSendTime = tmTemp.tv_sec * 1000 + tmTemp.tv_usec/1000;
 				(*iter)->uiRetryTimes ++;
 
-				this->m_sendList.push_back(*iter);
+				this->m_sendList.push_back(*iter);		
 				iter = this->m_sendList.erase(iter);
 
 				tempNum ++;
@@ -575,10 +552,10 @@ void CUdpSocket::SendAgain()
 			this->m_testData.usInsertSendListNum = 0;
 			this->m_testData.usRetryTimes = 0;
 			this->m_testData.usActualSendReqNum = 0;
-			this->m_testData.usRecvReqAckNum = 0;
-			this->m_testData.usRecvRspNum = 0;
+			this->m_testData.usRecvReqAckNum = 0; 
+			this->m_testData.usRecvRspNum = 0; 
 			this->m_testData.usSendRspAckNum = 0;
-			this->m_testData.usSendFailed = 0;
+			this->m_testData.usSendFailed = 0; 
 			this->m_testData.usSendListCount = 0;
 			this->m_testData.usFastTime = 100;
 			this->m_testData.usSlowTime = 0;
@@ -587,9 +564,9 @@ void CUdpSocket::SendAgain()
 			bOutPutFlag = true;
 		}
 		this->m_sendMapLock.UnLock();
-
 	}
 }
+
 
 int CUdpSocket::Send(unsigned int ip, unsigned short port, const char* buf, unsigned int len)
 {
@@ -597,9 +574,9 @@ int CUdpSocket::Send(unsigned int ip, unsigned short port, const char* buf, unsi
 	m_sendMapLock.Lock();
 
 	T_UUSEEHEAD tUuseeHead;
-	tUuseeHead.uiUuseeFlag	  = UDP_INIT_FLAG;
-	tUuseeHead.Version		  = CURRENT_VERSION;
-	tUuseeHead.PackType		  = UDP_INIT_PAKTYPE;
+	tUuseeHead.uiUuseeFlag = UDP_INIT_FLAG;
+	tUuseeHead.Version = CURRENT_VERSION;//current version = 1
+	tUuseeHead.PackType = UDP_INIT_PAKTYPE;
 	tUuseeHead.usPackNum      = m_packetNum;
 	tUuseeHead.uiBufLen       = len;
 	tUuseeHead.uiSendBufCrc   = crc32buf((char*)buf, len);
@@ -615,15 +592,14 @@ int CUdpSocket::Send(unsigned int ip, unsigned short port, const char* buf, unsi
 	tpSendNode->usPort 		= htons(port);
 	tpSendNode->uiSendLen		= sizeof(T_UUSEEHEAD) + len;
 	tpSendNode->uiRetryTimes  = 0;
-
 	struct timeval timeTemp;
 	CCommonStruct::gettimeofday_update(&timeTemp);
 	tpSendNode->uiLastSendTime = timeTemp.tv_sec * 1000 + timeTemp.tv_usec / 1000;
-
 	m_sendList.push_front(tpSendNode);
 	ITR_MAP_T_PSENDNODE iter = m_sendMap.find(m_packetNum);
 	if(iter != m_sendMap.end())
 	{
+		log_info(g_pLogHelper, "ERROR:%d had exist.....", m_packetNum);
 	}
 	m_sendMap[m_packetNum] = tpSendNode;
 
@@ -640,32 +616,33 @@ int CUdpSocket::Recv(unsigned int &ip, unsigned short &port, char* buf, unsigned
 
 	m_recvListLock.Lock();
 	if(m_recvList.empty())
-	{
-		m_recvListLock.UnLock();
+	{   
+		m_recvListLock.UnLock();    
 		return nRet;
-	}
+	}   
 
 	T_SENDNODE sendNode;
 	sendNode = m_recvList.front();
 	ip = sendNode.uiIp;
 	port = sendNode.usPort;
 	if(len < sendNode.uiSendLen)
-	{
+	{   
 		nRet =  RECV_BUF_NOT_ENOUGH;
-	}
+		log_info(g_pLogHelper, "(CUdpSocket::Recv) the buf len not enough....");
+	}   
 	else
-	{
+	{   
 		memcpy(buf, sendNode.sendBuf, sendNode.uiSendLen);
 		nRet = RECV_SUCCESS;
-	}
+	}   
 
 	len = sendNode.uiSendLen;
 
 	if(sendNode.sendBuf != NULL)
-	{
+	{   
 		delete [] sendNode.sendBuf;
 		sendNode.sendBuf = NULL;
-	}
+	}   
 	m_recvList.pop_front();
 	m_recvListLock.UnLock();
 
@@ -675,9 +652,7 @@ int CUdpSocket::Recv(unsigned int &ip, unsigned short &port, char* buf, unsigned
 unsigned int CUdpSocket::GetSendListNum()
 {
 	m_sendMapLock.Lock();
-
 	unsigned int mapRet = m_sendMap.size();
 	m_sendMapLock.UnLock();
-
 	return mapRet;
 }
